@@ -276,8 +276,12 @@ export const AssistantSettingsProvider = ({
 
   const refreshFromStorage = useCallback(() => {
     (async () => {
-      const s = await readStoredSettings();
-      setSettings(s);
+      try {
+        const s = await readStoredSettings();
+        setSettings(s);
+      } catch (error) {
+        console.error("Failed to refresh settings from storage:", error);
+      }
     })();
   }, []);
 
