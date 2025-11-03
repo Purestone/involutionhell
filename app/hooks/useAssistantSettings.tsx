@@ -98,7 +98,7 @@ async function encryptIfNeeded(
 ): Promise<string> {
   if (!passphrase || typeof window === "undefined" || !window.crypto?.subtle) {
     // 无口令或非浏览器环境：明文存储（兼容旧数据）
-    console.error(
+    console.warn(
       "Cannot encrypt assistant setting: missing passphrase or unsupported environment",
     );
     return plain;
