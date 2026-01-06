@@ -132,6 +132,34 @@ export default function RootLayout({
         `,
           }}
         />
+        {/* 主题脚本：避免首屏闪烁 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (() => {
+                try {
+                  const storageKey = "ih-theme";
+                  const root = document.documentElement;
+                  const stored = localStorage.getItem(storageKey);
+                  const theme = stored || "dark";
+                  root.classList.remove("light", "dark");
+
+                  if (theme === "system") {
+                    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+                      ? "dark"
+                      : "light";
+                    root.classList.add(systemTheme);
+                    return;
+                  }
+
+                  root.classList.add(theme);
+                } catch {
+                  // Ignore storage access errors to avoid blocking render.
+                }
+              })();
+            `,
+          }}
+        />
         {/* 预连接：缩短关键请求链 */}
         <link rel="preconnect" href="https://www.google-analytics.com" />
         {/* Preload the decorative sky texture so the LCP background image is discovered immediately */}
