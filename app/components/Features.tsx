@@ -1,9 +1,16 @@
 import React from "react";
 import { Users, Zap, Heart } from "lucide-react";
 import { Github as GithubIcon } from "./icons/Github";
+import { cn } from "@/lib/utils";
 
 export function Features() {
-  const features = [
+  const features: {
+    icon: React.ReactElement<{ className?: string }>;
+    title: string;
+    description: string;
+    highlight: string;
+    color: string;
+  }[] = [
     {
       icon: <GithubIcon className="h-8 w-8 text-sky-500" />,
       title: "完全开源",
@@ -64,8 +71,8 @@ export function Features() {
                   <div className="w-16 h-16 border border-[var(--foreground)] flex items-center justify-center group-hover:bg-[var(--foreground)] group-hover:text-[var(--background)] transition-all duration-300">
                     {/* Simplified icon styling */}
                     <div className="p-0 text-[var(--foreground)] group-hover:text-[var(--background)]">
-                      {React.cloneElement(feature.icon as React.ReactElement, {
-                        className: "h-8 w-8",
+                      {React.cloneElement(feature.icon, {
+                        className: cn("h-8 w-8", feature.icon.props.className),
                       })}
                     </div>
                   </div>
