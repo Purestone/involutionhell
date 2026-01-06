@@ -170,7 +170,7 @@ export function Contribute() {
           >
             <span className="relative z-10 flex items-center gap-4">
               <Sparkles className="h-6 w-6" />
-              <span>Submit Contribution</span>
+              <span>Submit Contribution / 投稿 </span>
             </span>
           </Button>
         </DialogTrigger>

@@ -60,7 +60,7 @@ export function Hero() {
           </div>
 
           <div className="lg:col-span-4 flex flex-col gap-8">
-            <div className="border border-[var(--foreground)] p-1 grayscale hover:grayscale-0 transition-all duration-500 bg-[var(--background)]">
+            <div className="border border-[var(--foreground)] p-1 grayscale hover:grayscale-0 dark:grayscale-0 dark:hover:grayscale transition-all duration-500 bg-[var(--background)]">
               <Image
                 src="/mascot.webp"
                 alt="Mascot"
@@ -80,9 +80,11 @@ export function Hero() {
                 Connect with thousands of developers who are reclaiming their
                 passion for technology.
               </p>
-              <button className="w-full py-3 border border-[var(--background)] font-sans text-xs uppercase tracking-widest hover:bg-[var(--background)] hover:text-[var(--foreground)] transition-all">
-                Access Archives
-              </button>
+              <Link href="/docs/ai" className="block w-full">
+                <button className="w-full py-3 border border-[var(--background)] font-sans text-xs uppercase tracking-widest hover:bg-[var(--background)] hover:text-[var(--foreground)] transition-all cursor-pointer">
+                  Access Archives
+                </button>
+              </Link>
             </div>
           </div>
         </div>

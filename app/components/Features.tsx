@@ -86,12 +86,6 @@ export function Features() {
                 <p className="font-body text-neutral-600 dark:text-neutral-400 leading-relaxed text-justify">
                   {feature.description}
                 </p>
-
-                <div className="mt-8 pt-6 border-t border-dashed border-neutral-300 dark:border-neutral-700 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="font-sans text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]">
-                    Learn More &rarr;
-                  </span>
-                </div>
               </div>
             </div>
           ))}
