@@ -5,121 +5,140 @@ import { LicenseNotice } from "./LicenseNotice";
 
 export function Footer() {
   return (
-    <footer id="contact" className="border-t border-border">
-      <div className="container mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer
+      id="contact"
+      className="border-t-4 border-[#111111] bg-[#F9F9F7] newsprint-texture"
+    >
+      <div className="container mx-auto px-6 py-24">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           {/* Brand */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-5 border-r border-[#111111] pr-12">
             <BrandMark
-              className="mb-4 gap-3"
-              textClassName="font-bold text-xl"
+              className="mb-6 gap-3"
+              textClassName="font-serif font-black text-2xl uppercase italic"
             />
-            <p className="text-muted-foreground mb-6 max-w-md">
-              一个由开发者自发组织的、完全免费且开放的学习社区。让每个人都能在轻松氛围下成长。
+            <p className="font-body text-neutral-600 mb-8 max-w-md text-justify leading-relaxed">
+              一个由开发者自发组织的、完全免费且开放的学习社区。我们相信通过集体协作与开放共享，可以打破技术垄断，创造一个更公平的学习环境。
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-2">
               <a
                 href="https://github.com/involutionhell"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="访问 Involution Hell 的 GitHub"
-                title="访问 GitHub"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-card border border-border hover:bg-accent hover:scale-110 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="w-12 h-12 flex items-center justify-center border border-[#111111] hover:bg-[#111111] hover:text-white transition-all"
               >
-                <Github className="h-5 w-5" aria-hidden="true" />
-                <span className="sr-only">访问 GitHub</span>
+                <Github className="h-5 w-5" />
               </a>
               <a
                 href="https://discord.com/invite/6CGP73ZWbD"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="加入 Discord 社区"
-                title="加入 Discord"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-card border border-border hover:bg-accent hover:scale-110 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="w-12 h-12 flex items-center justify-center border border-[#111111] hover:bg-[#111111] hover:text-white transition-all"
               >
-                <MessageCircle className="h-5 w-5" aria-hidden="true" />
-                <span className="sr-only">加入 Discord 社区</span>
+                <MessageCircle className="h-5 w-5" />
               </a>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-semibold mb-4">快速链接</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/docs/ai"
-                  className="text-muted-foreground hover:text-foreground transition-colors flex items-center"
-                >
-                  知识库
-                  <ExternalLink className="ml-1 h-3 w-3" aria-hidden="true" />
-                </Link>
-              </li>
-              <li>
-                <a
-                  href="#features"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  特点
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.zotero.org/groups/6053219/unsw_ai/library"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors flex items-center"
-                >
-                  文献资料库
-                  <ExternalLink className="ml-1 h-3 w-3" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#community"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  社区
-                </a>
-              </li>
-            </ul>
-          </div>
+          {/* Navigation */}
+          <div className="md:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="font-sans text-xs font-bold uppercase tracking-widest mb-6 border-b border-[#111111] pb-2">
+                Archives
+              </h3>
+              <ul className="space-y-3 font-body text-sm">
+                <li>
+                  <Link
+                    href="/docs/ai"
+                    className="hover:text-[#CC0000] transition-colors"
+                  >
+                    AI & Mathematics
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/docs/computer-science"
+                    className="hover:text-[#CC0000] transition-colors"
+                  >
+                    Computer Science
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/docs/CommunityShare"
+                    className="hover:text-[#CC0000] transition-colors"
+                  >
+                    Community Sharing
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/docs/jobs"
+                    className="hover:text-[#CC0000] transition-colors"
+                  >
+                    Career Prep
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="font-semibold mb-4">联系我们</h3>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="https://github.com/involutionhell/involutionhell/issues"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors flex items-center"
-                >
-                  提交 Issue
-                  <ExternalLink className="ml-1 h-3 w-3" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://discord.com/invite/6CGP73ZWbD"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors flex items-center"
-                >
-                  Discord 社区
-                  <ExternalLink className="ml-1 h-3 w-3" />
-                </a>
-              </li>
-            </ul>
+            <div>
+              <h3 className="font-sans text-xs font-bold uppercase tracking-widest mb-6 border-b border-[#111111] pb-2">
+                Resources
+              </h3>
+              <ul className="space-y-3 font-body text-sm">
+                <li>
+                  <a
+                    href="https://www.zotero.org/groups/6053219/unsw_ai/library"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#CC0000] transition-colors"
+                  >
+                    Zotero Library
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#features"
+                    className="hover:text-[#CC0000] transition-colors"
+                  >
+                    Mission Brief
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#community"
+                    className="hover:text-[#CC0000] transition-colors"
+                  >
+                    Network Status
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div className="col-span-2 md:col-span-1">
+              <h3 className="font-sans text-xs font-bold uppercase tracking-widest mb-6 border-b border-[#111111] pb-2">
+                Legal
+              </h3>
+              <div className="font-body text-xs text-neutral-500 leading-relaxed">
+                <p className="mb-4">Edition: Vol 1.0.0</p>
+                <p className="mb-4">Printed in the Cloud</p>
+                <LicenseNotice />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="border-t border-border mt-12 pt-8 text-center text-muted-foreground">
-          <p>完全开源，永远免费</p>
-          <LicenseNotice className="mt-2" />
+        {/* Bottom Bar */}
+        <div className="mt-24 pt-8 border-t border-[#111111] flex flex-col md:flex-row justify-between items-center gap-4 font-mono text-[10px] uppercase tracking-widest text-neutral-400">
+          <div>
+            &copy; {new Date().getFullYear()} Involution Hell Organization
+          </div>
+          <div className="flex gap-8">
+            <span>Open Source</span>
+            <span>Free Forever</span>
+            <span>All Rights Reserved</span>
+          </div>
         </div>
       </div>
     </footer>

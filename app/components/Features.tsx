@@ -1,5 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import React from "react";
 import { Users, Zap, Heart } from "lucide-react";
 import { Github as GithubIcon } from "./icons/Github";
 
@@ -40,47 +39,58 @@ export function Features() {
   ];
 
   return (
-    <section id="features" className="py-12">
+    <section id="features" className="py-24 border-t border-[#111111]">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-16">
-          <h3 className="text-3xl md:text-4xl font-bold mb-6">
-            <span className="bg-gradient-primary bg-clip-text text-transparent">
-              内卷地狱
-            </span>
-            想做什么{" "}
-          </h3>
-
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            我们致力于创造一个真正属于开发者的学习环境，让每个人都能在这里获得成长。
+        <div className="flex flex-col lg:flex-row gap-12 items-end mb-16 pb-8 border-b-4 border-[#111111]">
+          <h2 className="text-6xl md:text-8xl font-serif font-black italic uppercase leading-none tracking-tighter">
+            Mission <br /> Statement
+          </h2>
+          <p className="text-xl font-body text-neutral-600 max-w-2xl text-justify mb-2">
+            我们致力于创造一个真正属于开发者的学习环境，让每个人都能在这里获得成长。在这里，知识是流动的，门槛是不存在的，而内卷是被鄙视的。
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-l border-t border-[#111111]">
           {features.map((feature, index) => (
-            <Card
+            <div
               key={index}
-              className="relative overflow-hidden border-border bg-transparent shadow-none hover:shadow-elegant transition-all duration-500 hover:-translate-y-2 group"
+              className="group relative border-r border-b border-[#111111] p-12 hover:bg-neutral-100 transition-colors"
             >
-              <CardContent className="p-8">
-                <div className="flex items-start space-x-4">
-                  <div className="p-0">{feature.icon}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-xl font-semibold">{feature.title}</h3>
-                      <Badge variant="outline" className="text-xs">
-                        {feature.highlight}
-                      </Badge>
+              <div className="flex flex-col h-full">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="w-16 h-16 border border-[#111111] flex items-center justify-center group-hover:bg-[#111111] group-hover:text-white transition-all duration-300">
+                    {/* Simplified icon styling */}
+                    <div className="p-0 text-[#111111] group-hover:text-white">
+                      {React.cloneElement(feature.icon as React.ReactElement, {
+                        className: "h-8 w-8",
+                      })}
                     </div>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {feature.description}
-                    </p>
+                  </div>
+                  <div className="font-mono text-xs uppercase tracking-widest text-neutral-400">
+                    SEC. 0{index + 1}
                   </div>
                 </div>
 
-                {/* Hover effect decoration */}
-                <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
-              </CardContent>
-            </Card>
+                <div className="flex items-baseline gap-4 mb-4">
+                  <h3 className="text-3xl font-serif font-bold italic">
+                    {feature.title}
+                  </h3>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#CC0000] font-bold">
+                    {feature.highlight}
+                  </span>
+                </div>
+
+                <p className="font-body text-neutral-600 leading-relaxed text-justify">
+                  {feature.description}
+                </p>
+
+                <div className="mt-8 pt-6 border-t border-dashed border-neutral-300 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="font-sans text-[10px] font-bold uppercase tracking-widest text-[#111111]">
+                    Learn More &rarr;
+                  </span>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </div>

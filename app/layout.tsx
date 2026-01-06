@@ -125,6 +125,13 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=block');
+        `,
+          }}
+        />
         {/* 预连接：缩短关键请求链 */}
         <link rel="preconnect" href="https://www.google-analytics.com" />
         {/* Preload the decorative sky texture so the LCP background image is discovered immediately */}
@@ -160,10 +167,6 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* 全局装饰背景（不参与可访问性） */}
-        <div className="site-bg site-bg--sky" aria-hidden />
-        <div className="site-bg site-bg--stars" aria-hidden />
-
         <RootProvider
           search={{
             // 使用静态索引，兼容 next export 与本地开发

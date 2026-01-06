@@ -159,62 +159,18 @@ export function Contribute() {
           <Button
             variant="hero"
             size="lg"
-            className="relative isolate w-full sm:w-auto h-16 md:h-20 px-10 md:px-14 rounded-none
-                     text-lg md:text-2xl font-semibold tracking-wide overflow-hidden
-                     shadow-xl ring-1 ring-white/30 dark:ring-white/10
-                     bg-gradient-to-r from-sky-300 via-sky-400 to-blue-600
-                     dark:from-indigo-950 dark:via-slate-900 dark:to-black
-                     hover:shadow-[0_25px_60px_-12px] hover:scale-[1.03] transition-all duration-300 ease-out"
+            className="relative isolate w-full sm:w-auto h-20 px-14 rounded-none
+                     text-2xl font-serif font-black uppercase italic tracking-tighter
+                     bg-[#111111] text-[#F9F9F7] border border-[#111111]
+                     hover:bg-[#F9F9F7] hover:text-[#111111] transition-all duration-300"
             onClick={(event) => {
               event.preventDefault();
               router.push("/editor");
             }}
           >
-            {/* Day gradient shimmer */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -inset-1 opacity-30 blur-2xl transition-opacity duration-500
-                         bg-gradient-to-r from-sky-200 via-blue-300 to-sky-400 dark:opacity-0"
-            />
-            {/* Night nebula glow */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -inset-1 opacity-0 blur-2xl transition-opacity duration-500
-                         dark:opacity-25 dark:bg-gradient-to-br dark:from-indigo-800 dark:via-fuchsia-700/50 dark:to-blue-900"
-            />
-
-            {/* Day clouds */}
-            <span
-              aria-hidden
-              className={`absolute -left-12 top-1/3 w-48 h-24 rounded-full bg-white/60 blur-2xl dark:hidden ${styles.driftSlow}`}
-            />
-            <span
-              aria-hidden
-              className={`absolute left-1/3 -bottom-8 w-64 h-28 rounded-full bg-white/40 blur-3xl dark:hidden ${styles.driftFast}`}
-            />
-
-            {/* Night stars */}
-            <span aria-hidden className="hidden dark:block">
-              <span
-                className={`absolute left-6 top-3 w-1 h-1 rounded-full bg-white/90 ${styles.twinkle}`}
-              />
-              <span
-                className={`absolute left-1/3 top-2 w-1 h-1 rounded-full bg-white/80 ${styles.twinkleDelay1}`}
-              />
-              <span
-                className={`absolute left-2/3 top-5 w-1 h-1 rounded-full bg-white/70 ${styles.twinkleDelay2}`}
-              />
-              <span
-                className={`absolute right-8 top-4 w-1 h-1 rounded-full bg-white/90 ${styles.twinkleDelay3}`}
-              />
-              <span
-                className={`absolute right-1/4 bottom-3 w-1 h-1 rounded-full bg-white/80 ${styles.twinkle}`}
-              />
-            </span>
-
-            <span className="relative z-10 flex items-center gap-3 text-white">
-              <Sparkles className="h-6 w-6 opacity-95" />
-              <span className={styles.textGlow}>我要投稿</span>
+            <span className="relative z-10 flex items-center gap-4">
+              <Sparkles className="h-6 w-6" />
+              <span>Submit Contribution</span>
             </span>
           </Button>
         </DialogTrigger>
@@ -225,9 +181,9 @@ export function Contribute() {
           rel="noopener noreferrer"
           aria-label="查看投稿指南"
           title="查看投稿指南"
-          className="absolute top-0 right-0 flex h-11 w-11 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/80 bg-white text-sky-600 shadow-lg ring-1 ring-sky-400/60 transition-transform hover:-translate-y-1/2 hover:translate-x-1/2 hover:scale-105 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:border-slate-700 dark:bg-slate-900 dark:text-sky-300"
+          className="absolute top-0 right-0 flex h-10 w-10 translate-x-1/2 -translate-y-1/2 items-center justify-center border border-[#111111] bg-[#F9F9F7] text-[#111111] font-mono hover:bg-[#CC0000] hover:text-white transition-colors z-20"
         >
-          <span className="text-lg font-semibold">?</span>
+          <span className="text-sm font-bold">?</span>
           <span className="sr-only">查看投稿指南</span>
         </a>
       </div>
