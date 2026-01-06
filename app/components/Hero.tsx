@@ -44,7 +44,7 @@ export function Hero() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-8 border-r border-[var(--foreground)] pr-8 min-h-[400px] transition-colors duration-300">
-            <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-serif font-black leading-[0.85] tracking-tighter mb-8 uppercase italic text-[var(--foreground)]">
+            <h1 className="text-6xl md:text-8xl lg:text-[8rem] font-serif font-black leading-[0.85] tracking-tighter mb-8 uppercase italic text-[var(--foreground)]">
               Involution <br /> Hell
             </h1>
 
@@ -82,7 +82,7 @@ export function Hero() {
               </p>
               <Link href="/docs/ai" className="block w-full">
                 <button className="w-full py-3 border border-[var(--background)] font-sans text-xs uppercase tracking-widest hover:bg-[var(--background)] hover:text-[var(--foreground)] transition-all cursor-pointer">
-                  Access Archives
+                  Access Articles / 访问文章
                 </button>
               </Link>
             </div>

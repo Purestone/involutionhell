@@ -25,7 +25,7 @@ export function Community() {
           </div>
         </div>
 
-        {/* Main CTA Section - Inverted (Light Mode) / Normal (Dark Mode) 
+        {/* Main CTA Section - Inverted (Light Mode) / Normal (Dark Mode)
                 Design Decision: Keep high contrast.
                 Light Mode: Black Box, White Text.
                 Dark Mode: White Box, Black Text? Or Keep Black Box with White Border?
@@ -48,7 +48,8 @@ export function Community() {
               className="bg-transparent border-[var(--background)] text-[var(--background)] hover:bg-[var(--background)] hover:text-[var(--foreground)] px-12 py-8 h-auto font-sans text-sm uppercase tracking-widest font-bold"
             >
               <a href="docs/ai" target="_blank" rel="noopener noreferrer">
-                Access Archives <ExternalLink className="ml-4 h-5 w-5" />
+                Access Articles / 访问文章{" "}
+                <ExternalLink className="ml-4 h-5 w-5" />
               </a>
             </Button>
           </div>

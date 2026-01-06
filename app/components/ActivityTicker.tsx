@@ -27,6 +27,7 @@ export function ActivityTicker({ className }: ActivityTickerProps) {
   const events = rawEvents.slice(0, MAX_ITEMS);
   const animationDurationMs =
     configuredRotationIntervalMs * Math.max(events.length, 1);
+  const lastEventIndex = events.length - 1;
 
   if (events.length === 0) {
     return null;
@@ -41,9 +42,11 @@ export function ActivityTicker({ className }: ActivityTickerProps) {
       key={`${keyPrefix}-${event.name}-${idx}`}
       className="flex items-center gap-4 whitespace-nowrap"
     >
-      <span className="bg-[#CC0000] text-white px-2 py-0.5 font-mono text-[10px] uppercase tracking-tighter shrink-0">
-        Update
-      </span>
+      {idx === lastEventIndex ? (
+        <span className="bg-[#CC0000] text-white px-2 py-0.5 font-mono text-[10px] uppercase tracking-tighter shrink-0">
+          Update
+        </span>
+      ) : null}
       <a
         href={event.discord}
         target="_blank"

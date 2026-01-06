@@ -168,18 +168,18 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="site-bg site-bg--stars" aria-hidden />
-        <RootProvider
-          search={{
-            // 使用静态索引，兼容 next export 与本地开发
-            options: { type: "static", api: "/search.json" },
-          }}
-        >
-          <ThemeProvider defaultTheme="dark" storageKey="ih-theme">
+        <ThemeProvider defaultTheme="dark" storageKey="ih-theme">
+          <RootProvider
+            search={{
+              // 使用静态索引，兼容 next export 与本地开发
+              options: { type: "static", api: "/search.json" },
+            }}
+          >
             <main id="main-content" className="relative z-10">
               {children}
             </main>
-          </ThemeProvider>
-        </RootProvider>
+          </RootProvider>
+        </ThemeProvider>
         {/* 谷歌分析 */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-ED4GVN8YVW"
