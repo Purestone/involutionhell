@@ -7,17 +7,17 @@ export function Footer() {
   return (
     <footer
       id="contact"
-      className="border-t-4 border-[#111111] bg-[#F9F9F7] newsprint-texture"
+      className="border-t-4 border-[var(--foreground)] bg-[var(--background)] newsprint-texture transition-colors duration-300"
     >
       <div className="container mx-auto px-6 py-24">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           {/* Brand */}
-          <div className="md:col-span-5 border-r border-[#111111] pr-12">
+          <div className="md:col-span-5 border-r border-[var(--foreground)] pr-12 transition-colors duration-300">
             <BrandMark
               className="mb-6 gap-3"
-              textClassName="font-serif font-black text-2xl uppercase italic"
+              textClassName="font-serif font-black text-2xl uppercase italic text-[var(--foreground)]"
             />
-            <p className="font-body text-neutral-600 mb-8 max-w-md text-justify leading-relaxed">
+            <p className="font-body text-neutral-600 dark:text-neutral-400 mb-8 max-w-md text-justify leading-relaxed">
               一个由开发者自发组织的、完全免费且开放的学习社区。我们相信通过集体协作与开放共享，可以打破技术垄断，创造一个更公平的学习环境。
             </p>
             <div className="flex space-x-2">
@@ -25,7 +25,7 @@ export function Footer() {
                 href="https://github.com/involutionhell"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-12 h-12 flex items-center justify-center border border-[#111111] hover:bg-[#111111] hover:text-white transition-all"
+                className="w-12 h-12 flex items-center justify-center border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all text-[var(--foreground)]"
               >
                 <Github className="h-5 w-5" />
               </a>
@@ -33,7 +33,7 @@ export function Footer() {
                 href="https://discord.com/invite/6CGP73ZWbD"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-12 h-12 flex items-center justify-center border border-[#111111] hover:bg-[#111111] hover:text-white transition-all"
+                className="w-12 h-12 flex items-center justify-center border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all text-[var(--foreground)]"
               >
                 <MessageCircle className="h-5 w-5" />
               </a>
@@ -43,10 +43,10 @@ export function Footer() {
           {/* Navigation */}
           <div className="md:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="font-sans text-xs font-bold uppercase tracking-widest mb-6 border-b border-[#111111] pb-2">
+              <h3 className="font-sans text-xs font-bold uppercase tracking-widest mb-6 border-b border-[var(--foreground)] pb-2 text-[var(--foreground)]">
                 Archives
               </h3>
-              <ul className="space-y-3 font-body text-sm">
+              <ul className="space-y-3 font-body text-sm text-[var(--foreground)]">
                 <li>
                   <Link
                     href="/docs/ai"
@@ -83,10 +83,10 @@ export function Footer() {
             </div>
 
             <div>
-              <h3 className="font-sans text-xs font-bold uppercase tracking-widest mb-6 border-b border-[#111111] pb-2">
+              <h3 className="font-sans text-xs font-bold uppercase tracking-widest mb-6 border-b border-[var(--foreground)] pb-2 text-[var(--foreground)]">
                 Resources
               </h3>
-              <ul className="space-y-3 font-body text-sm">
+              <ul className="space-y-3 font-body text-sm text-[var(--foreground)]">
                 <li>
                   <a
                     href="https://www.zotero.org/groups/6053219/unsw_ai/library"
@@ -117,7 +117,7 @@ export function Footer() {
             </div>
 
             <div className="col-span-2 md:col-span-1">
-              <h3 className="font-sans text-xs font-bold uppercase tracking-widest mb-6 border-b border-[#111111] pb-2">
+              <h3 className="font-sans text-xs font-bold uppercase tracking-widest mb-6 border-b border-[var(--foreground)] pb-2 text-[var(--foreground)]">
                 Legal
               </h3>
               <div className="font-body text-xs text-neutral-500 leading-relaxed">
@@ -130,7 +130,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-24 pt-8 border-t border-[#111111] flex flex-col md:flex-row justify-between items-center gap-4 font-mono text-[10px] uppercase tracking-widest text-neutral-400">
+        <div className="mt-24 pt-8 border-t border-[var(--foreground)] flex flex-col md:flex-row justify-between items-center gap-4 font-mono text-[10px] uppercase tracking-widest text-neutral-400">
           <div>
             &copy; {new Date().getFullYear()} Involution Hell Organization
           </div>

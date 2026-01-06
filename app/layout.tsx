@@ -167,6 +167,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div className="site-bg site-bg--stars" aria-hidden />
         <RootProvider
           search={{
             // 使用静态索引，兼容 next export 与本地开发

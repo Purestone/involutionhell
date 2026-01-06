@@ -105,16 +105,17 @@ export function ActivityTicker({ className }: ActivityTickerProps) {
         </span>
       </div>
 
-      <div className="ml-auto flex border-l border-[#111111] h-full">
+      <div className="ml-auto flex border-l border-[var(--foreground)] h-full">
         <button
           onClick={handlePrev}
-          className="px-3 hover:bg-[#111111] hover:text-white transition-colors border-r border-[#111111]"
+          className="px-3 hover:bg-[var(--foreground)] hover:text-[var(--background)] text-[var(--foreground)] transition-colors border-r border-[var(--foreground)]"
         >
           <ChevronLeft className="h-3 w-3" />
         </button>
+
         <button
           onClick={handleNext}
-          className="px-3 hover:bg-[#111111] hover:text-white transition-colors"
+          className="px-3 hover:bg-[var(--foreground)] hover:text-[var(--background)] text-[var(--foreground)] transition-colors"
         >
           <ChevronRight className="h-3 w-3" />
         </button>

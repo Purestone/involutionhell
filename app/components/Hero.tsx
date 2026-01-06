@@ -30,11 +30,11 @@ export function Hero() {
   ];
 
   return (
-    <section className="relative pt-32 pb-16 newsprint-texture">
+    <section className="relative pt-32 pb-16 newsprint-texture transition-colors duration-300">
       <div className="container relative mx-auto px-6">
         {/* Ticker - mimicking stock ticker */}
-        <div className="border-y border-[#111111] py-2 mb-12 overflow-hidden bg-neutral-100 flex items-center">
-          <div className="font-mono text-xs uppercase tracking-widest px-4 border-r border-[#111111] whitespace-nowrap">
+        <div className="border-y border-[var(--foreground)] py-2 mb-12 overflow-hidden bg-neutral-100 dark:bg-neutral-900 flex items-center transition-colors duration-300">
+          <div className="font-mono text-xs uppercase tracking-widest px-4 border-r border-[var(--foreground)] whitespace-nowrap text-[var(--foreground)]">
             Breaking News
           </div>
           <div className="flex-1">
@@ -43,13 +43,13 @@ export function Hero() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-8 border-r border-[#111111] pr-8 min-h-[400px]">
-            <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-serif font-black leading-[0.85] tracking-tighter mb-8 uppercase italic">
+          <div className="lg:col-span-8 border-r border-[var(--foreground)] pr-8 min-h-[400px] transition-colors duration-300">
+            <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-serif font-black leading-[0.85] tracking-tighter mb-8 uppercase italic text-[var(--foreground)]">
               Involution <br /> Hell
             </h1>
 
             <div className="max-w-2xl">
-              <p className="text-xl md:text-2xl font-body leading-relaxed text-justify drop-cap">
+              <p className="text-xl md:text-2xl font-body leading-relaxed text-justify drop-cap text-[var(--foreground)]">
                 一个由开发者自发组织、免费开放的学习社区。降低门槛，避免无意义内卷，专注真实进步与乐趣。我们相信知识不应成为枷锁，而应是通往自由的阶梯。
               </p>
 
@@ -60,27 +60,27 @@ export function Hero() {
           </div>
 
           <div className="lg:col-span-4 flex flex-col gap-8">
-            <div className="border border-[#111111] p-1 grayscale hover:grayscale-0 transition-all duration-500">
+            <div className="border border-[var(--foreground)] p-1 grayscale hover:grayscale-0 transition-all duration-500 bg-[var(--background)]">
               <Image
                 src="/mascot.webp"
                 alt="Mascot"
                 width={420}
                 height={400}
                 priority
-                className="w-full h-auto object-contain bg-neutral-200"
+                className="w-full h-auto object-contain bg-neutral-200 dark:bg-neutral-800"
               />
-              <div className="font-mono text-[10px] uppercase p-2 border-t border-[#111111] text-neutral-500">
+              <div className="font-mono text-[10px] uppercase p-2 border-t border-[var(--foreground)] text-neutral-500">
                 Fig. 1.1 — The Spirit of Resilience
               </div>
             </div>
 
-            <div className="border border-[#111111] p-6 bg-[#111111] text-[#F9F9F7]">
+            <div className="border border-[var(--foreground)] p-6 bg-[var(--foreground)] text-[var(--background)]">
               <h3 className="font-serif text-2xl mb-4">Join the Resistance</h3>
               <p className="font-body text-sm mb-6 opacity-80">
                 Connect with thousands of developers who are reclaiming their
                 passion for technology.
               </p>
-              <button className="w-full py-3 border border-[#F9F9F7] font-sans text-xs uppercase tracking-widest hover:bg-[#F9F9F7] hover:text-[#111111] transition-all">
+              <button className="w-full py-3 border border-[var(--background)] font-sans text-xs uppercase tracking-widest hover:bg-[var(--background)] hover:text-[var(--foreground)] transition-all">
                 Access Archives
               </button>
             </div>
@@ -88,8 +88,8 @@ export function Hero() {
         </div>
 
         {/* Top-level directories - Grid with shared borders */}
-        <div className="mt-16 border-t-4 border-[#111111]">
-          <div className="py-4 font-mono text-xs uppercase tracking-widest border-b border-[#111111]">
+        <div className="mt-16 border-t-4 border-[var(--foreground)] transition-colors duration-300">
+          <div className="py-4 font-mono text-xs uppercase tracking-widest border-b border-[var(--foreground)] text-[var(--foreground)]">
             Classified Archives / 归档分类
           </div>
           <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
@@ -97,25 +97,25 @@ export function Hero() {
               <li
                 key={c.title}
                 className={cn(
-                  "group border-b border-[#111111] md:border-r last:border-r-0 h-full",
+                  "group border-b border-[var(--foreground)] md:border-r last:border-r-0 h-full",
                   idx % 2 === 1 && "md:border-r-0 lg:border-r",
                   idx === 3 && "lg:border-r-0",
                 )}
               >
                 <Link
                   href={c.href}
-                  className="p-8 hover:bg-neutral-100 transition-colors h-full flex flex-col hard-shadow-hover"
+                  className="p-8 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors h-full flex flex-col hard-shadow-hover"
                 >
                   <div className="font-mono text-[10px] text-neutral-400 mb-4">
                     00{idx + 1}
                   </div>
-                  <div className="text-2xl font-serif font-bold mb-2 uppercase">
+                  <div className="text-2xl font-serif font-bold mb-2 uppercase text-[var(--foreground)]">
                     {c.title}
                   </div>
-                  <p className="text-sm font-body text-neutral-600 flex-1 leading-relaxed">
+                  <p className="text-sm font-body text-neutral-600 dark:text-neutral-400 flex-1 leading-relaxed">
                     {c.desc}
                   </p>
-                  <div className="mt-6 font-sans text-[10px] uppercase tracking-widest font-bold group-hover:text-[#CC0000]">
+                  <div className="mt-6 font-sans text-[10px] uppercase tracking-widest font-bold text-[var(--foreground)] group-hover:text-[#CC0000]">
                     Read More &rarr;
                   </div>
                 </Link>

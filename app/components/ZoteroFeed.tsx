@@ -59,11 +59,11 @@ export function ZoteroFeed({
 
   return (
     <section className="mt-16 mb-10" aria-labelledby="zotero-heading">
-      <div className="border border-[#111111] bg-[#F9F9F7] p-8 newsprint-texture">
-        <div className="mb-6 flex items-baseline justify-between border-b border-[#111111] pb-4">
+      <div className="border border-[var(--foreground)] bg-[var(--background)] p-8 newsprint-texture transition-colors duration-300">
+        <div className="mb-6 flex items-baseline justify-between border-b border-[var(--foreground)] pb-4 transition-colors duration-300">
           <h2
             id="zotero-heading"
-            className="font-mono text-xs font-bold tracking-widest uppercase text-[#111111]"
+            className="font-mono text-xs font-bold tracking-widest uppercase text-[var(--foreground)]"
           >
             Reading List / 我们在读什么
           </h2>
@@ -84,18 +84,18 @@ export function ZoteroFeed({
         )}
 
         {!items && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-t border-l border-[#111111]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-t border-l border-[var(--foreground)] transition-colors duration-300">
             {Array.from({ length: limit }).map((_, i) => (
               <div
                 key={i}
-                className="h-24 border-r border-b border-[#111111] bg-neutral-100 animate-pulse"
+                className="h-24 border-r border-b border-[var(--foreground)] bg-neutral-100 dark:bg-neutral-900 animate-pulse transition-colors duration-300"
               />
             ))}
           </div>
         )}
 
         {items && (
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-0 border-t border-l border-[#111111]">
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-0 border-t border-l border-[var(--foreground)] transition-colors duration-300">
             {items
               .filter(
                 (it) =>
@@ -124,7 +124,7 @@ export function ZoteroFeed({
                 return (
                   <li
                     key={key}
-                    className="border-r border-b border-[#111111] p-6 hover:bg-neutral-100 transition group"
+                    className="border-r border-b border-[var(--foreground)] p-6 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition group"
                   >
                     <div className="font-mono text-[10px] text-neutral-400 mb-2">
                       REF. {idx + 1}
@@ -133,11 +133,11 @@ export function ZoteroFeed({
                       href={link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-serif font-bold text-lg leading-tight block mb-3 group-hover:text-[#CC0000] transition-colors"
+                      className="font-serif font-bold text-lg leading-tight block mb-3 text-[var(--foreground)] group-hover:text-[#CC0000] transition-colors"
                     >
                       {title}
                     </a>
-                    <div className="text-[11px] font-body text-neutral-600 leading-relaxed text-justify">
+                    <div className="text-[11px] font-body text-neutral-600 dark:text-neutral-400 leading-relaxed text-justify">
                       {authors && (
                         <span className={isExpanded ? "" : "line-clamp-1"}>
                           {authors}

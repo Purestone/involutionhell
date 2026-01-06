@@ -39,28 +39,31 @@ export function Features() {
   ];
 
   return (
-    <section id="features" className="py-24 border-t border-[#111111]">
+    <section
+      id="features"
+      className="py-24 border-t border-[var(--foreground)] transition-colors duration-300"
+    >
       <div className="container mx-auto px-6">
-        <div className="flex flex-col lg:flex-row gap-12 items-end mb-16 pb-8 border-b-4 border-[#111111]">
-          <h2 className="text-6xl md:text-8xl font-serif font-black italic uppercase leading-none tracking-tighter">
+        <div className="flex flex-col lg:flex-row gap-12 items-end mb-16 pb-8 border-b-4 border-[var(--foreground)] transition-colors duration-300">
+          <h2 className="text-6xl md:text-8xl font-serif font-black italic uppercase leading-none tracking-tighter text-[var(--foreground)]">
             Mission <br /> Statement
           </h2>
-          <p className="text-xl font-body text-neutral-600 max-w-2xl text-justify mb-2">
+          <p className="text-xl font-body text-neutral-600 dark:text-neutral-400 max-w-2xl text-justify mb-2">
             我们致力于创造一个真正属于开发者的学习环境，让每个人都能在这里获得成长。在这里，知识是流动的，门槛是不存在的，而内卷是被鄙视的。
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-l border-t border-[#111111]">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-l border-t border-[var(--foreground)] transition-colors duration-300">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="group relative border-r border-b border-[#111111] p-12 hover:bg-neutral-100 transition-colors"
+              className="group relative border-r border-b border-[var(--foreground)] p-12 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
             >
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between mb-8">
-                  <div className="w-16 h-16 border border-[#111111] flex items-center justify-center group-hover:bg-[#111111] group-hover:text-white transition-all duration-300">
+                  <div className="w-16 h-16 border border-[var(--foreground)] flex items-center justify-center group-hover:bg-[var(--foreground)] group-hover:text-[var(--background)] transition-all duration-300">
                     {/* Simplified icon styling */}
-                    <div className="p-0 text-[#111111] group-hover:text-white">
+                    <div className="p-0 text-[var(--foreground)] group-hover:text-[var(--background)]">
                       {React.cloneElement(feature.icon as React.ReactElement, {
                         className: "h-8 w-8",
                       })}
@@ -72,7 +75,7 @@ export function Features() {
                 </div>
 
                 <div className="flex items-baseline gap-4 mb-4">
-                  <h3 className="text-3xl font-serif font-bold italic">
+                  <h3 className="text-3xl font-serif font-bold italic text-[var(--foreground)]">
                     {feature.title}
                   </h3>
                   <span className="text-[10px] font-mono uppercase tracking-widest text-[#CC0000] font-bold">
@@ -80,12 +83,12 @@ export function Features() {
                   </span>
                 </div>
 
-                <p className="font-body text-neutral-600 leading-relaxed text-justify">
+                <p className="font-body text-neutral-600 dark:text-neutral-400 leading-relaxed text-justify">
                   {feature.description}
                 </p>
 
-                <div className="mt-8 pt-6 border-t border-dashed border-neutral-300 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="font-sans text-[10px] font-bold uppercase tracking-widest text-[#111111]">
+                <div className="mt-8 pt-6 border-t border-dashed border-neutral-300 dark:border-neutral-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="font-sans text-[10px] font-bold uppercase tracking-widest text-[var(--foreground)]">
                     Learn More &rarr;
                   </span>
                 </div>

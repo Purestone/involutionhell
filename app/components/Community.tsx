@@ -12,11 +12,11 @@ export function Community() {
   return (
     <section
       id="community"
-      className="py-24 border-t border-[#111111] newsprint-texture"
+      className="py-24 border-t border-[var(--foreground)] newsprint-texture transition-colors duration-300"
     >
       <div className="container mx-auto px-6">
-        <div className="flex flex-col lg:flex-row justify-between items-baseline mb-16 pb-4 border-b border-[#111111]">
-          <h2 className="text-6xl md:text-8xl font-serif font-black uppercase italic tracking-tighter">
+        <div className="flex flex-col lg:flex-row justify-between items-baseline mb-16 pb-4 border-b border-[var(--foreground)] transition-colors duration-300">
+          <h2 className="text-6xl md:text-8xl font-serif font-black uppercase italic tracking-tighter text-[var(--foreground)]">
             Community <br /> Archives
           </h2>
           <div className="font-mono text-xs uppercase tracking-widest text-neutral-500 max-w-sm text-right">
@@ -25,11 +25,16 @@ export function Community() {
           </div>
         </div>
 
-        {/* Main CTA Section - Inverted */}
-        <div className="mb-16 border-4 border-[#111111] bg-[#111111] text-[#F9F9F7] p-12 lg:p-24 relative overflow-hidden">
+        {/* Main CTA Section - Inverted (Light Mode) / Normal (Dark Mode) 
+                Design Decision: Keep high contrast.
+                Light Mode: Black Box, White Text.
+                Dark Mode: White Box, Black Text? Or Keep Black Box with White Border?
+                Let's go with Inverted relative to theme.
+            */}
+        <div className="mb-16 border-4 border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)] p-12 lg:p-24 relative overflow-hidden transition-colors duration-300">
           <div className="relative z-10 max-w-3xl mx-auto text-center">
-            <div className="inline-block border border-[#F9F9F7] p-4 mb-8">
-              <BookOpen className="h-12 w-12 text-[#F9F9F7]" />
+            <div className="inline-block border border-[var(--background)] p-4 mb-8">
+              <BookOpen className="h-12 w-12 text-[var(--background)]" />
             </div>
             <h3 className="text-4xl md:text-6xl font-serif font-bold italic mb-6">
               内卷知识库
@@ -40,7 +45,7 @@ export function Community() {
             <Button
               variant="outline"
               asChild
-              className="bg-transparent border-[#F9F9F7] text-[#F9F9F7] hover:bg-[#F9F9F7] hover:text-[#111111] px-12 py-8 h-auto font-sans text-sm uppercase tracking-widest font-bold"
+              className="bg-transparent border-[var(--background)] text-[var(--background)] hover:bg-[var(--background)] hover:text-[var(--foreground)] px-12 py-8 h-auto font-sans text-sm uppercase tracking-widest font-bold"
             >
               <a href="docs/ai" target="_blank" rel="noopener noreferrer">
                 Access Archives <ExternalLink className="ml-4 h-5 w-5" />
@@ -52,22 +57,22 @@ export function Community() {
         </div>
 
         {/* Action Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 border-t border-l border-[#111111]">
-          <div className="border-r border-b border-[#111111] p-12 hover:bg-neutral-100 transition-colors group">
-            <div className="mb-8 w-12 h-12 border border-[#111111] flex items-center justify-center group-hover:bg-[#111111] group-hover:text-white transition-all">
-              <Github className="h-6 w-6" />
+        <div className="grid grid-cols-1 md:grid-cols-3 border-t border-l border-[var(--foreground)] transition-colors duration-300">
+          <div className="border-r border-b border-[var(--foreground)] p-12 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors group">
+            <div className="mb-8 w-12 h-12 border border-[var(--foreground)] flex items-center justify-center group-hover:bg-[var(--foreground)] group-hover:text-[var(--background)] transition-all">
+              <Github className="h-6 w-6 text-[var(--foreground)] group-hover:text-[var(--background)]" />
             </div>
-            <h3 className="text-2xl font-serif font-bold italic mb-4">
+            <h3 className="text-2xl font-serif font-bold italic mb-4 text-[var(--foreground)]">
               GitHub 仓库
             </h3>
-            <p className="font-body text-neutral-600 mb-8 leading-relaxed">
+            <p className="font-body text-neutral-600 dark:text-neutral-400 mb-8 leading-relaxed">
               查看源代码，提交 Issue，参与项目讨论。每一个 Commit
               都是对社区的贡献。
             </p>
             <Button
               variant="outline"
               asChild
-              className="w-full border-[#111111] hover:bg-[#111111] hover:text-white font-sans text-[10px] uppercase tracking-widest font-bold"
+              className="w-full border-[var(--foreground)] text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] font-sans text-[10px] uppercase tracking-widest font-bold"
             >
               <a
                 href="https://github.com/involutionhell"
@@ -79,20 +84,20 @@ export function Community() {
             </Button>
           </div>
 
-          <div className="border-r border-b border-[#111111] p-12 hover:bg-neutral-100 transition-colors group">
-            <div className="mb-8 w-12 h-12 border border-[#111111] flex items-center justify-center group-hover:bg-[#111111] group-hover:text-white transition-all">
-              <MessageCircle className="h-6 w-6" />
+          <div className="border-r border-b border-[var(--foreground)] p-12 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors group">
+            <div className="mb-8 w-12 h-12 border border-[var(--foreground)] flex items-center justify-center group-hover:bg-[var(--foreground)] group-hover:text-[var(--background)] transition-all">
+              <MessageCircle className="h-6 w-6 text-[var(--foreground)] group-hover:text-[var(--background)]" />
             </div>
-            <h3 className="text-2xl font-serif font-bold italic mb-4">
+            <h3 className="text-2xl font-serif font-bold italic mb-4 text-[var(--foreground)]">
               Discord 社区
             </h3>
-            <p className="font-body text-neutral-600 mb-8 leading-relaxed">
+            <p className="font-body text-neutral-600 dark:text-neutral-400 mb-8 leading-relaxed">
               实时交流，分享经验，结识志同道合的朋友。打破孤岛，共同成长。
             </p>
             <Button
               variant="outline"
               asChild
-              className="w-full border-[#111111] hover:bg-[#111111] hover:text-white font-sans text-[10px] uppercase tracking-widest font-bold"
+              className="w-full border-[var(--foreground)] text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] font-sans text-[10px] uppercase tracking-widest font-bold"
             >
               <a
                 href="https://discord.com/invite/6CGP73ZWbD"
@@ -104,20 +109,20 @@ export function Community() {
             </Button>
           </div>
 
-          <div className="border-r border-b border-[#111111] p-12 hover:bg-neutral-100 transition-colors group">
-            <div className="mb-8 w-12 h-12 border border-[#111111] flex items-center justify-center group-hover:bg-[#111111] group-hover:text-white transition-all">
-              <GraduationCap className="h-6 w-6" />
+          <div className="border-r border-b border-[var(--foreground)] p-12 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors group">
+            <div className="mb-8 w-12 h-12 border border-[var(--foreground)] flex items-center justify-center group-hover:bg-[var(--foreground)] group-hover:text-[var(--background)] transition-all">
+              <GraduationCap className="h-6 w-6 text-[var(--foreground)] group-hover:text-[var(--background)]" />
             </div>
-            <h3 className="text-2xl font-serif font-bold italic mb-4">
+            <h3 className="text-2xl font-serif font-bold italic mb-4 text-[var(--foreground)]">
               文献资料
             </h3>
-            <p className="font-body text-neutral-600 mb-8 leading-relaxed">
+            <p className="font-body text-neutral-600 dark:text-neutral-400 mb-8 leading-relaxed">
               访问我们在 Zotero 的文献库，获取精选学术资源。连接前沿科技。
             </p>
             <Button
               variant="outline"
               asChild
-              className="w-full border-[#111111] hover:bg-[#111111] hover:text-white font-sans text-[10px] uppercase tracking-widest font-bold"
+              className="w-full border-[var(--foreground)] text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] font-sans text-[10px] uppercase tracking-widest font-bold"
             >
               <a
                 href="https://www.zotero.org/groups/6053219/unsw_ai/library"

@@ -161,8 +161,8 @@ export function Contribute() {
             size="lg"
             className="relative isolate w-full sm:w-auto h-20 px-14 rounded-none
                      text-2xl font-serif font-black uppercase italic tracking-tighter
-                     bg-[#111111] text-[#F9F9F7] border border-[#111111]
-                     hover:bg-[#F9F9F7] hover:text-[#111111] transition-all duration-300"
+                     bg-[var(--foreground)] text-[var(--background)] border border-[var(--foreground)]
+                     hover:bg-[var(--background)] hover:text-[var(--foreground)] transition-all duration-300"
             onClick={(event) => {
               event.preventDefault();
               router.push("/editor");
@@ -181,7 +181,7 @@ export function Contribute() {
           rel="noopener noreferrer"
           aria-label="查看投稿指南"
           title="查看投稿指南"
-          className="absolute top-0 right-0 flex h-10 w-10 translate-x-1/2 -translate-y-1/2 items-center justify-center border border-[#111111] bg-[#F9F9F7] text-[#111111] font-mono hover:bg-[#CC0000] hover:text-white transition-colors z-20"
+          className="absolute top-0 right-0 flex h-10 w-10 translate-x-1/2 -translate-y-1/2 items-center justify-center border border-[var(--foreground)] bg-[var(--background)] text-[var(--foreground)] font-mono hover:bg-[#CC0000] hover:text-white transition-colors z-20"
         >
           <span className="text-sm font-bold">?</span>
           <span className="sr-only">查看投稿指南</span>

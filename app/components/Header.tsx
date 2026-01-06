@@ -16,9 +16,9 @@ export async function Header() {
       : undefined;
   console.log("session", session);
   return (
-    <header className="fixed top-0 w-full z-50 bg-[#F9F9F7] border-b border-[#111111] py-2">
+    <header className="fixed top-0 w-full z-50 bg-[var(--background)] border-b border-[var(--foreground)] py-2 transition-colors duration-300">
       <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between border-b border-[#111111] pb-2 mb-2">
+        <div className="flex items-center justify-between border-b border-[var(--foreground)] pb-2 mb-2 transition-colors duration-300">
           <div className="hidden md:block font-mono text-[10px] uppercase tracking-widest text-neutral-500">
             Vol. 1 | No. 128 | Beijing Edition
           </div>
@@ -33,7 +33,7 @@ export async function Header() {
         </div>
 
         <div className="flex items-center justify-between h-10">
-          <nav className="hidden md:flex items-center gap-8 font-sans text-xs font-bold uppercase tracking-widest">
+          <nav className="hidden md:flex items-center gap-8 font-sans text-xs font-bold uppercase tracking-widest text-[var(--foreground)]">
             <a
               href="#features"
               className="hover:text-[#CC0000] transition-colors"
@@ -59,7 +59,7 @@ export async function Header() {
               variant="ghost"
               size="icon"
               asChild
-              className="rounded-none border border-transparent hover:border-[#111111] hover:bg-white"
+              className="rounded-none border border-transparent hover:border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] text-[var(--foreground)]"
             >
               <a
                 href="https://github.com/involutionhell"
@@ -74,7 +74,7 @@ export async function Header() {
               variant="ghost"
               size="icon"
               asChild
-              className="rounded-none border border-transparent hover:border-[#111111] hover:bg-white"
+              className="rounded-none border border-transparent hover:border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] text-[var(--foreground)]"
             >
               <a
                 href="https://discord.com/invite/6CGP73ZWbD"
@@ -85,6 +85,7 @@ export async function Header() {
                 <MessageCircle className="h-4 w-4" />
               </a>
             </Button>
+            <ThemeToggle />
             {user ? (
               <UserMenu user={user} provider={provider} />
             ) : (
