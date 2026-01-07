@@ -1,11 +1,12 @@
 import { ThemeToggle } from "./ThemeToggle";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import { Github as GithubIcon } from "./icons/Github";
 import { SignInButton } from "./SignInButton";
 import { auth } from "@/auth";
 import { UserMenu } from "./UserMenu";
 import { BrandMark } from "./BrandMark";
+import { LiveEditionLabel } from "./LiveEditionLabel";
 
 export async function Header() {
   const session = await auth();
@@ -14,21 +15,22 @@ export async function Header() {
     session && "provider" in session
       ? (session.provider as string | undefined)
       : undefined;
+  const now = new Date();
+  const editionTimestampMs = now.getTime();
+  const formattedDate = now.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
   console.log("session", session);
   return (
     <header className="fixed top-0 w-full z-50 bg-[var(--background)] border-b border-[var(--foreground)] py-2 transition-colors duration-300">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between border-b border-[var(--foreground)] pb-2 mb-2 transition-colors duration-300">
-          <div className="hidden md:block font-mono text-[10px] uppercase tracking-widest text-neutral-500">
-            Vol. 1 | No. 128 | Beijing Edition
-          </div>
+          <LiveEditionLabel initialTimestamp={editionTimestampMs} />
           <BrandMark priority />
           <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
-            {new Date().toLocaleDateString("en-US", {
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            })}
+            {formattedDate}
           </div>
         </div>
 
