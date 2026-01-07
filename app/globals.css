@@ -231,14 +231,18 @@ body {
   }
 }
 
-/* Fumadocs Overrides for Dark Mode */
-.nd-sidebar {
-  border-radius: 0px !important;
-  border-right: 1px solid var(--foreground) !important;
-  background-color: var(--background) !important;
+/* Fumadocs 表面样式调整，避免使用 !important */
+#nd-sidebar {
+  border-radius: 0;
+  --color-fd-card: var(--background);
+  --color-fd-border: var(--foreground);
+  background-color: var(--color-fd-card);
+  border-inline-end: 1px solid var(--color-fd-border);
 }
 
-.nd-nav {
-  border-bottom: 1px solid var(--foreground) !important;
-  background-color: var(--background) !important;
+#nd-nav {
+  --color-fd-background: var(--background);
+  --color-fd-border: var(--foreground);
+  background-color: var(--color-fd-background);
+  border-bottom: 1px solid var(--color-fd-border);
 }
