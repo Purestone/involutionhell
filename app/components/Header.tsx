@@ -1,11 +1,12 @@
 import { ThemeToggle } from "./ThemeToggle";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import { Github as GithubIcon } from "./icons/Github";
 import { SignInButton } from "./SignInButton";
 import { auth } from "@/auth";
 import { UserMenu } from "./UserMenu";
 import { BrandMark } from "./BrandMark";
+import { LiveEditionLabel } from "./LiveEditionLabel";
 
 export async function Header() {
   const session = await auth();
@@ -14,61 +15,85 @@ export async function Header() {
     session && "provider" in session
       ? (session.provider as string | undefined)
       : undefined;
+  const now = new Date();
+  const editionTimestampMs = now.getTime();
+  const formattedDate = now.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
   console.log("session", session);
   return (
-    <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-lg border-b border-border">
-      <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-        <BrandMark priority />
+    <header className="fixed top-0 w-full z-50 bg-[var(--background)] border-b border-[var(--foreground)] py-2 transition-colors duration-300">
+      <div className="container mx-auto px-6">
+        <div className="flex items-center justify-between border-b border-[var(--foreground)] pb-2 mb-2 transition-colors duration-300">
+          <LiveEditionLabel initialTimestamp={editionTimestampMs} />
+          <BrandMark priority />
+          <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
+            {formattedDate}
+          </div>
+        </div>
 
-        <nav className="hidden md:flex items-center gap-8">
-          <a
-            href="#features"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            特点
-          </a>
-          <a
-            href="#community"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            社区
-          </a>
-          <a
-            href="#contact"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            联系我们
-          </a>
-        </nav>
+        <div className="flex items-center justify-between h-10">
+          <nav className="hidden md:flex items-center gap-8 font-sans text-xs font-bold uppercase tracking-widest text-[var(--foreground)]">
+            <a
+              href="#features"
+              className="hover:text-[#CC0000] transition-colors"
+            >
+              特点
+            </a>
+            <a
+              href="#community"
+              className="hover:text-[#CC0000] transition-colors"
+            >
+              社区
+            </a>
+            <a
+              href="#contact"
+              className="hover:text-[#CC0000] transition-colors"
+            >
+              联系我们
+            </a>
+          </nav>
 
-        <div className="flex items-center gap-2">
-          {/* 扁平图标按钮：移除圆角与缩放动画 */}
-          <Button variant="ghost" size="icon" asChild className="rounded-none">
-            <a
-              href="https://github.com/involutionhell"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub"
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="rounded-none border border-transparent hover:border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] text-[var(--foreground)]"
             >
-              <GithubIcon className="h-5 w-5" />
-            </a>
-          </Button>
-          <Button variant="ghost" size="icon" asChild className="rounded-none">
-            <a
-              href="https://discord.com/invite/6CGP73ZWbD"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Discord"
+              <a
+                href="https://github.com/involutionhell"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+              >
+                <GithubIcon className="h-4 w-4" />
+              </a>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="rounded-none border border-transparent hover:border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] text-[var(--foreground)]"
             >
-              <MessageCircle className="h-5 w-5" />
-            </a>
-          </Button>
-          <ThemeToggle />
-          {user ? (
-            <UserMenu user={user} provider={provider} />
-          ) : (
-            <SignInButton />
-          )}
+              <a
+                href="https://discord.com/invite/6CGP73ZWbD"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Discord"
+              >
+                <MessageCircle className="h-4 w-4" />
+              </a>
+            </Button>
+            <ThemeToggle />
+            {user ? (
+              <UserMenu user={user} provider={provider} />
+            ) : (
+              <SignInButton />
+            )}
+          </div>
         </div>
       </div>
     </header>

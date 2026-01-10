@@ -8,7 +8,6 @@ export const maxDuration = 30;
 interface ChatRequest {
   messages: UIMessage[];
   system?: string;
-  tools?: unknown;
   pageContext?: {
     title?: string;
     description?: string;

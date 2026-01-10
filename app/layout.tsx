@@ -125,6 +125,44 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
+        />
+        {/* 主题脚本：避免首屏闪烁 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (() => {
+                try {
+                  const storageKey = "ih-theme";
+                  const root = document.documentElement;
+                  const stored = localStorage.getItem(storageKey);
+                  const theme = stored || "dark";
+                  root.classList.remove("light", "dark");
+
+                  if (theme === "system") {
+                    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+                      ? "dark"
+                      : "light";
+                    root.classList.add(systemTheme);
+                    return;
+                  }
+
+                  root.classList.add(theme);
+                } catch {
+                  // Ignore storage access errors to avoid blocking render.
+                }
+              })();
+            `,
+          }}
+        />
         {/* 预连接：缩短关键请求链 */}
         <link rel="preconnect" href="https://www.google-analytics.com" />
         {/* Preload the decorative sky texture so the LCP background image is discovered immediately */}
@@ -160,22 +198,19 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* 全局装饰背景（不参与可访问性） */}
-        <div className="site-bg site-bg--sky" aria-hidden />
         <div className="site-bg site-bg--stars" aria-hidden />
-
-        <RootProvider
-          search={{
-            // 使用静态索引，兼容 next export 与本地开发
-            options: { type: "static", api: "/search.json" },
-          }}
-        >
-          <ThemeProvider defaultTheme="dark" storageKey="ih-theme">
+        <ThemeProvider defaultTheme="dark" storageKey="ih-theme">
+          <RootProvider
+            search={{
+              // 使用静态索引，兼容 next export 与本地开发
+              options: { type: "static", api: "/search.json" },
+            }}
+          >
             <main id="main-content" className="relative z-10">
               {children}
             </main>
-          </ThemeProvider>
-        </RootProvider>
+          </RootProvider>
+        </ThemeProvider>
         {/* 谷歌分析 */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-ED4GVN8YVW"

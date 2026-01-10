@@ -3,6 +3,7 @@ import ZoteroFeedLazy from "@/app/components/ZoteroFeedLazy";
 import { Contribute } from "@/app/components/Contribute";
 import Image from "next/image";
 import { ActivityTicker } from "@/app/components/ActivityTicker";
+import { cn } from "@/lib/utils";
 
 export function Hero() {
   const categories: { title: string; desc: string; href: string }[] = [
@@ -29,61 +30,105 @@ export function Hero() {
   ];
 
   return (
-    <section className="relative">
-      <div className="container relative mx-auto px-6 pt-12 pb-0 text-center">
-        {/* 首页活动轮播浮窗：桌面端右上角，移动端底部居中 */}
-        <div className="absolute right-4 top-24 z-20 hidden sm:block w-72 lg:w-80">
-          <ActivityTicker />
-        </div>
-        <div className="absolute left-1/2 bottom-6 z-20 w-[min(90vw,320px)] -translate-x-1/2 sm:hidden">
-          <ActivityTicker />
-        </div>
-        <div className="relative mx-auto max-w-5xl mt-12">
-          <Image
-            src="/mascot.webp"
-            alt="Mascot"
-            width={420}
-            height={400}
-            priority
-            loading="eager"
-            fetchPriority="high"
-            sizes="216px"
-            className="mx-auto w-auto max-h-[25vh] object-contain"
-            style={{ maxWidth: "216px", height: "auto" }}
-          />
-          <h1 className="pointer-events-none select-none text-4xl md:text-6xl font-semibold leading-tight bg-gradient-primary bg-clip-text text-transparent">
-            内卷地狱
-          </h1>
+    <section className="relative pt-32 pb-16 newsprint-texture transition-colors duration-300">
+      <div className="container relative mx-auto px-6">
+        {/* Ticker - mimicking stock ticker */}
+        <div className="border-y border-[var(--foreground)] py-2 mb-12 overflow-hidden bg-neutral-100 dark:bg-neutral-900 flex items-center transition-colors duration-300">
+          <div className="font-mono text-xs uppercase tracking-widest px-4 border-r border-[var(--foreground)] whitespace-nowrap text-[var(--foreground)]">
+            Breaking News
+          </div>
+          <div className="flex-1">
+            <ActivityTicker />
+          </div>
         </div>
 
-        <div className="mx-auto max-w-4xl mt-8">
-          <p className="text-base md:text-lg text-muted-foreground">
-            一个由开发者自发组织、免费开放的学习社区。降低门槛，避免无意义内卷，专注真实进步与乐趣。
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-8 border-r border-[var(--foreground)] pr-8 min-h-[400px] transition-colors duration-300">
+            <h1 className="text-6xl md:text-8xl lg:text-[8rem] font-serif font-black leading-[0.85] tracking-tighter mb-8 uppercase italic text-[var(--foreground)]">
+              Involution <br /> Hell
+            </h1>
+
+            <div className="max-w-2xl">
+              <p className="text-xl md:text-2xl font-body leading-relaxed text-justify drop-cap text-[var(--foreground)]">
+                一个由开发者自发组织、免费开放的学习社区。降低门槛，避免无意义内卷，专注真实进步与乐趣。我们相信知识不应成为枷锁，而应是通往自由的阶梯。
+              </p>
+
+              <div className="mt-12">
+                <Contribute />
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-4 flex flex-col gap-8">
+            <div className="border border-[var(--foreground)] p-1 grayscale hover:grayscale-0 dark:grayscale-0 dark:hover:grayscale transition-all duration-500 bg-[var(--background)]">
+              <Image
+                src="/mascot.webp"
+                alt="Mascot"
+                width={420}
+                height={400}
+                priority
+                className="w-full h-auto object-contain bg-neutral-200 dark:bg-neutral-800"
+              />
+              <div className="font-mono text-[10px] uppercase p-2 border-t border-[var(--foreground)] text-neutral-500">
+                Fig. 1.1 — The Spirit of Resilience
+              </div>
+            </div>
+
+            <div className="border border-[var(--foreground)] p-6 bg-[var(--foreground)] text-[var(--background)]">
+              <h3 className="font-serif text-2xl mb-4">Join the Resistance</h3>
+              <p className="font-body text-sm mb-6 opacity-80">
+                Connect with thousands of developers who are reclaiming their
+                passion for technology.
+              </p>
+              <Link href="/docs/ai" className="block w-full">
+                <button className="w-full py-3 border border-[var(--background)] font-sans text-xs uppercase tracking-widest hover:bg-[var(--background)] hover:text-[var(--foreground)] transition-all cursor-pointer">
+                  Access Articles / 访问文章
+                </button>
+              </Link>
+            </div>
+          </div>
         </div>
-        {/* 投稿按钮 */}
-        <Contribute />
-        {/* Top-level directories */}
-        <div className="mt-14">
-          <div className="mb-4 text-sm text-muted-foreground">目录</div>
-          <ul className="grid gap-4 md:grid-cols-3">
-            {categories.map((c) => (
-              <li key={c.title} className="h-full">
+
+        {/* Top-level directories - Grid with shared borders */}
+        <div className="mt-16 border-t-4 border-[var(--foreground)] transition-colors duration-300">
+          <div className="py-4 font-mono text-xs uppercase tracking-widest border-b border-[var(--foreground)] text-[var(--foreground)]">
+            Classified Archives / 归档分类
+          </div>
+          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+            {categories.map((c, idx) => (
+              <li
+                key={c.title}
+                className={cn(
+                  "group border-b border-[var(--foreground)] md:border-r last:border-r-0 h-full",
+                  idx % 2 === 1 && "md:border-r-0 lg:border-r",
+                  idx === 3 && "lg:border-r-0",
+                )}
+              >
                 <Link
                   href={c.href}
-                  className="flex border border-border p-5 hover:bg-accent transition-colors h-full flex-col"
+                  className="p-8 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors h-full flex flex-col hard-shadow-hover"
                 >
-                  <div className="text-lg font-semibold">{c.title}</div>
-                  <p className="mt-1 text-sm text-muted-foreground flex-1">
+                  <div className="font-mono text-[10px] text-neutral-400 mb-4">
+                    00{idx + 1}
+                  </div>
+                  <div className="text-2xl font-serif font-bold mb-2 uppercase text-[var(--foreground)]">
+                    {c.title}
+                  </div>
+                  <p className="text-sm font-body text-neutral-600 dark:text-neutral-400 flex-1 leading-relaxed">
                     {c.desc}
                   </p>
+                  <div className="mt-6 font-sans text-[10px] uppercase tracking-widest font-bold text-[var(--foreground)] group-hover:text-[#CC0000]">
+                    Read More &rarr;
+                  </div>
                 </Link>
               </li>
             ))}
           </ul>
         </div>
-        {/* 最新文献（Zotero，避免被 iframe 拒绝） */}
-        <ZoteroFeedLazy groupId={6053219} limit={8} />
+
+        <div className="mt-16">
+          <ZoteroFeedLazy groupId={6053219} limit={8} />
+        </div>
       </div>
     </section>
   );

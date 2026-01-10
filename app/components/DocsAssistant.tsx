@@ -93,9 +93,29 @@ interface AssistantErrorState {
   showSettingsCTA: boolean;
 }
 
+type AssistantProvider = "openai" | "gemini" | "intern";
+
+type AssistantErrorData = {
+  error?: string;
+};
+
+type AssistantErrorPayload = {
+  message?: string;
+  statusCode?: number;
+  responseBody?: string;
+  data?: AssistantErrorData;
+};
+
+type AssistantErrorInput =
+  | AssistantErrorPayload
+  | Error
+  | string
+  | null
+  | undefined;
+
 function deriveAssistantError(
-  err: unknown,
-  provider: "openai" | "gemini" | "intern",
+  err: AssistantErrorInput,
+  provider: AssistantProvider,
 ): AssistantErrorState {
   const providerLabel =
     provider === "gemini"
@@ -113,12 +133,7 @@ function deriveAssistantError(
     return fallback;
   }
 
-  const maybeError = err as Partial<{
-    message?: string;
-    statusCode?: number;
-    responseBody?: string;
-    data?: unknown;
-  }>;
+  const maybeError = coerceAssistantErrorPayload(err);
 
   let message = "";
 
@@ -139,15 +154,8 @@ function deriveAssistantError(
     }
   }
 
-  if (!message && err instanceof Error && typeof err.message === "string") {
-    message = err.message.trim();
-  }
-
-  if (!message && maybeError.data && typeof maybeError.data === "object") {
-    const dataError = (maybeError.data as { error?: unknown }).error;
-    if (typeof dataError === "string" && dataError.trim().length > 0) {
-      message = dataError.trim();
-    }
+  if (!message && maybeError.data?.error) {
+    message = maybeError.data.error.trim();
   }
 
   const statusCode =
@@ -193,6 +201,21 @@ function deriveAssistantError(
   };
 }
 
+function coerceAssistantErrorPayload(
+  err: AssistantErrorInput,
+): AssistantErrorPayload {
+  if (!err) {
+    return {};
+  }
+  if (typeof err === "string") {
+    return { message: err };
+  }
+  if (err instanceof Error) {
+    return { message: err.message };
+  }
+  return err;
+}
+
 function extractErrorFromResponseBody(body: string): string | undefined {
   const trimmed = body.trim();
   if (!trimmed) {
@@ -200,16 +223,16 @@ function extractErrorFromResponseBody(body: string): string | undefined {
   }
 
   try {
-    const parsed = JSON.parse(trimmed);
+    const parsed = JSON.parse(trimmed) as string | AssistantErrorData;
     if (typeof parsed === "string") {
       return parsed.trim();
     }
     if (
       parsed &&
       typeof parsed === "object" &&
-      typeof (parsed as { error?: unknown }).error === "string"
+      typeof parsed.error === "string"
     ) {
-      return (parsed as { error: string }).error.trim();
+      return parsed.error.trim();
     }
   } catch {
     // Ignore JSON parsing issues and fall back to the raw body text.

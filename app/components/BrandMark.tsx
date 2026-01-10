@@ -58,7 +58,10 @@ export function BrandMark({
         />
       </div>
       <span
-        className={cn("font-semibold text-lg tracking-tight", textClassName)}
+        className={cn(
+          "font-serif font-black text-2xl tracking-tighter uppercase italic",
+          textClassName,
+        )}
       >
         {BRAND_NAME}
       </span>

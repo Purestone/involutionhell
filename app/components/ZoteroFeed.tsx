@@ -26,14 +26,6 @@ export function ZoteroFeed({
 }) {
   const [items, setItems] = React.useState<ZoteroItem[] | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  // Track which items' author lists are expanded
-  const [expandedAuthors, setExpandedAuthors] = React.useState<
-    Record<string, boolean>
-  >({});
-
-  const toggleAuthors = React.useCallback((key: string) => {
-    setExpandedAuthors((prev) => ({ ...prev, [key]: !prev[key] }));
-  }, []);
 
   React.useEffect(() => {
     const controller = new AbortController();
@@ -59,52 +51,51 @@ export function ZoteroFeed({
 
   return (
     <section className="mt-16 mb-10" aria-labelledby="zotero-heading">
-      <div className="border border-border bg-background/20 backdrop-blur-sm rounded-lg p-6">
-        <div className="mb-3 flex items-baseline justify-between">
+      <div className="border border-[var(--foreground)] bg-[var(--background)] p-8 newsprint-texture transition-colors duration-300">
+        <div className="mb-6 flex items-baseline justify-between border-b border-[var(--foreground)] pb-4 transition-colors duration-300">
           <h2
             id="zotero-heading"
-            className="text-xs font-semibold tracking-wide uppercase text-muted-foreground"
+            className="font-mono text-xs font-bold tracking-widest uppercase text-[var(--foreground)]"
           >
-            我们在读什么:
+            Reading List / 我们在读什么
           </h2>
           <a
             href={openUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-sky-600 dark:text-sky-400 hover:underline"
+            className="font-sans text-[10px] uppercase tracking-widest font-bold text-[#CC0000] hover:underline underline-offset-4"
           >
-            在 Zotero 中打开 →
+            Full Library →
           </a>
         </div>
 
         {error && (
-          <div className="border border-border p-4 text-sm text-red-600 dark:text-red-400">
-            加载失败：{error}
+          <div className="border border-[#CC0000] p-4 font-mono text-xs text-[#CC0000]">
+            ERROR LOAD_FAILED: {error}
           </div>
         )}
 
         {!items && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-t border-l border-[var(--foreground)] transition-colors duration-300">
             {Array.from({ length: limit }).map((_, i) => (
               <div
                 key={i}
-                className="h-20 border border-border bg-transparent animate-pulse"
+                className="h-24 border-r border-b border-[var(--foreground)] bg-neutral-100 dark:bg-neutral-900 animate-pulse transition-colors duration-300"
               />
             ))}
           </div>
         )}
 
         {items && (
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-0 border-t border-l border-[var(--foreground)] transition-colors duration-300">
             {items
-              // Guard against attachments/notes even if server-side filter changes
               .filter(
                 (it) =>
                   it.data?.itemType !== "attachment" &&
                   it.data?.itemType !== "note",
               )
               .filter((it) => it.data?.title && it.data.title.trim() !== "")
-              .map((it) => {
+              .map((it, idx) => {
                 const d = it.data ?? {};
                 const title = d.title!;
                 const link = d.url || it.links?.alternate?.href || openUrl;
@@ -120,55 +111,33 @@ export function ZoteroFeed({
                 const venue = d.publicationTitle;
                 const date = d.date;
                 const key = it.key;
-                const isExpanded = !!expandedAuthors[key];
-                const needsToggle =
-                  creators.length > 3 || (authors && authors.length > 80);
 
                 return (
                   <li
                     key={key}
-                    className="border border-border px-3 py-2 bg-transparent hover:bg-accent/10 transition"
+                    className="border-r border-b border-[var(--foreground)] p-6 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition group"
                   >
+                    <div className="font-mono text-[10px] text-neutral-400 mb-2">
+                      REF. {idx + 1}
+                    </div>
                     <a
                       href={link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium text-foreground hover:underline text-sm leading-tight block"
+                      className="font-serif font-bold text-lg leading-tight block mb-3 text-[var(--foreground)] group-hover:text-[#CC0000] transition-colors"
                     >
                       {title}
                     </a>
-                    <div className="mt-0.5 text-xs text-muted-foreground flex items-baseline gap-1 flex-wrap">
-                      {authors && (
-                        <>
-                          <span
-                            className={
-                              isExpanded
-                                ? "whitespace-normal"
-                                : "truncate overflow-hidden text-ellipsis whitespace-nowrap max-w-[calc(100%-6rem)]"
-                            }
-                            title={!isExpanded ? authors : undefined}
-                          >
-                            {authors}
+                    <div className="text-[11px] font-body text-neutral-600 dark:text-neutral-400 leading-relaxed text-justify">
+                      {authors && <span>{authors}</span>}
+                      <div className="mt-2 font-mono text-[9px] uppercase tracking-wider text-neutral-500 flex gap-2">
+                        {venue && (
+                          <span className="truncate max-w-[150px]">
+                            {venue}
                           </span>
-                          {needsToggle && (
-                            <button
-                              type="button"
-                              onClick={() => toggleAuthors(key)}
-                              className="ml-1 shrink-0 text-muted-foreground hover:text-foreground underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-[2px]"
-                              aria-expanded={isExpanded}
-                              aria-controls={`authors-${key}`}
-                            >
-                              {isExpanded ? "收起" : "展开"}
-                            </button>
-                          )}
-                        </>
-                      )}
-                      {authors && (venue || date) && (
-                        <span className="shrink-0">·</span>
-                      )}
-                      {venue && <span className="shrink-0">{venue}</span>}
-                      {venue && date && <span className="shrink-0">·</span>}
-                      {date && <span className="shrink-0">{date}</span>}
+                        )}
+                        {date && <span>[{date}]</span>}
+                      </div>
                     </div>
                   </li>
                 );

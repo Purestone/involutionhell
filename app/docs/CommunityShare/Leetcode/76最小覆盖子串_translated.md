@@ -25,8 +25,8 @@ If you findt，Jump back
 > To improve the code, consider the following:
 > Use a dict dict_keys instead of the isAll function to track the count of each character in the current window, and update the count directly instead of using Counter function repeatedly.
 > Remove unused variables ans, hash_1, and dict_t.
-> Initialize right outside the loop, and use while right < len(s) and not isAll(dict_keys, dict_t) as the loop condition to terminate when all characters in t are present in the current window.
-> Keep track of the minimum window length and the start and end indices of the window, and return s[start:end + 1] at the end.
+> Initialize right outside the loop, and use while right &lt; len(s) and not isAll(dict_keys, dict_t) as the loop condition to terminate when all characters in t are present in the current window.
+> &gt; Keep track of the minimum window length and the start and end indices of the window, and return s[start:end + 1] at the end.
 > get()Method grammar：
 
 `dict.get(key[, value]) `
