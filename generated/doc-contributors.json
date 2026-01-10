@@ -1,6 +1,6 @@
 {
   "repo": "InvolutionHell/involutionhell",
-  "generatedAt": "2025-12-18T18:31:51.162Z",
+  "generatedAt": "2026-01-10T11:14:38.587Z",
   "docsDir": "app/docs",
   "totalDocs": 146,
   "results": [
@@ -2591,13 +2591,13 @@
       "docId": "l358imxaj1mmtth6dydvu54s",
       "path": "app/docs/CommunityShare/Leetcode/76最小覆盖子串_translated.md",
       "contributorStats": {
-        "114939201": 2
+        "114939201": 3
       },
       "contributors": [
         {
           "githubId": "114939201",
-          "contributions": 2,
-          "lastContributedAt": "2025-12-15T03:07:23.000Z",
+          "contributions": 3,
+          "lastContributedAt": "2026-01-10T09:31:08.000Z",
           "login": "longsizhuo",
           "avatarUrl": "https://avatars.githubusercontent.com/u/114939201?v=4",
           "htmlUrl": "https://github.com/longsizhuo"
