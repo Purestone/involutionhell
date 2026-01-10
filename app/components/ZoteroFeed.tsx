@@ -26,14 +26,6 @@ export function ZoteroFeed({
 }) {
   const [items, setItems] = React.useState<ZoteroItem[] | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  // Track which items' author lists are expanded
-  const [expandedAuthors, setExpandedAuthors] = React.useState<
-    Record<string, boolean>
-  >({});
-
-  const toggleAuthors = React.useCallback((key: string) => {
-    setExpandedAuthors((prev) => ({ ...prev, [key]: !prev[key] }));
-  }, []);
 
   React.useEffect(() => {
     const controller = new AbortController();

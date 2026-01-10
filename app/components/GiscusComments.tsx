@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Giscus from "@giscus/react";
 import { useTheme } from "./ThemeProvider";
 
@@ -13,27 +13,26 @@ export function GiscusComments({ className, docId }: GiscusCommentsProps) {
   const { theme } = useTheme();
   const normalizedDocId = typeof docId === "string" ? docId.trim() : "";
   const useSpecificMapping = normalizedDocId.length > 0;
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
+  const [isSystemDark, setIsSystemDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
 
   useEffect(() => {
+    if (theme !== "system" || typeof window === "undefined") return;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const calcResolved = (): "light" | "dark" => {
-      if (theme === "system") {
-        return media.matches ? "dark" : "light";
-      }
-      return theme === "dark" ? "dark" : "light";
-    };
-
-    setResolvedTheme(calcResolved());
-
-    if (theme === "system") {
-      const handler = () => setResolvedTheme(calcResolved());
-      media.addEventListener("change", handler);
-      return () => media.removeEventListener("change", handler);
-    }
-
-    return undefined;
+    const handler = (event: MediaQueryListEvent) =>
+      setIsSystemDark(event.matches);
+    media.addEventListener("change", handler);
+    return () => media.removeEventListener("change", handler);
   }, [theme]);
+
+  const resolvedTheme = useMemo<"light" | "dark">(() => {
+    if (theme === "system") {
+      return isSystemDark ? "dark" : "light";
+    }
+    return theme === "dark" ? "dark" : "light";
+  }, [isSystemDark, theme]);
 
   return (
     <div className={className}>

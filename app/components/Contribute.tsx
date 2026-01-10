@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ExternalLink, Sparkles } from "lucide-react";
-import styles from "./Contribute.module.css";
 import { useRouter } from "next/navigation";
 
 // --- antd

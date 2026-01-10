@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Github, MessageCircle, ExternalLink } from "lucide-react";
+import { Github, MessageCircle } from "lucide-react";
 import { BrandMark } from "./BrandMark";
 import { LicenseNotice } from "./LicenseNotice";
 
