@@ -111,7 +111,6 @@ export function ZoteroFeed({
                 const venue = d.publicationTitle;
                 const date = d.date;
                 const key = it.key;
-                const isExpanded = !!expandedAuthors[key];
 
                 return (
                   <li
@@ -130,11 +129,7 @@ export function ZoteroFeed({
                       {title}
                     </a>
                     <div className="text-[11px] font-body text-neutral-600 dark:text-neutral-400 leading-relaxed text-justify">
-                      {authors && (
-                        <span className={isExpanded ? "" : "line-clamp-1"}>
-                          {authors}
-                        </span>
-                      )}
+                      {authors && <span>{authors}</span>}
                       <div className="mt-2 font-mono text-[9px] uppercase tracking-wider text-neutral-500 flex gap-2">
                         {venue && (
                           <span className="truncate max-w-[150px]">

@@ -24,16 +24,11 @@ export function Community() {
           </div>
         </div>
 
-        {/* Main CTA Section - Inverted (Light Mode) / Normal (Dark Mode)
-                Design Decision: Keep high contrast.
-                Light Mode: Black Box, White Text.
-                Dark Mode: White Box, Black Text? Or Keep Black Box with White Border?
-                Let's go with Inverted relative to theme.
-            */}
-        <div className="mb-16 border-4 border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)] p-12 lg:p-24 relative overflow-hidden transition-colors duration-300">
+        {/* Main CTA Section */}
+        <div className="mb-16 border-4 border-[var(--foreground)] bg-[var(--background)] text-[var(--foreground)] p-12 lg:p-24 relative overflow-hidden transition-colors duration-300">
           <div className="relative z-10 max-w-3xl mx-auto text-center">
-            <div className="inline-block border border-[var(--background)] p-4 mb-8">
-              <BookOpen className="h-12 w-12 text-[var(--background)]" />
+            <div className="inline-block border border-[var(--foreground)] p-4 mb-8">
+              <BookOpen className="h-12 w-12 text-[var(--foreground)]" />
             </div>
             <h3 className="text-4xl md:text-6xl font-serif font-bold italic mb-6">
               内卷知识库
@@ -44,7 +39,7 @@ export function Community() {
             <Button
               variant="outline"
               asChild
-              className="bg-transparent border-[var(--background)] text-[var(--background)] hover:bg-[var(--background)] hover:text-[var(--foreground)] px-12 py-8 h-auto font-sans text-sm uppercase tracking-widest font-bold"
+              className="bg-transparent border-[var(--foreground)] text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] px-12 py-8 h-auto font-sans text-sm uppercase tracking-widest font-bold"
             >
               <a href="docs/ai" target="_blank" rel="noopener noreferrer">
                 Access Articles / 访问文章{" "}
