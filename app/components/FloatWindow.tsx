@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { activityEventsConfig, type ActivityEvent } from "@/app/types/event";
@@ -51,6 +51,59 @@ export function FloatWindow() {
     return () => clearInterval(interval);
   }, [isCollapsed, isHovered]);
 
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(
+    null,
+  );
+  const [isDragging, setIsDragging] = useState(false);
+  // Store the offset from the top-left of the element to the mouse pointer
+  const dragOffset = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    // Prevent drag if using right click or if interacting with inputs
+    if (e.button !== 0) return;
+
+    const el = e.currentTarget as HTMLElement;
+    const rect = el.getBoundingClientRect();
+
+    setIsDragging(true);
+    dragOffset.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+
+    // If it's the first time dragging (position is null), we need to set the initial position
+    // based on the current computed rect, so it doesn't jump.
+    if (!position) {
+      setPosition({ x: rect.left, y: rect.top });
+    }
+
+    // Capture pointer to track movement even outside the window
+    el.setPointerCapture(e.pointerId);
+  };
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handlePointerMove = (e: PointerEvent) => {
+      setPosition({
+        x: e.clientX - dragOffset.current.x,
+        y: e.clientY - dragOffset.current.y,
+      });
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      setIsDragging(false);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [isDragging]);
+
   const handleDismiss = useCallback(() => {
     setIsDismissed(true);
   }, []);
@@ -68,10 +121,18 @@ export function FloatWindow() {
 
   return (
     <div
+      ref={(node) => {
+        if (node) node.style.touchAction = "none";
+      }}
       className={cn(
-        "fixed bottom-6 right-6 z-50 transition-all duration-500 ease-out",
+        "fixed z-50",
+        !position && "bottom-6 right-6",
+        !isDragging && "transition-all duration-500 ease-out",
         isCollapsed ? "w-auto" : "w-[340px]",
+        isDragging ? "cursor-grabbing" : "cursor-grab",
       )}
+      style={position ? { left: position.x, top: position.y } : undefined}
+      onPointerDown={handlePointerDown}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -79,6 +140,7 @@ export function FloatWindow() {
       {isCollapsed ? (
         <button
           onClick={handleToggle}
+          onPointerDown={(e) => e.stopPropagation()}
           className={cn(
             "group flex items-center gap-3 px-4 py-3",
             "bg-[var(--background)] border-2 border-[var(--foreground)]",
@@ -134,6 +196,7 @@ export function FloatWindow() {
               <div className="flex items-center gap-1">
                 <button
                   onClick={handleToggle}
+                  onPointerDown={(e) => e.stopPropagation()}
                   className="p-1 hover:bg-[#f5f0e6] hover:text-[#3d3428] transition-colors"
                   aria-label="Minimize"
                 >
@@ -141,6 +204,7 @@ export function FloatWindow() {
                 </button>
                 <button
                   onClick={handleDismiss}
+                  onPointerDown={(e) => e.stopPropagation()}
                   className="p-1 hover:bg-[#CC0000] transition-colors"
                   aria-label="Close"
                 >
@@ -190,6 +254,7 @@ export function FloatWindow() {
                   fill
                   className="object-cover"
                   sizes="340px"
+                  draggable={false}
                 />
                 {/* 复古照片覆盖层 */}
                 <div
@@ -242,6 +307,7 @@ export function FloatWindow() {
                     href={currentEvent.playback}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onPointerDown={(e) => e.stopPropagation()}
                     className={cn(
                       "flex items-center justify-center gap-2 px-3 py-2 w-full",
                       "bg-[#3d3428] dark:bg-[#e8e4dc] text-[#f5f0e6] dark:text-[#1a1816]",
@@ -259,6 +325,7 @@ export function FloatWindow() {
                     href={currentEvent.discord}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onPointerDown={(e) => e.stopPropagation()}
                     className={cn(
                       "flex items-center justify-center gap-2 px-3 py-2 w-full",
                       "bg-[#3d3428] dark:bg-[#e8e4dc] text-[#f5f0e6] dark:text-[#1a1816]",
@@ -288,6 +355,7 @@ export function FloatWindow() {
                         setIsAnimating(false);
                       }, 300);
                     }}
+                    onPointerDown={(e) => e.stopPropagation()}
                     className={cn(
                       "w-2 h-2 border border-[#8B7355] dark:border-[#5a5045] transition-all duration-200",
                       idx === currentIndex
