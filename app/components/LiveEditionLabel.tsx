@@ -17,6 +17,11 @@ export function LiveEditionLabel({ initialTimestamp }: LiveEditionLabelProps) {
   const [currentDate, setCurrentDate] = useState(
     () => new Date(initialTimestamp),
   );
+  /*
+   * digits 数组包含 11 个元素：0..9，最后再补一个 0 以实现平滑循环。
+   * 由于 '0' 出现了两次，如果不使用索引作为 key，会出现 key 重复的报错。
+   * 因此必须使用索引 `i` 作为唯一 key。
+   */
   const digits = Array.from({ length: 11 }, (_, i) => i % 10); // extra 0 for smooth loop
 
   useEffect(() => {
@@ -98,8 +103,8 @@ export function LiveEditionLabel({ initialTimestamp }: LiveEditionLabelProps) {
           <span className="inline-flex items-center gap-[1px] align-middle ms-digits">
             <span className="digit-slot">
               <span className="digit-seq fast">
-                {digits.map((d) => (
-                  <span className="digit-char" key={`fast-${d}`}>
+                {digits.map((d, i) => (
+                  <span className="digit-char" key={`fast-${i}`}>
                     {d}
                   </span>
                 ))}
@@ -107,8 +112,8 @@ export function LiveEditionLabel({ initialTimestamp }: LiveEditionLabelProps) {
             </span>
             <span className="digit-slot">
               <span className="digit-seq faster">
-                {digits.map((d) => (
-                  <span className="digit-char" key={`faster-${d}`}>
+                {digits.map((d, i) => (
+                  <span className="digit-char" key={`faster-${i}`}>
                     {d}
                   </span>
                 ))}
