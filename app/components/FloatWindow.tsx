@@ -11,8 +11,8 @@ import styles from "./FloatWindow.module.css";
 const { events: rawEvents, settings } = activityEventsConfig;
 const { rotationIntervalMs, maxItems } = settings;
 
-// Show all events (including deprecated ones for archives)
-// Prioritize non-deprecated events first, then deprecated ones
+// 显示所有活动（包括存档的已过期活动）
+// 优先显示未过期的活动，然后是已过期的
 const sortedEvents = [
   ...rawEvents.filter((e) => !e.deprecated),
   ...rawEvents.filter((e) => e.deprecated),
@@ -21,9 +21,9 @@ const sortedEvents = [
 const activeEvents = sortedEvents;
 
 /**
- * FloatWindow - A newspaper-style floating event announcement window
- * Features crumpled paper texture effect, auto-rotating events, and vintage aesthetics
- * Only visible on the homepage (/)
+ * FloatWindow - 复古报纸风格的活动预告悬浮窗
+ * 具有皱纸纹理效果、自动轮播活动和复古美学
+ * 仅在首页 (/) 可见
  */
 export function FloatWindow() {
   const pathname = usePathname();
@@ -33,10 +33,10 @@ export function FloatWindow() {
   const [isHovered, setIsHovered] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Only show on homepage
+  // 仅在首页显示
   const isHomePage = pathname === "/";
 
-  // Auto-rotate events
+  // 自动轮播活动
   useEffect(() => {
     if (isCollapsed || isHovered || activeEvents.length <= 1) return;
 
@@ -59,7 +59,7 @@ export function FloatWindow() {
     setIsCollapsed((prev) => !prev);
   }, []);
 
-  // Don't render if not on homepage, dismissed, or no active events
+  // 如果不在首页、已关闭或无活动，则不渲染
   if (!isHomePage || isDismissed || activeEvents.length === 0) {
     return null;
   }
@@ -75,7 +75,7 @@ export function FloatWindow() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Collapsed State - Minimal Tab */}
+      {/* 折叠状态 - 极简标签 */}
       {isCollapsed ? (
         <button
           onClick={handleToggle}
@@ -95,9 +95,9 @@ export function FloatWindow() {
           <ChevronUp className="w-4 h-4 rotate-180 group-hover:translate-y-0.5 transition-transform" />
         </button>
       ) : (
-        /* Expanded State - Full Newspaper Card */
+        /* 展开状态 - 完整报纸卡片 */
         <div className="relative">
-          {/* Main Card with aged paper effect */}
+          {/* 具有陈旧纸张效果的主卡片 */}
           <div
             className={cn(
               styles.paperAged,
@@ -110,7 +110,7 @@ export function FloatWindow() {
                 "shadow-[8px_8px_0px_0px_rgba(60,45,30,0.5)] dark:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.7)]",
             )}
           >
-            {/* Crumpled paper texture overlay */}
+            {/* 皱纸纹理覆盖层 */}
             <div
               className={cn(
                 styles.paperCrumpleOverlay,
@@ -118,7 +118,7 @@ export function FloatWindow() {
               )}
             />
 
-            {/* Header Bar - like newspaper dateline */}
+            {/* 标题栏 - 类似报纸日期行 */}
             <div className="relative z-10 flex items-center justify-between px-4 py-2 border-b-2 border-[#8B7355] dark:border-[#2a2520] bg-[#3d3428] dark:bg-[#1a1816] text-[#f5f0e6] dark:text-[#e8e4dc]">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-[#CC0000]" />
@@ -149,7 +149,7 @@ export function FloatWindow() {
               </div>
             </div>
 
-            {/* Masthead - newspaper title */}
+            {/* 报头 - 报纸标题 */}
             <div className="relative z-10 px-4 pt-4 pb-2 border-b border-[#8B7355]/50 dark:border-[#3a3530]/50">
               <div className="flex items-baseline justify-between">
                 <h3
@@ -175,14 +175,14 @@ export function FloatWindow() {
               </div>
             </div>
 
-            {/* Event Content */}
+            {/* 活动内容 */}
             <div
               className={cn(
                 "relative z-10 transition-opacity duration-300",
                 isAnimating && "opacity-0",
               )}
             >
-              {/* Event Image */}
+              {/* 活动图片 */}
               <div className="relative aspect-[16/9] border-b border-[#8B7355]/50 dark:border-[#3a3530]/50 overflow-hidden">
                 <Image
                   src={currentEvent.coverUrl}
@@ -191,7 +191,7 @@ export function FloatWindow() {
                   className="object-cover"
                   sizes="340px"
                 />
-                {/* Vintage photo overlay */}
+                {/* 复古照片覆盖层 */}
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
@@ -202,7 +202,7 @@ export function FloatWindow() {
                 />
               </div>
 
-              {/* Event Details */}
+              {/* 活动详情 */}
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <span
@@ -236,7 +236,7 @@ export function FloatWindow() {
                     : "Join us for this community event. Connect with fellow developers, learn new skills, and grow together."}
                 </p>
 
-                {/* Action Button - single button only */}
+                {/* 操作按钮 - 仅单个按钮 */}
                 {currentEvent.deprecated && currentEvent.playback ? (
                   <a
                     href={currentEvent.playback}
@@ -275,7 +275,7 @@ export function FloatWindow() {
               </div>
             </div>
 
-            {/* Footer - Pagination Dots */}
+            {/* 页脚 - 分页点 */}
             {activeEvents.length > 1 && (
               <div className="relative z-10 flex items-center justify-center gap-2 px-4 py-3 border-t border-[#8B7355]/50 dark:border-[#3a3530]/50 bg-[#ebe5d8] dark:bg-[#0a0908]">
                 {activeEvents.map((_, idx) => (
@@ -303,7 +303,7 @@ export function FloatWindow() {
               </div>
             )}
 
-            {/* Decorative torn corner effect */}
+            {/* 装饰性撕角效果 */}
             <div
               className={cn(
                 styles.tornCorner,
@@ -311,7 +311,7 @@ export function FloatWindow() {
               )}
             />
 
-            {/* Bottom torn edge simulation */}
+            {/* 底部撕边模拟 */}
             <div
               className="absolute bottom-0 left-0 right-0 h-1 pointer-events-none z-30"
               style={{
@@ -326,7 +326,7 @@ export function FloatWindow() {
             />
           </div>
 
-          {/* Stacked paper effect behind */}
+          {/* 后方的堆叠纸张效果 */}
           <div
             className={cn(
               styles.stackedPaper1,

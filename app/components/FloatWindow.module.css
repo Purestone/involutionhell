@@ -1,4 +1,4 @@
-/* Crumpled/Aged Paper Base Texture - Light Mode */
+/* 皱缩/陈旧纸张基础纹理 - 浅色模式 */
 .paperAged {
   background-color: #f5f0e6;
   /* background-image:
@@ -25,7 +25,7 @@
       url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E"); */
 }
 
-/* Dark Mode - Softened vintage newspaper (rubbed effect) */
+/* 深色模式 - 柔和复古报纸（摩擦效果） */
 :global(.dark) .paperAged {
   background-color: #1a1918;
   /* background-image:
@@ -42,7 +42,7 @@
     url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.05'/%3E%3C/svg%3E"); */
 }
 
-/* Crumple overlay with wrinkles - Light Mode */
+/* 带皱纹的皱纸覆盖层 - 浅色模式 */
 .paperCrumpleOverlay {
   /* background-image:
     linear-gradient(
@@ -76,7 +76,7 @@
   opacity: 0.4;
 }
 
-/* Dark Mode - Soft folded paper look */
+/* 深色模式 - 柔和折纸外观 */
 :global(.dark) .paperCrumpleOverlay {
   /* background-image:
     linear-gradient(
@@ -96,7 +96,7 @@
   opacity: 0.15;
 }
 
-/* Worn edges effect - Light Mode */
+/* 磨损边缘效果 - 浅色模式 */
 .paperWornEdges {
   box-shadow:
     inset 0 0 30px rgba(139, 90, 43, 0.1),
@@ -105,7 +105,7 @@
     inset -2px -2px 8px rgba(0, 0, 0, 0.05);
 }
 
-/* Dark Mode - Edge shadows */
+/* 深色模式 - 边缘阴影 */
 :global(.dark) .paperWornEdges {
   box-shadow:
     inset 0 0 40px rgba(0, 0, 0, 0.5),
@@ -114,17 +114,17 @@
     inset -2px -2px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Ink bleed effect for text - Light Mode */
+/* 文字墨水晕染效果 - 浅色模式 */
 .inkBleed {
   text-shadow: 0.3px 0.3px 0px rgba(0, 0, 0, 0.1);
 }
 
-/* Dark Mode */
+/* 深色模式 */
 :global(.dark) .inkBleed {
   text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-/* Faded print effect */
+/* 印刷褪色效果 */
 .fadedPrint {
   opacity: 0.92;
 }
@@ -133,7 +133,7 @@
   opacity: 0.95;
 }
 
-/* Torn corner effect - Light Mode */
+/* 撕角效果 - 浅色模式 */
 .tornCorner {
   background: linear-gradient(
     135deg,
@@ -155,7 +155,7 @@
   filter: drop-shadow(-1px 1px 1px rgba(0, 0, 0, 0.3));
 }
 
-/* Stacked paper layers - Light Mode */
+/* 堆叠纸张层 - 浅色模式 */
 .stackedPaper1 {
   background-color: #e8e2d5;
   border-color: rgba(139, 115, 85, 0.3);
