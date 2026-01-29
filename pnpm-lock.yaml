@@ -91,8 +91,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(vue@3.5.24(typescript@5.9.2))
       ai:
-        specifier: ^5.0.94
-        version: 5.0.94(zod@4.1.11)
+        specifier: ^5.0.95
+        version: 5.0.95(zod@4.1.11)
       antd:
         specifier: ^5.27.4
         version: 5.27.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -122,7 +122,7 @@ importers:
         version: 15.7.13(@types/react@19.2.7)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       fumadocs-mdx:
         specifier: ^11.10.1
-        version: 11.10.1(fumadocs-core@15.7.13(@types/react@19.2.7)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(vite@7.1.12(@types/node@25.0.3)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1))
+        version: 11.10.1(fumadocs-core@15.7.13(@types/react@19.2.7)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(vite@7.1.12(@types/node@25.0.9)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1))
       fumadocs-ui:
         specifier: ^15.7.13
         version: 15.7.13(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.13)
@@ -183,7 +183,7 @@ importers:
         version: 4.0.4
       '@types/node':
         specifier: latest
-        version: 25.0.3
+        version: 25.0.9
       '@types/react':
         specifier: 19.2.7
         version: 19.2.7
@@ -252,7 +252,7 @@ importers:
         version: 48.8.0(rollup@4.52.5)(typescript@5.9.2)
       vitest:
         specifier: ^4.0.6
-        version: 4.0.6(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@25.0.3)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1)
+        version: 4.0.6(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@25.0.9)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1)
 
 packages:
 
@@ -262,8 +262,8 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4
 
-  '@ai-sdk/gateway@2.0.10':
-    resolution: {integrity: sha512-c++qOKfjKokTPAJ+vP9UXXNuTQ819yEDCZVXBhpZbgRly1P4fHTJbIAwuh+Qxxe9Bmtu8PEta0JGYZxc+hm7/Q==}
+  '@ai-sdk/gateway@2.0.11':
+    resolution: {integrity: sha512-B0Vt2Xv88Lo9rg861Oyzq/SdTmT4LiqdjkpOxpSPpNk8Ih5TXTgyDAsV/qW14N6asPdK1YI5PosFLnVzfK5LrA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -2732,11 +2732,11 @@ packages:
   '@types/node@16.18.11':
     resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==}
 
-  '@types/node@22.19.3':
-    resolution: {integrity: sha512-1N9SBnWYOJTrNZCdh/yJE+t910Y128BoyY+zBLWhL3r0TYzlTmFdXrPwHL9DyFZmlEXNQQolTZh3KHV31QDhyA==}
+  '@types/node@22.19.7':
+    resolution: {integrity: sha512-MciR4AKGHWl7xwxkBa6xUGxQJ4VBOmPTF7sL+iGzuahOFaO0jHCsuEfS80pan1ef4gWId1oWOweIhrDEYLuaOw==}
 
-  '@types/node@25.0.3':
-    resolution: {integrity: sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA==}
+  '@types/node@25.0.9':
+    resolution: {integrity: sha512-/rpCXHlCWeqClNBwUhDcusJxXYDjZTyE8v5oTO7WbL8eij2nKhUeU89/6xgjU7N4/Vh3He0BtyhJdQbDyhiXAw==}
 
   '@types/pg@8.11.6':
     resolution: {integrity: sha512-/2WmmBXHLsfRqzfHW7BNZ8SbYzE8OSk7i3WjFYvfgRHj7S1xj+16Je5fUKv3lVdVzk/zn9TXOqf+avFCFIE0yQ==}
@@ -3113,8 +3113,8 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4
 
-  ai@5.0.94:
-    resolution: {integrity: sha512-PQs3H8xDhORG/L6eyR+SxAKUsa0ORO4ENvRovzGgPmPGCIlwle6UD5VIMQFtj1gvZk+BKBUVEFFwtkTeJTAURw==}
+  ai@5.0.95:
+    resolution: {integrity: sha512-dsvFdYMeGP08zuUQkhKO1UMMXMCb+nro9ZmDdwaAkkTlCGkP3u1S+xaRUDNayu/c0KVkiTtfEroPG//U+kvXzg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -3578,8 +3578,8 @@ packages:
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
 
-  diff@4.0.2:
-    resolution: {integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==}
+  diff@4.0.4:
+    resolution: {integrity: sha512-X07nttJQkwkfKfvTPG/KSnE2OMdcUCao6+eXF3wmnIQRn2aPAHH3VxDbDOdegkd6JbPsXqShpvEOHfAT+nCNwQ==}
     engines: {node: '>=0.3.1'}
 
   doctrine@2.1.0:
@@ -6283,10 +6283,12 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   tar@7.4.3:
     resolution: {integrity: sha512-5S7Va8hKfV7W5U6g3aYxXmlPoZVAwUMy9AOKyF2fVuZa2UD3qZjg578OrLRt8PcNN1PleVaL/5/yYATNL0ICUw==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   throttle-debounce@5.0.2:
     resolution: {integrity: sha512-B71/4oyj61iNH0KeCamLuE2rmKuTO5byTOSVwECM5FA7TiAiAW+UqTKZ9ERueC4qvgSttUhdmq1mXC3kJqGX7A==}
@@ -6792,7 +6794,7 @@ snapshots:
       '@ai-sdk/provider-utils': 3.0.9(zod@4.1.11)
       zod: 4.1.11
 
-  '@ai-sdk/gateway@2.0.10(zod@4.1.11)':
+  '@ai-sdk/gateway@2.0.11(zod@4.1.11)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
       '@ai-sdk/provider-utils': 3.0.17(zod@4.1.11)
@@ -6910,7 +6912,7 @@ snapshots:
       '@assistant-ui/react': 0.11.14(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.5.0(react@19.2.3))
       '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.2.7)(react@19.2.3)
       '@types/json-schema': 7.0.15
-      ai: 5.0.94(zod@4.1.11)
+      ai: 5.0.95(zod@4.1.11)
       assistant-stream: 0.2.28
       json-schema: 0.4.0
       react: 19.2.3
@@ -8696,7 +8698,7 @@ snapshots:
 
   '@neondatabase/serverless@1.0.1':
     dependencies:
-      '@types/node': 22.19.3
+      '@types/node': 22.19.7
       '@types/pg': 8.15.5
 
   '@next/env@16.0.10': {}
@@ -9959,23 +9961,23 @@ snapshots:
 
   '@types/node@16.18.11': {}
 
-  '@types/node@22.19.3':
+  '@types/node@22.19.7':
     dependencies:
       undici-types: 6.21.0
 
-  '@types/node@25.0.3':
+  '@types/node@25.0.9':
     dependencies:
       undici-types: 7.16.0
 
   '@types/pg@8.11.6':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.9
       pg-protocol: 1.10.3
       pg-types: 4.1.0
 
   '@types/pg@8.15.5':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.9
       pg-protocol: 1.10.3
       pg-types: 2.2.0
 
@@ -10391,13 +10393,13 @@ snapshots:
       chai: 6.2.0
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.6(vite@7.1.12(@types/node@25.0.3)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1))':
+  '@vitest/mocker@4.0.6(vite@7.1.12(@types/node@25.0.9)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1))':
     dependencies:
       '@vitest/spy': 4.0.6
       estree-walker: 3.0.3
       magic-string: 0.30.19
     optionalDependencies:
-      vite: 7.1.12(@types/node@25.0.3)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1)
+      vite: 7.1.12(@types/node@25.0.9)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1)
 
   '@vitest/pretty-format@4.0.6':
     dependencies:
@@ -10501,9 +10503,9 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       zod: 4.1.11
 
-  ai@5.0.94(zod@4.1.11):
+  ai@5.0.95(zod@4.1.11):
     dependencies:
-      '@ai-sdk/gateway': 2.0.10(zod@4.1.11)
+      '@ai-sdk/gateway': 2.0.11(zod@4.1.11)
       '@ai-sdk/provider': 2.0.0
       '@ai-sdk/provider-utils': 3.0.17(zod@4.1.11)
       '@opentelemetry/api': 1.9.0
@@ -11007,7 +11009,7 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  diff@4.0.2: {}
+  diff@4.0.4: {}
 
   doctrine@2.1.0:
     dependencies:
@@ -11741,7 +11743,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  fumadocs-mdx@11.10.1(fumadocs-core@15.7.13(@types/react@19.2.7)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(vite@7.1.12(@types/node@25.0.3)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1)):
+  fumadocs-mdx@11.10.1(fumadocs-core@15.7.13(@types/react@19.2.7)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(vite@7.1.12(@types/node@25.0.9)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1)):
     dependencies:
       '@mdx-js/mdx': 3.1.1
       '@standard-schema/spec': 1.0.0
@@ -11762,7 +11764,7 @@ snapshots:
     optionalDependencies:
       next: 16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react: 19.2.3
-      vite: 7.1.12(@types/node@25.0.3)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1)
+      vite: 7.1.12(@types/node@25.0.9)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -14557,7 +14559,7 @@ snapshots:
       acorn-walk: 8.3.4
       arg: 4.1.3
       create-require: 1.1.1
-      diff: 4.0.2
+      diff: 4.0.4
       make-error: 1.3.6
       typescript: 4.9.5
       v8-compile-cache-lib: 3.0.1
@@ -14834,7 +14836,7 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite@7.1.12(@types/node@25.0.3)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1):
+  vite@7.1.12(@types/node@25.0.9)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.10
       fdir: 6.5.0(picomatch@4.0.3)
@@ -14843,17 +14845,17 @@ snapshots:
       rollup: 4.52.5
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.9
       fsevents: 2.3.3
       jiti: 2.5.1
       lightningcss: 1.30.1
       tsx: 4.19.2
       yaml: 2.8.1
 
-  vitest@4.0.6(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@25.0.3)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1):
+  vitest@4.0.6(@edge-runtime/vm@3.2.0)(@types/debug@4.1.12)(@types/node@25.0.9)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1):
     dependencies:
       '@vitest/expect': 4.0.6
-      '@vitest/mocker': 4.0.6(vite@7.1.12(@types/node@25.0.3)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1))
+      '@vitest/mocker': 4.0.6(vite@7.1.12(@types/node@25.0.9)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1))
       '@vitest/pretty-format': 4.0.6
       '@vitest/runner': 4.0.6
       '@vitest/snapshot': 4.0.6
@@ -14870,12 +14872,12 @@ snapshots:
       tinyexec: 0.3.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vite: 7.1.12(@types/node@25.0.3)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1)
+      vite: 7.1.12(@types/node@25.0.9)(jiti@2.5.1)(lightningcss@1.30.1)(tsx@4.19.2)(yaml@2.8.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@edge-runtime/vm': 3.2.0
       '@types/debug': 4.1.12
-      '@types/node': 25.0.3
+      '@types/node': 25.0.9
     transitivePeerDependencies:
       - jiti
       - less
