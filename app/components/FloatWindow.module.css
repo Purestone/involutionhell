@@ -1,8 +1,7 @@
 /* Crumpled/Aged Paper Base Texture - Light Mode */
 .paperAged {
   background-color: #f5f0e6;
-  background-image:
-    /* Coffee stain effect */
+  /* background-image:
     radial-gradient(
       ellipse at 85% 15%,
       rgba(139, 90, 43, 0.08) 0%,
@@ -13,7 +12,6 @@
       rgba(139, 90, 43, 0.05) 0%,
       transparent 40%
     ),
-    /* Yellowed edges */
       radial-gradient(
         ellipse at 0% 0%,
         rgba(180, 140, 80, 0.15) 0%,
@@ -24,40 +22,29 @@
       rgba(180, 140, 80, 0.12) 0%,
       transparent 50%
     ),
-    /* Paper fiber texture */
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E");
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E"); */
 }
 
-/* Dark Mode - Deep charcoal with subtle warm undertones */
+/* Dark Mode - Softened vintage newspaper (rubbed effect) */
 :global(.dark) .paperAged {
-  background-color: #0d0c0a;
-  background-image:
-    /* Subtle warm glow in corners */
+  background-color: #1a1918;
+  /* background-image:
     radial-gradient(
-      ellipse at 85% 15%,
-      rgba(80, 60, 40, 0.15) 0%,
-      transparent 50%
+      ellipse at 50% 40%,
+      rgba(255, 255, 255, 0.03) 0%,
+      transparent 70%
     ),
     radial-gradient(
-      ellipse at 10% 80%,
-      rgba(80, 60, 40, 0.1) 0%,
-      transparent 40%
+      circle at 50% 50%,
+      transparent 50%,
+      rgba(0, 0, 0, 0.3) 100%
     ),
-    /* Edge darkening */
-      radial-gradient(ellipse at 0% 0%, rgba(0, 0, 0, 0.3) 0%, transparent 50%),
-    radial-gradient(
-      ellipse at 100% 100%,
-      rgba(0, 0, 0, 0.25) 0%,
-      transparent 50%
-    ),
-    /* Subtle noise texture */
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.05'/%3E%3C/svg%3E"); */
 }
 
 /* Crumple overlay with wrinkles - Light Mode */
 .paperCrumpleOverlay {
-  background-image:
-    /* Diagonal crease lines */
+  /* background-image:
     linear-gradient(
       47deg,
       transparent 30%,
@@ -79,8 +66,7 @@
       rgba(0, 0, 0, 0.02) 61%,
       transparent 61.5%
     ),
-    /* Noise grain */
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); */
   background-size:
     100% 100%,
     100% 100%,
@@ -90,31 +76,22 @@
   opacity: 0.4;
 }
 
-/* Dark Mode - Very subtle overlay */
+/* Dark Mode - Soft folded paper look */
 :global(.dark) .paperCrumpleOverlay {
-  background-image:
+  /* background-image:
     linear-gradient(
-      47deg,
+      120deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.02) 45%,
+      transparent 50%
+    ),
+    linear-gradient(
+      60deg,
       transparent 30%,
-      rgba(255, 255, 255, 0.008) 30.5%,
-      rgba(255, 255, 255, 0.008) 31%,
-      transparent 31.5%
+      rgba(255, 255, 255, 0.02) 35%,
+      transparent 40%
     ),
-    linear-gradient(
-      137deg,
-      transparent 45%,
-      rgba(255, 255, 255, 0.006) 45.5%,
-      rgba(255, 255, 255, 0.006) 46%,
-      transparent 46.5%
-    ),
-    linear-gradient(
-      -43deg,
-      transparent 60%,
-      rgba(255, 255, 255, 0.004) 60.5%,
-      rgba(255, 255, 255, 0.004) 61%,
-      transparent 61.5%
-    ),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); */
   mix-blend-mode: overlay;
   opacity: 0.15;
 }
