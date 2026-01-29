@@ -21,17 +21,21 @@ export function sanitizeResourceKey(input: string, fallbackBase = "file") {
     trimmedInput.split(/[\\/]/).filter(Boolean).pop() ?? trimmedInput;
   const lower = lastSegment.toLowerCase();
 
+  // 防止超长字符串导致的 ReDoS 攻击
+  if (lower.length > 256) {
+    return fallbackName;
+  }
+
   const lastDotIndex = lower.lastIndexOf(".");
   const basePart = lastDotIndex > 0 ? lower.slice(0, lastDotIndex) : lower;
   const rawExtPart = lastDotIndex > 0 ? lower.slice(lastDotIndex) : "";
 
   const cleanedBase = basePart
     .replace(CONTROL_CHARS, "")
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/\.{2,}/g, ".")
-    .replace(/-+/g, "-")
-    .replace(/^[._-]+|[-_.]+$/g, "");
+    .replace(/[^a-z0-9._-]+/g, "-") // 立即将非白名单字符合并替换为单个连字符
+    .replace(/\.{2,}/g, ".") // 合并多个点
+    .replace(/-+/g, "-") // 合并多个连字符
+    .replace(/^[._-]+|[-_.]+$/g, ""); // 去除首尾的分隔符
 
   const cleanedExt = rawExtPart
     .replace(CONTROL_CHARS, "")
