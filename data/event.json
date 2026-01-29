@@ -9,7 +9,7 @@
       "discord": "https://discord.gg/QHsjqezfC?event=1430500169299922965",
       "playback": "https://involutionhell.com/docs/jobs/event-keynote/event-takeway",
       "coverUrl": "./event/mockInterview.png",
-      "deprecated": false
+      "deprecated": true
     },
     {
       "name": "Coffee Chat",
