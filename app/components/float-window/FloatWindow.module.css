@@ -1,179 +1,45 @@
-/* 皱缩/陈旧纸张基础纹理 - 浅色模式 */
-.paperAged {
-  background-color: #e8dcc5;
-  /* 牛皮纸颜色 */
-  /* background-image:
-    radial-gradient(
-      ellipse at 85% 15%,
-      rgba(139, 90, 43, 0.08) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      ellipse at 10% 80%,
-      rgba(139, 90, 43, 0.05) 0%,
-      transparent 40%
-    ),
-      radial-gradient(
-        ellipse at 0% 0%,
-        rgba(180, 140, 80, 0.15) 0%,
-        transparent 50%
-      ),
-    radial-gradient(
-      ellipse at 100% 100%,
-      rgba(180, 140, 80, 0.12) 0%,
-      transparent 50%
-    ),
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E"); */
+/* 纹理与图案 */
+.newsprintTexture {
+  background-color: #f9f9f7;
+  /* 细微的 4x4px 点阵图案 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23111111' fill-opacity='0.04' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
 }
 
-/* 深色模式 - 柔和复古报纸（摩擦效果） */
-:global(.dark) .paperAged {
-  background-color: #2c241b;
-  /* 深色牛皮纸 */
-  /* background-image:
-    radial-gradient(
-      ellipse at 50% 40%,
-      rgba(255, 255, 255, 0.03) 0%,
-      transparent 70%
-    ),
-    radial-gradient(
-      circle at 50% 50%,
-      transparent 50%,
-      rgba(0, 0, 0, 0.3) 100%
-    ),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.05'/%3E%3C/svg%3E"); */
+:global(.dark) .newsprintTexture {
+  background-color: #111111;
+  /* 暗黑模式下的反色点阵图案 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23F9F9F7' fill-opacity='0.05' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
 }
 
-/* 带皱纹的皱纸覆盖层 - 浅色模式 */
-.paperCrumpleOverlay {
-  /* background-image:
-    linear-gradient(
-      47deg,
-      transparent 30%,
-      rgba(0, 0, 0, 0.03) 30.5%,
-      rgba(0, 0, 0, 0.03) 31%,
-      transparent 31.5%
-    ),
-    linear-gradient(
-      137deg,
-      transparent 45%,
-      rgba(0, 0, 0, 0.025) 45.5%,
-      rgba(0, 0, 0, 0.025) 46%,
-      transparent 46.5%
-    ),
-    linear-gradient(
-      -43deg,
-      transparent 60%,
-      rgba(0, 0, 0, 0.02) 60.5%,
-      rgba(0, 0, 0, 0.02) 61%,
-      transparent 61.5%
-    ),
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); */
-  background-size:
-    400px 400px,
-    400px 400px,
-    400px 400px,
-    100px 100px;
-  mix-blend-mode: multiply;
-  opacity: 0.4;
+/* 锐利边缘与边框 */
+.sharpContainer {
+  /* 强制 0px 圆角 */
+  border-radius: 0px !important;
+  /* 1px 纯黑实线边框 */
+  border: 1px solid #111111;
 }
 
-/* 深色模式 - 柔和折纸外观 */
-:global(.dark) .paperCrumpleOverlay {
-  /* background-image:
-    linear-gradient(
-      120deg,
-      transparent 40%,
-      rgba(255, 255, 255, 0.02) 45%,
-      transparent 50%
-    ),
-    linear-gradient(
-      60deg,
-      transparent 30%,
-      rgba(255, 255, 255, 0.02) 35%,
-      transparent 40%
-    ),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); */
-  mix-blend-mode: overlay;
-  opacity: 0.15;
+:global(.dark) .sharpContainer {
+  border-color: #f9f9f7;
 }
 
-/* 磨损边缘效果 - 浅色模式 */
-.paperWornEdges {
-  box-shadow:
-    inset 0 0 30px rgba(139, 90, 43, 0.1),
-    inset 0 0 60px rgba(139, 90, 43, 0.05),
-    inset 2px 2px 8px rgba(0, 0, 0, 0.08),
-    inset -2px -2px 8px rgba(0, 0, 0, 0.05);
+/* 悬停效果 */
+.hardShadowHover {
+  transition: all 0.2s ease-out;
 }
 
-/* 深色模式 - 边缘阴影 */
-:global(.dark) .paperWornEdges {
-  box-shadow:
-    inset 0 0 40px rgba(0, 0, 0, 0.5),
-    inset 0 0 80px rgba(0, 0, 0, 0.3),
-    inset 2px 2px 12px rgba(0, 0, 0, 0.4),
-    inset -2px -2px 12px rgba(0, 0, 0, 0.3);
+.hardShadowHover:hover {
+  /* 硬偏移阴影 */
+  box-shadow: 4px 4px 0px 0px #111111;
+  transform: translate(-2px, -2px);
 }
 
-/* 文字墨水晕染效果 - 浅色模式 */
+:global(.dark) .hardShadowHover:hover {
+  box-shadow: 4px 4px 0px 0px #f9f9f7;
+}
+
+/* 排版样式 */
 .inkBleed {
-  text-shadow: 0.3px 0.3px 0px rgba(0, 0, 0, 0.1);
-}
-
-/* 深色模式 */
-:global(.dark) .inkBleed {
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-/* 印刷褪色效果 */
-.fadedPrint {
-  opacity: 0.92;
-}
-
-:global(.dark) .fadedPrint {
-  opacity: 0.95;
-}
-
-/* 撕角效果 - 浅色模式 */
-.tornCorner {
-  background: linear-gradient(
-    135deg,
-    transparent 60%,
-    #d5cfc2 60%,
-    #e5dfd5 100%
-  );
-  filter: drop-shadow(-1px 1px 1px rgba(0, 0, 0, 0.1));
-}
-
-/* Dark Mode */
-:global(.dark) .tornCorner {
-  background: linear-gradient(
-    135deg,
-    transparent 60%,
-    #1a1816 60%,
-    #0d0c0a 100%
-  );
-  filter: drop-shadow(-1px 1px 1px rgba(0, 0, 0, 0.3));
-}
-
-/* 堆叠纸张层 - 浅色模式 */
-.stackedPaper1 {
-  background-color: #e8e2d5;
-  border-color: rgba(139, 115, 85, 0.3);
-}
-
-:global(.dark) .stackedPaper1 {
-  background-color: #0a0908;
-  border-color: rgba(60, 50, 40, 0.4);
-}
-
-.stackedPaper2 {
-  background-color: #ddd7ca;
-  border-color: rgba(139, 115, 85, 0.2);
-}
-
-:global(.dark) .stackedPaper2 {
-  background-color: #080706;
-  border-color: rgba(60, 50, 40, 0.3);
+  /* 报纸风格不需要模糊阴影，保持锐利 */
+  text-shadow: none;
 }

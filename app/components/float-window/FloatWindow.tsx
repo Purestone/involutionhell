@@ -31,74 +31,49 @@ export function FloatWindow() {
   const [isDismissed, setIsDismissed] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  // 仅在首页显示
+  // 仅在首页 (/) 可见
   const isHomePage = pathname === "/";
 
   const [position, setPosition] = useState<{ x: number; y: number } | null>(
     null,
   );
   const [isDragging, setIsDragging] = useState(false);
-  // Store the offset from the top-left of the element to the mouse pointer
   const dragOffset = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    // Prevent drag if using right click or if interacting with inputs
     if (e.button !== 0) return;
-
     const el = e.currentTarget as HTMLElement;
     const rect = el.getBoundingClientRect();
-
     setIsDragging(true);
     dragOffset.current = {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     };
-
-    // If it's the first time dragging (position is null), we need to set the initial position
-    // based on the current computed rect, so it doesn't jump.
-    if (!position) {
-      setPosition({ x: rect.left, y: rect.top });
-    }
-
-    // Capture pointer to track movement even outside the window
+    if (!position) setPosition({ x: rect.left, y: rect.top });
     el.setPointerCapture(e.pointerId);
   };
 
   useEffect(() => {
     if (!isDragging) return;
-
     const handlePointerMove = (e: PointerEvent) => {
       setPosition({
         x: e.clientX - dragOffset.current.x,
         y: e.clientY - dragOffset.current.y,
       });
     };
-
-    const handlePointerUp = (e: PointerEvent) => {
-      setIsDragging(false);
-    };
-
+    const handlePointerUp = () => setIsDragging(false);
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("pointerup", handlePointerUp);
-
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
     };
   }, [isDragging]);
 
-  const handleDismiss = useCallback(() => {
-    setIsDismissed(true);
-  }, []);
+  const handleDismiss = useCallback(() => setIsDismissed(true), []);
+  const handleToggle = useCallback(() => setIsCollapsed((prev) => !prev), []);
 
-  const handleToggle = useCallback(() => {
-    setIsCollapsed((prev) => !prev);
-  }, []);
-
-  // 如果不在首页、已关闭或无活动，则不渲染
-  if (!isHomePage || isDismissed || !latestEvent) {
-    return null;
-  }
+  if (!isHomePage || isDismissed || !latestEvent) return null;
 
   const currentEvent = latestEvent;
 
@@ -110,8 +85,8 @@ export function FloatWindow() {
       className={cn(
         "fixed z-50",
         !position && "bottom-6 right-6",
-        !isDragging && "transition-all duration-500 ease-out",
-        isCollapsed ? "w-auto" : "w-[260px]",
+        !isDragging && "transition-all duration-300 ease-out",
+        isCollapsed ? "w-auto" : "w-[280px]",
         isDragging ? "cursor-grabbing" : "cursor-grab",
       )}
       style={position ? { left: position.x, top: position.y } : undefined}
@@ -119,186 +94,130 @@ export function FloatWindow() {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* 折叠状态 - 极简标签 */}
+      {/* 极简折叠状态 */}
       {isCollapsed ? (
         <button
           onClick={handleToggle}
           onPointerDown={(e) => e.stopPropagation()}
           className={cn(
-            "group flex items-center gap-2 px-3 py-2",
-            "bg-[var(--background)] border-2 border-[var(--foreground)]",
-            "font-mono text-[10px] uppercase tracking-widest",
-            "hover:bg-[var(--foreground)] hover:text-[var(--background)]",
-            "transition-all duration-200",
-            "shadow-[3px_3px_0px_0px_var(--foreground)]",
-            "hover:shadow-[4px_4px_0px_0px_var(--foreground)]",
-            "hover:translate-x-[-1px] hover:translate-y-[-1px]",
+            "group flex items-center gap-2 px-4 py-2",
+            // Newsprint 风格：锐利边角，纯黑实线边框
+            "bg-[#111111] text-[#F9F9F7] border border-[#111111]",
+            "hover:bg-[#F9F9F7] hover:text-[#111111]", // 悬停时反色
+            "font-mono text-xs uppercase tracking-widest",
+            "transition-colors duration-200",
+            "shadow-[4px_4px_0px_0px_#111111] hover:translate-x-[-1px] hover:translate-y-[-1px]",
           )}
         >
-          <span className="w-1.5 h-1.5 bg-[#CC0000] animate-pulse" />
+          <span className="w-2 h-2 bg-[#CC0000] animate-pulse" />
           <span className="font-bold">Latest</span>
-          <ChevronUp className="w-3 h-3 rotate-180 group-hover:translate-y-0.5 transition-transform" />
+          <ChevronUp className="w-4 h-4 rotate-180 group-hover:-translate-y-0.5 transition-transform" />
         </button>
       ) : (
-        /* 展开状态 - 完整报纸卡片 */
-        <div className="relative">
-          {/* 具有陈旧纸张效果的主卡片 */}
-          <div
-            className={cn(
-              styles.paperAged,
-              styles.paperWornEdges,
-              "relative overflow-hidden",
-              "border border-[#8B7355] dark:border-[#2a2520]",
-              "shadow-[4px_4px_0px_0px_rgba(60,45,30,0.4)] dark:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.6)]",
-              "transition-shadow duration-200",
-              isHovered &&
-                "shadow-[6px_6px_0px_0px_rgba(60,45,30,0.5)] dark:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.7)]",
-            )}
-          >
-            {/* 皱纸纹理覆盖层 */}
-            <div
-              className={cn(
-                styles.paperCrumpleOverlay,
-                "absolute inset-0 pointer-events-none z-20",
-              )}
-            />
-
-            {/* 简化的顶部栏 */}
-            <div className="relative z-10 flex items-center justify-between px-3 py-1.5 border-b border-[#8B7355]/30 dark:border-[#2a2520] bg-[#3d3428]/5 dark:bg-[#1a1816]/30">
-              <span
-                className={cn(
-                  styles.inkBleed,
-                  "font-mono text-[9px] uppercase tracking-wider font-bold text-[#8B7355] dark:text-[#8a8070]",
-                )}
+        /* 展开状态 - 报纸卡片 */
+        <div
+          className={cn(
+            styles.newsprintTexture,
+            styles.hardShadowHover,
+            "relative border border-[#111111] dark:border-[#F9F9F7]", // 显式边框
+            "flex flex-col",
+          )}
+        >
+          {/* Header Bar */}
+          <div className="flex items-center justify-between px-3 py-2 border-b border-[#111111] dark:border-[#F9F9F7] bg-[#111111] dark:bg-[#F9F9F7]">
+            <span className="font-mono text-[10px] uppercase tracking-widest font-bold text-[#F9F9F7] dark:text-[#111111]">
+              The Daily Feed
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleToggle}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="text-[#F9F9F7] dark:text-[#111111] hover:text-[#CC0000] transition-colors"
+                aria-label="Minimize"
               >
-                The Daily Feed
-              </span>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={handleToggle}
-                  onPointerDown={(e) => e.stopPropagation()}
-                  className="p-0.5 hover:bg-[#8B7355]/10 rounded transition-colors text-[#5a4d3d] dark:text-[#b5a898]"
-                  aria-label="Minimize"
-                >
-                  <ChevronUp className="w-3 h-3" />
-                </button>
-                <button
-                  onClick={handleDismiss}
-                  onPointerDown={(e) => e.stopPropagation()}
-                  className="p-0.5 hover:bg-[#CC0000] hover:text-white rounded transition-colors text-[#5a4d3d] dark:text-[#b5a898]"
-                  aria-label="Close"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
+                <ChevronUp className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={handleDismiss}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="text-[#F9F9F7] dark:text-[#111111] hover:text-[#CC0000] transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
-
-            {/* 活动内容 */}
-            <div className="relative z-10">
-              {/* 活动图片 - 更紧凑 */}
-              <div className="relative aspect-[2/1] border-b border-[#8B7355]/30 dark:border-[#3a3530]/30 overflow-hidden">
-                <Image
-                  src={currentEvent.coverUrl}
-                  alt={currentEvent.name}
-                  fill
-                  className="object-cover"
-                  sizes="260px"
-                  draggable={false}
-                />
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, rgba(139,90,43,0.1) 0%, transparent 40%, transparent 60%, rgba(139,90,43,0.1) 100%)",
-                    mixBlendMode: "multiply",
-                  }}
-                />
-              </div>
-
-              {/* 活动详情 - 更紧凑 */}
-              <div className="p-3">
-                <div className="flex items-start gap-2 mb-2">
-                  <span
-                    className={cn(
-                      "shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full",
-                      currentEvent.deprecated ? "bg-[#6a5d4d]" : "bg-[#CC0000]",
-                    )}
-                  />
-                  <h4
-                    className={cn(
-                      styles.inkBleed,
-                      "font-serif text-sm font-bold leading-tight text-[#2a2218] dark:text-[#f0ebe0]",
-                    )}
-                  >
-                    {currentEvent.name}
-                  </h4>
-                </div>
-
-                <p
-                  className={cn(
-                    styles.fadedPrint,
-                    "font-body text-[10px] text-[#5a4d3d] dark:text-[#b5a898] leading-relaxed mb-3 line-clamp-3",
-                  )}
-                >
-                  {currentEvent.deprecated
-                    ? "This event has concluded."
-                    : "Join us for this community event to learn and grow."}
-                </p>
-
-                {/* 操作按钮 - 小巧版 */}
-                {currentEvent.deprecated && currentEvent.playback ? (
-                  <a
-                    href={currentEvent.playback}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onPointerDown={(e) => e.stopPropagation()}
-                    className={cn(
-                      "flex items-center justify-center gap-1.5 px-2 py-1.5 w-full",
-                      "bg-[#3d3428] dark:bg-[#e8e4dc] text-[#f5f0e6] dark:text-[#1a1816]",
-                      "font-mono text-[9px] uppercase tracking-wider font-bold",
-                      "hover:bg-[#CC0000] hover:text-white transition-colors",
-                    )}
-                  >
-                    <Play className="w-2.5 h-2.5" />
-                    Replay
-                  </a>
-                ) : (
-                  <a
-                    href={currentEvent.discord}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onPointerDown={(e) => e.stopPropagation()}
-                    className={cn(
-                      "flex items-center justify-center gap-1.5 px-2 py-1.5 w-full",
-                      "bg-[#3d3428] dark:bg-[#e8e4dc] text-[#f5f0e6] dark:text-[#1a1816]",
-                      "font-mono text-[9px] uppercase tracking-wider font-bold",
-                      "hover:bg-[#CC0000] hover:text-white transition-colors",
-                    )}
-                  >
-                    <ExternalLink className="w-2.5 h-2.5" />
-                    Join
-                  </a>
-                )}
-              </div>
-            </div>
-
-            {/* 装饰性撕角效果 */}
-            <div
-              className={cn(
-                styles.tornCorner,
-                "absolute top-0 right-0 w-6 h-6 pointer-events-none z-30",
-              )}
-            />
           </div>
 
-          {/* 后方的堆叠纸张效果 - 减淡 */}
-          <div
-            className={cn(
-              styles.stackedPaper1,
-              "absolute -bottom-0.5 -right-0.5 w-full h-full border -z-10",
-            )}
-            style={{ transform: "rotate(1deg)" }}
-          />
+          {/* Content */}
+          <div className="p-0">
+            {/* 图片区域 - 默认为灰度（暗黑模式除外） */}
+            <div className="relative aspect-[16/9] border-b border-[#111111] dark:border-[#F9F9F7] overflow-hidden group">
+              <Image
+                src={currentEvent.coverUrl}
+                alt={currentEvent.name}
+                fill
+                className="object-cover grayscale dark:grayscale-0 group-hover:grayscale-0 group-hover:sepia transition-all duration-500"
+                sizes="280px"
+                draggable={false}
+              />
+              {/* 突发新闻徽章 */}
+              {!currentEvent.deprecated && (
+                <div className="absolute top-2 left-2 bg-[#CC0000] text-white px-2 py-0.5 text-[9px] font-mono tracking-widest uppercase font-bold">
+                  Breaking
+                </div>
+              )}
+            </div>
+
+            {/* 标题与描述 */}
+            <div className="p-4 bg-transparent">
+              <h4 className="font-serif text-lg font-bold leading-tight text-[#111111] dark:text-[#F9F9F7] mb-2">
+                {currentEvent.name}
+              </h4>
+              <p className="font-serif text-sm leading-relaxed text-[#111111]/80 dark:text-[#F9F9F7]/80 line-clamp-3 mb-4 text-justify">
+                {currentEvent.deprecated
+                  ? "This event has concluded. View the archives for full coverage."
+                  : "Join us for this significant community event. Detailed coverage inside."}
+              </p>
+
+              {/* 操作按钮 */}
+              {currentEvent.deprecated && currentEvent.playback ? (
+                <a
+                  href={currentEvent.playback}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className={cn(
+                    "flex items-center justify-center gap-2 w-full px-4 py-2",
+                    "border border-[#111111] dark:border-[#F9F9F7]",
+                    "bg-transparent hover:bg-[#111111] hover:text-[#F9F9F7]",
+                    "dark:hover:bg-[#F9F9F7] dark:hover:text-[#111111]",
+                    "font-mono text-xs uppercase tracking-widest font-bold",
+                    "transition-colors duration-200",
+                  )}
+                >
+                  <Play className="w-3 h-3" />
+                  <span>Watch Replay</span>
+                </a>
+              ) : (
+                <a
+                  href={currentEvent.discord}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className={cn(
+                    "flex items-center justify-center gap-2 w-full px-4 py-2",
+                    "bg-[#111111] text-[#F9F9F7]",
+                    "hover:bg-[#CC0000] hover:border-[#CC0000]",
+                    "font-mono text-xs uppercase tracking-widest font-bold",
+                    "transition-colors duration-200",
+                  )}
+                >
+                  <span>Read More</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
