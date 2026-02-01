@@ -10,6 +10,7 @@
   --color-muted: var(--muted);
   --color-accent: #cc0000;
   --color-border: var(--foreground);
+  --color-ring: var(--foreground);
 
   --font-serif: "Playfair Display", "Times New Roman", serif;
   --font-body: "Lora", Georgia, serif;
