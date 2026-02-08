@@ -29,7 +29,6 @@ export function FloatWindow() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   // 仅在首页 (/) 可见
   const isHomePage = pathname === "/";
@@ -73,7 +72,8 @@ export function FloatWindow() {
   const handleDismiss = useCallback(() => setIsDismissed(true), []);
   const handleToggle = useCallback(() => setIsCollapsed((prev) => !prev), []);
 
-  if (!isHomePage || isDismissed || !latestEvent) return null;
+  if (!isHomePage || isDismissed || !latestEvent || latestEvent.deprecated)
+    return null;
 
   const currentEvent = latestEvent;
 
@@ -91,8 +91,6 @@ export function FloatWindow() {
       )}
       style={position ? { left: position.x, top: position.y } : undefined}
       onPointerDown={handlePointerDown}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* 极简折叠状态 */}
       {isCollapsed ? (
