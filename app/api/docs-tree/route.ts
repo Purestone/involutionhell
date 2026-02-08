@@ -110,7 +110,6 @@ export async function GET() {
     }
 
     // pick the first existing candidate
-    let docsRoot: string | undefined;
     const candidateChecks = await Promise.all(
       candidates.map(async (p) => {
         try {
@@ -121,7 +120,7 @@ export async function GET() {
         }
       }),
     );
-    docsRoot = candidateChecks.find((c) => c.exists)?.p;
+    const docsRoot = candidateChecks.find((c) => c.exists)?.p;
 
     if (!docsRoot) {
       return NextResponse.json(
@@ -140,9 +139,9 @@ export async function GET() {
     }
 
     // try to list
-    let tree: DirNode[] = [];
     try {
-      tree = await buildTree(docsRoot, 2);
+      const tree = await buildTree(docsRoot, 2);
+      return NextResponse.json({ ok: true, docsRoot, tree, diag });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       return NextResponse.json(
@@ -155,8 +154,6 @@ export async function GET() {
         { status: 500 },
       );
     }
-
-    return NextResponse.json({ ok: true, docsRoot, tree, diag });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return NextResponse.json(

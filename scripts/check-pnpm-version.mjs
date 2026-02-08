@@ -54,7 +54,7 @@ try {
   let actualVersion;
   try {
     actualVersion = execSync('pnpm --version', { encoding: 'utf-8' }).trim();
-  } catch (error) {
+  } catch {
     console.error('❌ Error: pnpm is not installed or not found in PATH');
     console.error('\nTo fix this issue:');
     console.error('1. Enable corepack: corepack enable');
