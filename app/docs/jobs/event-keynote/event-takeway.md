@@ -20,3 +20,7 @@ docId: s8w3d2p5k9m4h7z1x0c2a8r6
 每一场活动都有宝贵的经验沉淀。  
 但如果缺乏系统整理，这些干货往往会随时间流散。  
 本栏目旨在将社区的知识转化为可复用的学习资料，帮助更多同学少走弯路。
+
+## 往期录播下载链接
+
+1. [2026/02/07萝卜特](https://drive.google.com/file/d/1Ylf6dmOs5TILIpo9jqxKS32dQa_EN-8b/view?usp=sharing)
