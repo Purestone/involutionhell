@@ -39,29 +39,44 @@ function hasFs() {
   }
 }
 
-function safeListDir(dir: string): { entries: fs.Dirent[]; error?: string } {
+async function safeListDir(
+  dir: string,
+): Promise<{ entries: fs.Dirent[]; error?: string }> {
   try {
-    return { entries: fs.readdirSync(dir, { withFileTypes: true }) };
+    const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+    return { entries };
   } catch (e) {
     return { entries: [], error: String(e) };
   }
 }
 
-function buildTree(root: string, maxDepth = 2, rel = ""): DirNode[] {
-  const { entries, error } = safeListDir(root);
+async function buildTree(
+  root: string,
+  maxDepth = 2,
+  rel = "",
+): Promise<DirNode[]> {
+  const { entries, error } = await safeListDir(root);
   if (error) throw new Error(`readdir failed at ${root}: ${error}`);
 
   const dirs = entries.filter((d) => d.isDirectory());
-  const nodes: DirNode[] = [];
 
-  for (const e of dirs) {
-    if (e.name.startsWith(".") || e.name.startsWith("[")) continue;
+  // 并行处理所有子目录以提高 I/O 效率
+  const nodePromises = dirs.map(async (e) => {
+    if (e.name.startsWith(".") || e.name.startsWith("[")) return null;
     const abs = path.join(root, e.name);
     const nodeRel = rel ? `${rel}/${e.name}` : e.name;
     const node: DirNode = { name: e.name, path: nodeRel };
-    if (maxDepth > 1) node.children = buildTree(abs, maxDepth - 1, nodeRel);
-    nodes.push(node);
-  }
+    if (maxDepth > 1) {
+      // 递归构建子树
+      node.children = await buildTree(abs, maxDepth - 1, nodeRel);
+    }
+    return node;
+  });
+
+  // 等待所有并行任务完成，并过滤掉被忽略的目录
+  const nodes = (await Promise.all(nodePromises)).filter(
+    (n): n is DirNode => n !== null,
+  );
 
   try {
     nodes.sort((a, b) => a.name.localeCompare(b.name, "zh-Hans"));
@@ -97,8 +112,21 @@ export async function GET() {
       );
     }
 
-    // pick the first existing candidate
-    const docsRoot = candidates.find((p) => fs.existsSync(p));
+    // 异步并行检查所有候选路径是否存在
+    const candidateChecks = await Promise.all(
+      candidates.map(async (p) => {
+        try {
+          // 使用 access 检查路径是否可读
+          await fs.promises.access(p);
+          return { p, exists: true };
+        } catch {
+          return { p, exists: false };
+        }
+      }),
+    );
+    // 从检查结果中找到第一个存在的路径
+    const docsRoot = candidateChecks.find((c) => c.exists)?.p;
+
     if (!docsRoot) {
       return NextResponse.json(
         {
@@ -107,7 +135,7 @@ export async function GET() {
           diag: {
             ...diag,
             exists: Object.fromEntries(
-              candidates.map((p) => [p, fs.existsSync(p)]),
+              candidateChecks.map((c) => [c.p, c.exists]),
             ),
           },
         },
@@ -116,9 +144,9 @@ export async function GET() {
     }
 
     // try to list
-    let tree: DirNode[] = [];
     try {
-      tree = buildTree(docsRoot, 2);
+      const tree = await buildTree(docsRoot, 2);
+      return NextResponse.json({ ok: true, docsRoot, tree, diag });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       return NextResponse.json(
@@ -131,8 +159,6 @@ export async function GET() {
         { status: 500 },
       );
     }
-
-    return NextResponse.json({ ok: true, docsRoot, tree, diag });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return NextResponse.json(
