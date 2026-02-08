@@ -37,31 +37,40 @@ export function ActivityTicker({ className }: ActivityTickerProps) {
     event: (typeof events)[number],
     keyPrefix: string,
     idx: number,
-  ) => (
-    <div
-      key={`${keyPrefix}-${event.name}-${idx}`}
-      className="flex items-center gap-4 whitespace-nowrap"
-    >
-      {idx === lastEventIndex ? (
-        <span className="bg-[#CC0000] text-white px-2 py-0.5 font-mono text-[10px] uppercase tracking-tighter shrink-0">
-          Update
-        </span>
-      ) : null}
-      <a
-        href={event.discord}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="font-sans text-xs font-bold uppercase tracking-widest hover:text-[#CC0000]"
+  ) => {
+    let href = event.discord;
+    if (event.deprecated) {
+      href =
+        event.playback ||
+        "https://involutionhell.com/docs/jobs/event-keynote/event-takeway";
+    }
+
+    return (
+      <div
+        key={`${keyPrefix}-${event.name}-${idx}`}
+        className="flex items-center gap-4 whitespace-nowrap"
       >
-        {event.name} —{" "}
-        {event.deprecated ? "Archives Available" : "Event Active"}
-      </a>
-      <span className="text-neutral-400 font-mono text-[10px]">&bull;</span>
-      <span className="font-mono text-[10px] text-neutral-500 uppercase">
-        Edition 1.0.0
-      </span>
-    </div>
-  );
+        {idx === lastEventIndex ? (
+          <span className="bg-[#CC0000] text-white px-2 py-0.5 font-mono text-[10px] uppercase tracking-tighter shrink-0">
+            Update
+          </span>
+        ) : null}
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-sans text-xs font-bold uppercase tracking-widest hover:text-[#CC0000]"
+        >
+          {event.name} —{" "}
+          {event.deprecated ? "Archives Available" : "Event Active"}
+        </a>
+        <span className="text-neutral-400 font-mono text-[10px]">&bull;</span>
+        <span className="font-mono text-[10px] text-neutral-500 uppercase">
+          Edition 1.0.0
+        </span>
+      </div>
+    );
+  };
 
   return (
     <div
