@@ -60,17 +60,20 @@ async function buildTree(
 
   const dirs = entries.filter((d) => d.isDirectory());
 
+  // 并行处理所有子目录以提高 I/O 效率
   const nodePromises = dirs.map(async (e) => {
     if (e.name.startsWith(".") || e.name.startsWith("[")) return null;
     const abs = path.join(root, e.name);
     const nodeRel = rel ? `${rel}/${e.name}` : e.name;
     const node: DirNode = { name: e.name, path: nodeRel };
     if (maxDepth > 1) {
+      // 递归构建子树
       node.children = await buildTree(abs, maxDepth - 1, nodeRel);
     }
     return node;
   });
 
+  // 等待所有并行任务完成，并过滤掉被忽略的目录
   const nodes = (await Promise.all(nodePromises)).filter(
     (n): n is DirNode => n !== null,
   );
@@ -109,10 +112,11 @@ export async function GET() {
       );
     }
 
-    // pick the first existing candidate
+    // 异步并行检查所有候选路径是否存在
     const candidateChecks = await Promise.all(
       candidates.map(async (p) => {
         try {
+          // 使用 access 检查路径是否可读
           await fs.promises.access(p);
           return { p, exists: true };
         } catch {
@@ -120,6 +124,7 @@ export async function GET() {
         }
       }),
     );
+    // 从检查结果中找到第一个存在的路径
     const docsRoot = candidateChecks.find((c) => c.exists)?.p;
 
     if (!docsRoot) {
