@@ -569,6 +569,31 @@ async function main() {
   // 若未启用 DB，则 JSON 退化为“本轮快照 + 基础信息”（无法拿到累计值）。
   const finalJsonResults = [];
 
+  // 批量获取 DB 数据（解决 N+1 问题）
+  const docsMap = new Map();
+  if (shouldSyncDb) {
+    const docIdsToFetch = results.map((r) => r.docId).filter(Boolean);
+    const allDocs = await prisma.docs.findMany({
+      where: { id: { in: docIdsToFetch } },
+      select: {
+        id: true,
+        contributor_stats: true,
+        path_current: true,
+        doc_contributors: {
+          select: {
+            github_id: true,
+            contributions: true,
+            last_contributed_at: true,
+          },
+          orderBy: [{ contributions: "desc" }, { last_contributed_at: "desc" }],
+        },
+      },
+    });
+    for (const d of allDocs) {
+      docsMap.set(d.id, d);
+    }
+  }
+
   for (const r of results) {
     if (!r.docId) continue;
 
@@ -601,24 +626,7 @@ async function main() {
           .filter(Boolean),
       );
 
-      const row = await prisma.docs.findUnique({
-        where: { id: r.docId },
-        select: {
-          contributor_stats: true,
-          path_current: true,
-          doc_contributors: {
-            select: {
-              github_id: true,
-              contributions: true,
-              last_contributed_at: true,
-            },
-            orderBy: [
-              { contributions: "desc" },
-              { last_contributed_at: "desc" },
-            ],
-          },
-        },
-      });
+      const row = docsMap.get(r.docId);
 
       const contributorsFromDb = (row?.doc_contributors ?? [])
         .map((contrib) => ({
