@@ -7,6 +7,8 @@ import "./globals.css";
 import "katex/dist/katex.min.css";
 import { ThemeProvider } from "@/app/components/ThemeProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { auth } from "@/auth";
+import { UmamiIdentity } from "@/app/components/UmamiIdentity";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -119,9 +121,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const session = await auth();
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
@@ -224,6 +227,15 @@ export default function RootLayout({
             gtag('config', 'G-ED4GVN8YVW');
           `}
         </Script>
+        {/* Umami Analytics */}
+        <Script
+          defer
+          src="https://umami.involutionhell.com/script.js"
+          data-website-id="f3aeb896-50b7-4a5d-b37c-270550678c63"
+          strategy="lazyOnload"
+        />
+        {/* User Identification */}
+        <UmamiIdentity user={session?.user} />
         {/* 性能分析 */}
         <SpeedInsights />
       </body>
