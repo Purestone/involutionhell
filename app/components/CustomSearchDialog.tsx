@@ -18,11 +18,6 @@ import {
   type SharedProps,
 } from "fumadocs-ui/components/dialog/search";
 
-interface SearchLink {
-  name: string;
-  href: string;
-}
-
 interface TagItem {
   name: string;
   value: string;
