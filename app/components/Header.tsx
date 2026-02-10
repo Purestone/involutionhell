@@ -39,18 +39,27 @@ export async function Header() {
             <a
               href="#features"
               className="hover:text-[#CC0000] transition-colors"
+              data-umami-event="navigation_click"
+              data-umami-event-region="header"
+              data-umami-event-label="features"
             >
               特点
             </a>
             <a
               href="#community"
               className="hover:text-[#CC0000] transition-colors"
+              data-umami-event="navigation_click"
+              data-umami-event-region="header"
+              data-umami-event-label="community"
             >
               社区
             </a>
             <a
               href="#contact"
               className="hover:text-[#CC0000] transition-colors"
+              data-umami-event="navigation_click"
+              data-umami-event-region="header"
+              data-umami-event-label="contact"
             >
               联系我们
             </a>
@@ -68,6 +77,9 @@ export async function Header() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
+                data-umami-event="social_click"
+                data-umami-event-platform="github"
+                data-umami-event-location="header"
               >
                 <GithubIcon className="h-4 w-4" />
               </a>
@@ -83,6 +95,9 @@ export async function Header() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Discord"
+                data-umami-event="social_click"
+                data-umami-event-platform="discord"
+                data-umami-event-location="header"
               >
                 <MessageCircle className="h-4 w-4" />
               </a>

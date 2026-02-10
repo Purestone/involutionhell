@@ -107,6 +107,12 @@ const AssistantModalButton = forwardRef<
     if (onCloseBubble) {
       onCloseBubble();
     }
+
+    // 如果当前是关闭状态，说明即将打开，记录埋点
+    if (state === "closed" && window.umami) {
+      window.umami.track("ai_assistant_open");
+    }
+
     // 继续执行原有的点击事件
     if (rest.onClick) {
       rest.onClick(e);

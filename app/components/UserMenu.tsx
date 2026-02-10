@@ -22,6 +22,7 @@ export function UserMenu({ user, provider }: UserMenuProps) {
       <summary
         className="flex cursor-pointer list-none items-center rounded-full border border-border bg-background p-0.5 transition hover:border-primary/60 [&::-webkit-details-marker]:hidden"
         aria-label="Account menu"
+        data-umami-event="user_menu_click"
       >
         <Avatar className="size-9">
           {user.image ? (

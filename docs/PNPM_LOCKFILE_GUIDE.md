@@ -149,24 +149,24 @@ git status
 ```yaml
 steps:
   - uses: actions/checkout@v4
-  
+
   # 显式启用 corepack
   - name: Enable Corepack
     run: corepack enable
-  
+
   - uses: pnpm/action-setup@v4
-  
+
   - uses: actions/setup-node@v4
     with:
       node-version: 20
       cache: pnpm
-  
+
   # 验证版本
   - name: Check pnpm version
     run: node scripts/check-pnpm-version.mjs
-  
+
   - run: pnpm install --frozen-lockfile
-  
+
   # 验证 lockfile 没有被修改
   - name: Check lockfile consistency
     run: |
