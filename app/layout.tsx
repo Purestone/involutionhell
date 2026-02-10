@@ -9,6 +9,8 @@ import { ThemeProvider } from "@/app/components/ThemeProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { auth } from "@/auth";
 import { UmamiIdentity } from "@/app/components/UmamiIdentity";
+// import { SearchWrapper } from "@/app/components/SearchWrapper";
+import { CustomSearchDialog } from "@/app/components/CustomSearchDialog";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -205,6 +207,7 @@ export default async function RootLayout({
         <ThemeProvider defaultTheme="dark" storageKey="ih-theme">
           <RootProvider
             search={{
+              SearchDialog: CustomSearchDialog,
               // 使用静态索引，兼容 next export 与本地开发
               options: { type: "static", api: "/search.json" },
             }}

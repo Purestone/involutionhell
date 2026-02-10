@@ -2,76 +2,81 @@
 
 本文档描述了 Involution Hell 网站 (involutionhell.com) 的用户行为埋点设计。使用 Umami v2 进行数据采集。
 
-## 1. 全局组件 (Global Components)
+## 1. 全局导航与交互 (Global Navigation & Interaction)
 
-这些元素出现在几乎所有页面上（如页眉、页脚）。
+**内部导航 (Internal Navigation)**: 仅用于网站内部页面的跳转。
 
-| 区域       | 按钮/元素说明                     | 触发行为 | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                                                |
-| :--------- | :-------------------------------- | :------- | :---------------------- | :------------------------------------------------------------------- |
-| **Header** | 导航栏链接 (特点, 社区, 联系我们) | 点击     | `header_nav_click`      | `label`: 具体链接名称 (e.g., "features", "community", "contact")     |
-| **Header** | GitHub 图标按钮                   | 点击     | `social_click`          | `platform`: "github", `location`: "header"                           |
-| **Header** | Discord 图标按钮                  | 点击     | `social_click`          | `platform`: "discord", `location`: "header"                          |
-| **Header** | 主题切换 (Theme Toggle)           | 点击     | `theme_toggle`          | `theme`: 切换后的主题 ("light" / "dark")                             |
-| **Header** | 登录按钮 (Sign In)                | 点击     | `auth_click`            | `action`: "signin", `location`: "header"                             |
-| **Header** | 用户菜单 (User Menu)              | 点击     | `user_menu_click`       | -                                                                    |
-| **Footer** | GitHub 链接                       | 点击     | `social_click`          | `platform`: "github", `location`: "footer"                           |
-| **Footer** | Discord 链接                      | 点击     | `social_click`          | `platform`: "discord", `location`: "footer"                          |
-| **Footer** | 归档链接 (Archives)               | 点击     | `footer_link_click`     | `category`: "archives", `label`: 链接名称 (e.g., "AI & Mathematics") |
-| **Footer** | 资源链接 (Resources)              | 点击     | `footer_link_click`     | `category`: "resources", `label`: 链接名称 (e.g., "Zotero Library")  |
+| 区域 (Region)  | 元素说明                      | 触发行为 | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                                                                 |
+| :------------- | :---------------------------- | :------- | :---------------------- | :------------------------------------------------------------------------------------ |
+| **header**     | 导航链接 (特点, 社区等)       | 点击     | `navigation_click`      | `region`: "header", `label`: 链接名 (e.g., "features"), `path`: 目标路径              |
+| **footer**     | 归档/资源链接                 | 点击     | `navigation_click`      | `region`: "footer", `label`: 链接名 (e.g., "AI & Mathematics"), `category`: "archive" |
+| **sidebar**    | 文档侧边栏链接                | 点击     | `navigation_click`      | `region`: "sidebar", `label`: 页面标题, `path`: 目标路径                              |
+| **toc**        | 目录 (Table of Contents) 链接 | 点击     | `navigation_click`      | `region`: "toc", `label`: 章节标题                                                    |
+| **pagination** | 上一篇/下一篇                 | 点击     | `navigation_click`      | `region`: "pagination", `label`: "prev" / "next", `path`: 目标路径                    |
 
-## 2. 首页 (Home Page - /)
+**资源与外部链接 (Resources & External Links)**: 用于追踪外部资源、工具或社交媒体的点击。
 
-| 区域                  | 按钮/元素说明                  | 触发行为 | 埋点事件名 (Event Name)      | 埋点传参 (Event Data)                                        |
-| :-------------------- | :----------------------------- | :------- | :--------------------------- | :----------------------------------------------------------- |
-| **Hero**              | 核心分类卡片 (AI, CS, etc.)    | 点击     | `home_category_click`        | `category`: 分类名称 (e.g., "AI", "Computer Science")        |
-| **Hero**              | 投稿按钮 (Submit Contribution) | 点击     | `contribute_trigger`         | `location`: "hero"                                           |
-| **Hero (Contribute)** | 投稿弹窗 - 跳转 GitHub         | 点击     | `contribute_github_redirect` | `dir`: 目录路径, `filename`: 文件名                          |
-| **Hero (Right)**      | 访问文章按钮 (Access Articles) | 点击     | `feature_cta_click`          | `action`: "access_articles", `location`: "hero_sidebar"      |
-| **Community**         | 知识库 - 访问文章按钮          | 点击     | `feature_cta_click`          | `action`: "access_articles", `location`: "community_section" |
-| **Community**         | GitHub 仓库卡片按钮            | 点击     | `social_click`               | `platform`: "github", `location`: "community_card"           |
-| **Community**         | Discord 社区卡片按钮           | 点击     | `social_click`               | `platform`: "discord", `location`: "community_card"          |
-| **Community**         | Zotero 文献库卡片按钮          | 点击     | `resource_click`             | `type`: "zotero", `location`: "community_card"               |
+| 类别 (Category) | 元素说明               | 触发行为 | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                                         |
+| :-------------- | :--------------------- | :------- | :---------------------- | :------------------------------------------------------------ |
+| **Tool**        | Zotero 文献库          | 点击     | `resource_click`        | `type`: "zotero", `location`: "community_card", `url`: 链接   |
+| **Repo**        | GitHub 仓库            | 点击     | `resource_click`        | `type`: "github_repo", `location`: "community_card"           |
+| **Community**   | Discord 社区           | 点击     | `resource_click`        | `type`: "discord_invite", `location`: "community_card"        |
+| **Social**      | Footer/Header 社交链接 | 点击     | `social_click`          | `platform`: "github"/"discord", `location`: "header"/"footer" |
 
-## 3. 文档页 (Documentation - /docs/\*)
+## 2. 核心功能交互 (Core Features)
 
-| 区域          | 按钮/元素说明                     | 触发行为 | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                                                          |
-| :------------ | :-------------------------------- | :------- | :---------------------- | :----------------------------------------------------------------------------- |
-| **Sidebar**   | 侧边栏导航链接                    | 点击     | `docs_nav_click`        | `path`: 目标路径                                                               |
-| **Content**   | 在 GitHub 上编辑 (Edit on GitHub) | 点击     | `docs_edit_click`       | `page`: 当前页面路径                                                           |
-| **Assistant** | AI 助手 - 打开聊天                | 点击     | `ai_assistant_open`     | -                                                                              |
-| **Assistant** | AI 助手 - 发送消息                | 发送     | `ai_assistant_query`    | `length`: 字符数范围 (e.g., "0-50", "50-100") _注意：不记录具体内容以保护隐私_ |
-| **Content**   | 复制生词/代码块                   | 点击     | `content_copy`          | `type`: "code" 或 "text"                                                       |
+| 功能模块   | 动作说明                      | 触发行为 | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                                        |
+| :--------- | :---------------------------- | :------- | :---------------------- | :----------------------------------------------------------- |
+| **Search** | 执行搜索                      | 提交     | `search_query`          | `query`: 搜索关键词                                          |
+| **Search** | 点击搜索结果                  | 点击     | `search_result_click`   | `query`: 搜索关键词, `rank`: 排名 (1-based), `url`: 结果链接 |
+| **Theme**  | 切换主题                      | 点击     | `theme_toggle`          | `theme`: "light" / "dark"                                    |
+| **Auth**   | 登录 (Header/Login Page)      | 点击     | `auth_click`            | `action`: "signin", `location`: 触发位置                     |
+| **Social** | 社交媒体链接 (GitHub/Discord) | 点击     | `social_click`          | `platform`: "github"/"discord", `location`: 触发位置         |
 
-## 4. 登录页 (Login - /login)
+## 3. 内容互动与反馈 (Content Interaction & Feedback)
 
-| 区域     | 按钮/元素说明 | 触发行为 | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                        |
-| :------- | :------------ | :------- | :---------------------- | :------------------------------------------- |
-| **Main** | 登录按钮      | 点击     | `auth_click`            | `action`: "signin", `location`: "login_page" |
+| 区域             | 元素说明           | 触发行为 | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                                                |
+| :--------------- | :----------------- | :------- | :---------------------- | :------------------------------------------------------------------- |
+| **Content**      | 复制生词/代码块    | 点击     | `prose_copy`            | `type`: "code"/"text", `content_length`: 字符数范围                  |
+| **Content**      | 页面反馈 (Helpful) | 点击     | `feedback_submit`       | `page`: 当前页面路径, `vote`: "helpful" / "not_helpful"              |
+| **Feature**      | 投稿 (Contribute)  | 点击     | `contribute_trigger`    | `location`: "hero" / "docs"                                          |
+| **AI Assistant** | 提问               | 发送     | `ai_assistant_query`    | `length`: 字符数范围 (e.g., "0-50") _注意：不记录具体内容以保护隐私_ |
+
+## 4. 异常与错误 (Errors)
+
+| 场景    | 说明       | 触发条件      | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                  |
+| :------ | :--------- | :------------ | :---------------------- | :------------------------------------- |
+| **404** | 页面未找到 | 访问 404 页面 | `error_404`             | `path`: 访问路径, `referrer`: 来源页面 |
 
 ## 实施指南
 
-在 Next.js / React 中使用 Umami 进行埋点可以通过添加 `data-umami-event` 属性来实现，或者使用 `window.umami.track()` 函数。
-
-### 示例 1: HTML 属性方式 (推荐用于静态内容)
+### 统一导航埋点示例
 
 ```jsx
-<button
-  data-umami-event="auth_click"
-  data-umami-event-action="signin"
-  data-umami-event-location="header"
->
-  Sign In
-</button>
+// Header Link
+<a
+  href="#features"
+  data-umami-event="navigation_click"
+  data-umami-event-region="header"
+  data-umami-event-label="features"
+>特点</a>
+
+// Sidebar Link (Fumadocs integration example)
+<Link
+  href="/docs/ai"
+  onClick={() => umami.track('navigation_click', { region: 'sidebar', path: '/docs/ai' })}
+>Artificial Intelligence</Link>
 ```
 
-### 示例 2: JS 函数方式 (推荐用于动态交互)
+### 搜索埋点示例 (配合 cmdk / fumadocs)
 
-```javascript
-// 在组件中调用
-const handleThemeToggle = (newTheme) => {
-  setTheme(newTheme);
-  if (window.umami) {
-    window.umami.track("theme_toggle", { theme: newTheme });
-  }
+```tsx
+// 在搜索组件中
+const onSelectResult = (result, index) => {
+  umami.track("search_result_click", {
+    query: searchQuery,
+    rank: index + 1,
+    url: result.url,
+  });
 };
 ```

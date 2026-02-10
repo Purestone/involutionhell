@@ -39,7 +39,8 @@ export async function Header() {
             <a
               href="#features"
               className="hover:text-[#CC0000] transition-colors"
-              data-umami-event="header_nav_click"
+              data-umami-event="navigation_click"
+              data-umami-event-region="header"
               data-umami-event-label="features"
             >
               特点
@@ -47,7 +48,8 @@ export async function Header() {
             <a
               href="#community"
               className="hover:text-[#CC0000] transition-colors"
-              data-umami-event="header_nav_click"
+              data-umami-event="navigation_click"
+              data-umami-event-region="header"
               data-umami-event-label="community"
             >
               社区
@@ -55,7 +57,8 @@ export async function Header() {
             <a
               href="#contact"
               className="hover:text-[#CC0000] transition-colors"
-              data-umami-event="header_nav_click"
+              data-umami-event="navigation_click"
+              data-umami-event-region="header"
               data-umami-event-label="contact"
             >
               联系我们

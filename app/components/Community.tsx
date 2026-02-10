@@ -45,9 +45,9 @@ export function Community() {
                 href="docs/ai"
                 target="_blank"
                 rel="noopener noreferrer"
-                data-umami-event="feature_cta_click"
-                data-umami-event-action="access_articles"
-                data-umami-event-location="community_section"
+                data-umami-event="navigation_click"
+                data-umami-event-region="community_section"
+                data-umami-event-label="Access Articles"
               >
                 Access Articles / 访问文章{" "}
                 <ExternalLink className="ml-4 h-5 w-5" />
@@ -80,8 +80,8 @@ export function Community() {
                 href="https://github.com/involutionhell"
                 target="_blank"
                 rel="noopener noreferrer"
-                data-umami-event="social_click"
-                data-umami-event-platform="github"
+                data-umami-event="resource_click"
+                data-umami-event-type="github_repo"
                 data-umami-event-location="community_card"
               >
                 Source Code <ExternalLink className="ml-2 h-4 w-4" />
@@ -108,8 +108,8 @@ export function Community() {
                 href="https://discord.com/invite/6CGP73ZWbD"
                 target="_blank"
                 rel="noopener noreferrer"
-                data-umami-event="social_click"
-                data-umami-event-platform="discord"
+                data-umami-event="resource_click"
+                data-umami-event-type="discord_invite"
                 data-umami-event-location="community_card"
               >
                 Join Dispatch <ExternalLink className="ml-2 h-4 w-4" />

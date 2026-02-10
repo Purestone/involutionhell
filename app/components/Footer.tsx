@@ -63,8 +63,8 @@ export function Footer() {
                   <Link
                     href="/docs/ai"
                     className="hover:text-[#CC0000] transition-colors"
-                    data-umami-event="footer_link_click"
-                    data-umami-event-category="archives"
+                    data-umami-event="navigation_click"
+                    data-umami-event-region="footer"
                     data-umami-event-label="AI & Mathematics"
                   >
                     AI & Mathematics
@@ -74,8 +74,8 @@ export function Footer() {
                   <Link
                     href="/docs/computer-science"
                     className="hover:text-[#CC0000] transition-colors"
-                    data-umami-event="footer_link_click"
-                    data-umami-event-category="archives"
+                    data-umami-event="navigation_click"
+                    data-umami-event-region="footer"
                     data-umami-event-label="Computer Science"
                   >
                     Computer Science
@@ -85,8 +85,8 @@ export function Footer() {
                   <Link
                     href="/docs/CommunityShare"
                     className="hover:text-[#CC0000] transition-colors"
-                    data-umami-event="footer_link_click"
-                    data-umami-event-category="archives"
+                    data-umami-event="navigation_click"
+                    data-umami-event-region="footer"
                     data-umami-event-label="Community Sharing"
                   >
                     Community Sharing
@@ -96,8 +96,8 @@ export function Footer() {
                   <Link
                     href="/docs/jobs"
                     className="hover:text-[#CC0000] transition-colors"
-                    data-umami-event="footer_link_click"
-                    data-umami-event-category="archives"
+                    data-umami-event="navigation_click"
+                    data-umami-event-region="footer"
                     data-umami-event-label="Career Prep"
                   >
                     Career Prep
@@ -117,9 +117,10 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-[#CC0000] transition-colors"
-                    data-umami-event="footer_link_click"
-                    data-umami-event-category="resources"
-                    data-umami-event-label="Zotero Library"
+                    data-umami-event="resource_click"
+                    data-umami-event-type="zotero"
+                    data-umami-event-location="footer"
+                    data-umami-event-url="https://www.zotero.org/groups/6053219/unsw_ai/library"
                   >
                     Zotero Library
                   </a>

@@ -65,6 +65,8 @@ export function Features() {
             <div
               key={index}
               className="group relative border-r border-b border-[var(--foreground)] p-12 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
+              data-umami-event="feature_card_hover"
+              data-umami-event-title={feature.title}
             >
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between mb-8">
