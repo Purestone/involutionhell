@@ -132,6 +132,14 @@ export function Contribute() {
     if (filename !== articleFile) {
       setArticleFile(filename);
     }
+
+    if (window.umami) {
+      window.umami.track("contribute_github_redirect", {
+        dir: finalDirPath,
+        filename: filename,
+      });
+    }
+
     window.open(
       buildGithubNewUrl(finalDirPath, filename, title),
       "_blank",
@@ -162,6 +170,8 @@ export function Contribute() {
                      text-2xl font-serif font-black uppercase italic tracking-tighter
                      bg-[var(--foreground)] text-[var(--background)] border border-[var(--foreground)]
                      hover:bg-[var(--background)] hover:text-[var(--foreground)] transition-all duration-300"
+            data-umami-event="contribute_trigger"
+            data-umami-event-location="hero"
             onClick={(event) => {
               event.preventDefault();
               router.push("/editor");

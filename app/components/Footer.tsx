@@ -27,6 +27,9 @@ export function Footer() {
                 rel="noopener noreferrer"
                 aria-label="访问 GitHub"
                 title="访问 GitHub"
+                data-umami-event="social_click"
+                data-umami-event-platform="github"
+                data-umami-event-location="footer"
                 className="w-12 h-12 flex items-center justify-center border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all text-[var(--foreground)]"
               >
                 <Github className="h-5 w-5" />
@@ -38,6 +41,9 @@ export function Footer() {
                 rel="noopener noreferrer"
                 aria-label="加入 Discord 社区"
                 title="加入 Discord 社区"
+                data-umami-event="social_click"
+                data-umami-event-platform="discord"
+                data-umami-event-location="footer"
                 className="w-12 h-12 flex items-center justify-center border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all text-[var(--foreground)]"
               >
                 <MessageCircle className="h-5 w-5" />
@@ -57,6 +63,9 @@ export function Footer() {
                   <Link
                     href="/docs/ai"
                     className="hover:text-[#CC0000] transition-colors"
+                    data-umami-event="footer_link_click"
+                    data-umami-event-category="archives"
+                    data-umami-event-label="AI & Mathematics"
                   >
                     AI & Mathematics
                   </Link>
@@ -65,6 +74,9 @@ export function Footer() {
                   <Link
                     href="/docs/computer-science"
                     className="hover:text-[#CC0000] transition-colors"
+                    data-umami-event="footer_link_click"
+                    data-umami-event-category="archives"
+                    data-umami-event-label="Computer Science"
                   >
                     Computer Science
                   </Link>
@@ -73,6 +85,9 @@ export function Footer() {
                   <Link
                     href="/docs/CommunityShare"
                     className="hover:text-[#CC0000] transition-colors"
+                    data-umami-event="footer_link_click"
+                    data-umami-event-category="archives"
+                    data-umami-event-label="Community Sharing"
                   >
                     Community Sharing
                   </Link>
@@ -81,6 +96,9 @@ export function Footer() {
                   <Link
                     href="/docs/jobs"
                     className="hover:text-[#CC0000] transition-colors"
+                    data-umami-event="footer_link_click"
+                    data-umami-event-category="archives"
+                    data-umami-event-label="Career Prep"
                   >
                     Career Prep
                   </Link>
@@ -99,6 +117,9 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-[#CC0000] transition-colors"
+                    data-umami-event="footer_link_click"
+                    data-umami-event-category="resources"
+                    data-umami-event-label="Zotero Library"
                   >
                     Zotero Library
                   </a>

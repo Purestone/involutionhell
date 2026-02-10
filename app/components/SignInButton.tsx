@@ -27,7 +27,14 @@ export function SignInButton({
         });
       }}
     >
-      <Button type="submit" size="sm" variant="outline">
+      <Button
+        type="submit"
+        size="sm"
+        variant="outline"
+        data-umami-event="auth_click"
+        data-umami-event-action="signin"
+        data-umami-event-location="header"
+      >
         SignIn
       </Button>
     </form>

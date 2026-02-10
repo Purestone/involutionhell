@@ -41,7 +41,14 @@ export function Community() {
               asChild
               className="bg-transparent border-[var(--foreground)] text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] px-12 py-8 h-auto font-sans text-sm uppercase tracking-widest font-bold"
             >
-              <a href="docs/ai" target="_blank" rel="noopener noreferrer">
+              <a
+                href="docs/ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-umami-event="feature_cta_click"
+                data-umami-event-action="access_articles"
+                data-umami-event-location="community_section"
+              >
                 Access Articles / 访问文章{" "}
                 <ExternalLink className="ml-4 h-5 w-5" />
               </a>
@@ -73,6 +80,9 @@ export function Community() {
                 href="https://github.com/involutionhell"
                 target="_blank"
                 rel="noopener noreferrer"
+                data-umami-event="social_click"
+                data-umami-event-platform="github"
+                data-umami-event-location="community_card"
               >
                 Source Code <ExternalLink className="ml-2 h-4 w-4" />
               </a>
@@ -98,6 +108,9 @@ export function Community() {
                 href="https://discord.com/invite/6CGP73ZWbD"
                 target="_blank"
                 rel="noopener noreferrer"
+                data-umami-event="social_click"
+                data-umami-event-platform="discord"
+                data-umami-event-location="community_card"
               >
                 Join Dispatch <ExternalLink className="ml-2 h-4 w-4" />
               </a>
@@ -123,6 +136,9 @@ export function Community() {
                 href="https://www.zotero.org/groups/6053219/unsw_ai/library"
                 target="_blank"
                 rel="noopener noreferrer"
+                data-umami-event="resource_click"
+                data-umami-event-type="zotero"
+                data-umami-event-location="community_card"
               >
                 View Library <ExternalLink className="ml-2 h-4 w-4" />
               </a>

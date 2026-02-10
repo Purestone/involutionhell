@@ -13,6 +13,9 @@ export function ThemeToggle() {
       onClick={() => {
         const next = theme === "light" ? "dark" : "light";
         setTheme(next);
+        if (window.umami) {
+          window.umami.track("theme_toggle", { theme: next });
+        }
       }}
       className="h-10 w-10 rounded-none transition-colors"
     >

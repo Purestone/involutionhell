@@ -52,7 +52,15 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
     [geminiApiKey, openaiApiKey, pageContext, provider],
   );
 
-  const chat = useChat({ transport });
+  const chat = useChat({
+    transport,
+    onFinish: () => {
+      // 当对话结束时（流式传输完成），记录一次查询行为
+      if (window.umami) {
+        window.umami.track("ai_assistant_query");
+      }
+    },
+  });
 
   const {
     error: chatError,

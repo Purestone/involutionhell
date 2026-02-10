@@ -5,6 +5,8 @@ export function EditOnGithub({ href }: { href: string }) {
     <Link
       href={href}
       className="inline-flex items-center gap-2 rounded-md px-4 h-11 text-base font-medium hover:bg-muted/80 hover:text-foreground no-underline"
+      data-umami-event="docs_edit_click"
+      data-umami-event-page={href}
     >
       <svg
         aria-hidden="true"
