@@ -39,11 +39,11 @@
 
 | 区域             | 元素说明                   | 触发行为 | 埋点事件名 (Event Name)      | 埋点传参 (Event Data)                                        |
 | :--------------- | :------------------------- | :------- | :--------------------------- | :----------------------------------------------------------- |
-| **Content**      | 复制生词/代码块            | 复制     | `prose_copy`                 | `type`: "code"/"text", `content_length`: 字符数 (number)     |
+| **Content**      | 复制生词/代码块            | 复制     | `content_copy`               | `type`: "code"/"text", `content_length`: 字符数 (number)     |
 | **Content**      | 页面反馈 (Helpful)         | 点击     | `feedback_submit`            | `page`: 当前页面路径, `vote`: "helpful" / "not_helpful"      |
 | **Feature**      | 投稿 (Contribute)          | 点击     | `contribute_trigger`         | `location`: "hero" / "docs"                                  |
 | **Feature**      | 投稿跳转 (Github Redirect) | 跳转     | `contribute_github_redirect` | `dir`: 目标目录, `filename`: 文件名                          |
-| **AI Assistant** | 提问                       | 完成     | `ai_assistant_query`         | `length`: 查询字符数 (number) _注意：不记录具体内容以保护隐私_ |
+| **AI Assistant** | 提问                       | 完成     | `ai_assistant_query`         | _(暂未包含具体参数)_                                         |
 
 ## 4. 异常与错误 (Errors)
 
@@ -86,7 +86,7 @@ umami.track("search_result_click", {
 
 ```tsx
 // 自动监听 document copy 事件
-umami.track("prose_copy", {
+umami.track("content_copy", {
   type: isCode ? "code" : "text",
   content_length: selection.toString().length,
 });

@@ -42,7 +42,7 @@ export function CopyTracking() {
 
       // Umami 埋点: 记录复制行为，区分文本/代码类型和复制长度
       if (window.umami) {
-        window.umami.track("prose_copy", {
+        window.umami.track("content_copy", {
           type,
           content_length: text.length,
         });

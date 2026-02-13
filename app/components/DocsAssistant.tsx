@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useAISDKRuntime } from "@assistant-ui/react-ai-sdk";
@@ -54,31 +54,19 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
 
   const chat = useChat({
     transport,
+    onFinish: () => {
+      // 当对话结束时（流式传输完成），记录一次查询行为
+      if (window.umami) {
+        window.umami.track("ai_assistant_query");
+      }
+    },
   });
 
   const {
-    messages,
     error: chatError,
     status: chatStatus,
     clearError: clearChatError,
   } = chat;
-
-  // Track assistant query completion
-  const prevStatus = useRef(chatStatus);
-
-  useEffect(() => {
-    if (prevStatus.current === "streaming" && chatStatus === "ready") {
-      // Streaming finished successfully
-      const lastUserMessage = messages.filter((m) => m.role === "user").pop();
-      // Umami 埋点: AI 对话结束，记录查询长度（保护隐私，不记录具体内容）
-      if (window.umami) {
-        window.umami.track("ai_assistant_query", {
-          length: (lastUserMessage as any)?.content?.length ?? 0, // eslint-disable-line @typescript-eslint/no-explicit-any
-        });
-      }
-    }
-    prevStatus.current = chatStatus;
-  }, [chatStatus, messages]);
 
   useEffect(() => {
     if (chatStatus === "submitted" || chatStatus === "streaming") {

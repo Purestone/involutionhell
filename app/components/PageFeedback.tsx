@@ -12,8 +12,8 @@ export function PageFeedback() {
   const handleVote = (vote: "helpful" | "not_helpful") => {
     if (voted) return;
 
-    // Umami 埋点: 记录用户是否有帮助的投票
     if (window.umami) {
+      // Umami 埋点: 记录用户是否有帮助的投票
       window.umami.track("feedback_submit", {
         page: pathname,
         vote,
@@ -24,32 +24,32 @@ export function PageFeedback() {
 
   if (voted) {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2 mt-8 py-4 border-t border-border">
+      <div className="flex items-center gap-2 text-sm text-neutral-500 mt-8 py-4 border-t border-[var(--foreground)] font-serif italic">
         <span>Thanks for your feedback! / 感谢您的反馈！</span>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 py-4 border-t border-border mt-8">
-      <span className="text-sm font-medium text-muted-foreground">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 py-4 border-t border-[var(--foreground)] mt-8">
+      <span className="text-sm font-medium text-[var(--foreground)] font-serif">
         Was this page helpful? / 这篇文章有帮助吗？
       </span>
       <div className="flex gap-2">
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={() => handleVote("helpful")}
-          className="gap-2 hover:bg-green-500/10 hover:text-green-600"
+          className="gap-2 border-[var(--foreground)] text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors rounded-none font-sans"
         >
           <ThumbsUp className="h-4 w-4" />
           Yes
         </Button>
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={() => handleVote("not_helpful")}
-          className="gap-2 hover:bg-red-500/10 hover:text-red-600"
+          className="gap-2 border-[var(--foreground)] text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors rounded-none font-sans"
         >
           <ThumbsDown className="h-4 w-4" />
           No
