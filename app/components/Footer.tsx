@@ -63,6 +63,7 @@ export function Footer() {
                   <Link
                     href="/docs/ai"
                     className="hover:text-[#CC0000] transition-colors"
+                    // Umami 埋点: Footer 快速链接点击
                     data-umami-event="navigation_click"
                     data-umami-event-region="footer"
                     data-umami-event-label="AI & Mathematics"
@@ -74,6 +75,7 @@ export function Footer() {
                   <Link
                     href="/docs/computer-science"
                     className="hover:text-[#CC0000] transition-colors"
+                    // Umami 埋点: Footer 快速链接点击
                     data-umami-event="navigation_click"
                     data-umami-event-region="footer"
                     data-umami-event-label="Computer Science"
@@ -85,6 +87,7 @@ export function Footer() {
                   <Link
                     href="/docs/CommunityShare"
                     className="hover:text-[#CC0000] transition-colors"
+                    // Umami 埋点: Footer 快速链接点击
                     data-umami-event="navigation_click"
                     data-umami-event-region="footer"
                     data-umami-event-label="Community Sharing"
@@ -96,6 +99,7 @@ export function Footer() {
                   <Link
                     href="/docs/jobs"
                     className="hover:text-[#CC0000] transition-colors"
+                    // Umami 埋点: Footer 快速链接点击
                     data-umami-event="navigation_click"
                     data-umami-event-region="footer"
                     data-umami-event-label="Career Prep"
@@ -128,6 +132,10 @@ export function Footer() {
                 <li>
                   <a
                     href="#features"
+                    // Umami 埋点: Footer 快速链接点击
+                    data-umami-event="navigation_click"
+                    data-umami-event-region="footer"
+                    data-umami-event-label="Mission Brief"
                     className="hover:text-[#CC0000] transition-colors"
                   >
                     Mission Brief
@@ -136,6 +144,10 @@ export function Footer() {
                 <li>
                   <a
                     href="#community"
+                    // Umami 埋点: Footer 快速链接点击
+                    data-umami-event="navigation_click"
+                    data-umami-event-region="footer"
+                    data-umami-event-label="Network Status"
                     className="hover:text-[#CC0000] transition-colors"
                   >
                     Network Status
