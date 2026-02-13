@@ -12,6 +12,7 @@ export function PageFeedback() {
   const handleVote = (vote: "helpful" | "not_helpful") => {
     if (voted) return;
 
+    // Umami 埋点: 记录用户是否有帮助的投票
     if (window.umami) {
       window.umami.track("feedback_submit", {
         page: pathname,

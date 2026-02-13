@@ -9,6 +9,7 @@ export default function NotFound() {
   const pathname = usePathname();
 
   useEffect(() => {
+      // Umami 埋点: 记录 404 错误和来源页面 (Referrer)
     if (window.umami) {
       window.umami.track("error_404", {
         path: pathname,

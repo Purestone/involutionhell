@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 export function CopyTracking() {
   useEffect(() => {
+    // 监听全局 Copy 事件
     const handleCopy = () => {
       const selection = window.getSelection();
       if (!selection || selection.isCollapsed) return;
@@ -35,9 +36,11 @@ export function CopyTracking() {
       };
 
       if (isCode(anchorNode) || isCode(focusNode)) {
+      // 判断选中节点是否包含在 <pre> 或 <code> 标签内，区分代码块复制
         type = "code";
       }
 
+      // Umami 埋点: 记录复制行为，区分文本/代码类型和复制长度
       if (window.umami) {
         window.umami.track("prose_copy", {
           type,

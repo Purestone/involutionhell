@@ -70,6 +70,7 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
     if (prevStatus.current === "streaming" && chatStatus === "ready") {
       // Streaming finished successfully
       const lastUserMessage = messages.filter((m) => m.role === "user").pop();
+      // Umami 埋点: AI 对话结束，记录查询长度（保护隐私，不记录具体内容）
       if (window.umami) {
         window.umami.track("ai_assistant_query", {
           length: (lastUserMessage as any)?.content?.length ?? 0, // eslint-disable-line @typescript-eslint/no-explicit-any

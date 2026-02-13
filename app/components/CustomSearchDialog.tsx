@@ -82,6 +82,7 @@ export function CustomSearchDialog({
     if (!search) return;
 
     const timer = setTimeout(() => {
+            // Umami 埋点: 搜索结果点击
       if (window.umami) {
         window.umami.track("search_query", { query: search });
       }
@@ -100,6 +101,7 @@ export function CustomSearchDialog({
     }));
   }, [links]);
 
+  // 使用 useMemo 劫持 search items，注入埋点逻辑
   const trackedItems = useMemo(() => {
     const data = query.data !== "empty" && query.data ? query.data : defaultItems;
     if (!data) return [];
@@ -109,6 +111,7 @@ export function CustomSearchDialog({
         return {
           ...searchItem,
           onSelect: (value: string) => {
+            // Umami 埋点: 搜索结果点击
             if (window.umami) {
               window.umami.track("search_result_click", {
                 query: search,
@@ -122,6 +125,7 @@ export function CustomSearchDialog({
 
             // Handle navigation if URL exists
             if (searchItem.url) {
+                // 显式执行路由跳转和关闭弹窗，确保点击行为能够同时触发埋点和导航
                 router.push(searchItem.url);
                 if (onOpenChange) {
                     onOpenChange(false);

@@ -83,6 +83,7 @@ export function Hero() {
               <Link
                 href="/docs/ai"
                 className="block w-full"
+                // Umami 埋点: Hero CTA 按钮点击
                 data-umami-event="navigation_click"
                 data-umami-event-region="hero_cta"
                 data-umami-event-label="Access Articles"
@@ -113,6 +114,7 @@ export function Hero() {
                 <Link
                   href={c.href}
                   className="p-8 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors h-full flex flex-col hard-shadow-hover"
+                  // Umami 埋点: 首页分类卡片点击
                   data-umami-event="navigation_click"
                   data-umami-event-region="home_categories" data-umami-event-label={c.title}
                 >
