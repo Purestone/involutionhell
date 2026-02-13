@@ -10,7 +10,10 @@ export default function NotFound() {
 
   useEffect(() => {
     if (window.umami) {
-      window.umami.track("404", { path: pathname });
+      window.umami.track("error_404", {
+        path: pathname,
+        referrer: document.referrer || "direct",
+      });
     }
   }, [pathname]);
 

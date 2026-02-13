@@ -13,6 +13,7 @@ import {
 import { Contributors } from "@/app/components/Contributors";
 import { DocsAssistant } from "@/app/components/DocsAssistant";
 import { LicenseNotice } from "@/app/components/LicenseNotice";
+import { PageFeedback } from "@/app/components/PageFeedback";
 import fs from "fs/promises";
 import path from "path";
 
@@ -92,6 +93,7 @@ export default async function DocPage({ params }: Param) {
           </div>
           <Mdx components={getMDXComponents()} />
           <Contributors entry={contributorsEntry} />
+          <PageFeedback />
           <section className="mt-16">
             <GiscusComments docId={docIdFromPage ?? null} />
           </section>

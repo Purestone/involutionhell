@@ -83,9 +83,9 @@ export function Hero() {
               <Link
                 href="/docs/ai"
                 className="block w-full"
-                data-umami-event="feature_cta_click"
-                data-umami-event-action="access_articles"
-                data-umami-event-location="hero_sidebar"
+                data-umami-event="navigation_click"
+                data-umami-event-region="hero_cta"
+                data-umami-event-label="Access Articles"
               >
                 <button className="w-full py-3 border border-[var(--background)] font-sans text-xs uppercase tracking-widest hover:bg-[var(--background)] hover:text-[var(--foreground)] transition-all cursor-pointer">
                   Access Articles / 访问文章
@@ -113,8 +113,8 @@ export function Hero() {
                 <Link
                   href={c.href}
                   className="p-8 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors h-full flex flex-col hard-shadow-hover"
-                  data-umami-event="home_category_click"
-                  data-umami-event-category={c.title}
+                  data-umami-event="navigation_click"
+                  data-umami-event-region="home_categories" data-umami-event-label={c.title}
                 >
                   <div className="font-mono text-[10px] text-neutral-400 mb-4">
                     00{idx + 1}

@@ -17,6 +17,7 @@ import {
   TagsListItem,
   type SharedProps,
 } from "fumadocs-ui/components/dialog/search";
+import { useRouter } from "next/navigation";
 
 interface TagItem {
   name: string;
@@ -34,6 +35,12 @@ interface DefaultSearchDialogProps extends SharedProps {
   allowClear?: boolean;
 }
 
+interface SearchItem {
+  url?: string;
+  onSelect?: (value: string) => void;
+  [key: string]: unknown;
+}
+
 export function CustomSearchDialog({
   defaultTag,
   tags = [],
@@ -46,7 +53,12 @@ export function CustomSearchDialog({
   ...props
 }: DefaultSearchDialogProps) {
   const { locale } = useI18n();
+  const router = useRouter();
   const [tag, setTag] = useState(defaultTag);
+
+  // Extract onOpenChange to use in dependency array cleanly
+  const { onOpenChange, ...otherProps } = props;
+
   const { search, setSearch, query } = useDocsSearch(
     type === "fetch"
       ? {
@@ -65,7 +77,7 @@ export function CustomSearchDialog({
         },
   );
 
-  // Tracking logic
+  // Tracking logic for queries
   useEffect(() => {
     if (!search) return;
 
@@ -88,12 +100,45 @@ export function CustomSearchDialog({
     }));
   }, [links]);
 
+  const trackedItems = useMemo(() => {
+    const data = query.data !== "empty" && query.data ? query.data : defaultItems;
+    if (!data) return [];
+
+    return data.map((item: unknown, index: number) => {
+        const searchItem = item as SearchItem;
+        return {
+          ...searchItem,
+          onSelect: (value: string) => {
+            if (window.umami) {
+              window.umami.track("search_result_click", {
+                query: search,
+                rank: index + 1,
+                url: searchItem.url,
+              });
+            }
+
+            // Call original onSelect if it exists
+            if (searchItem.onSelect) searchItem.onSelect(value);
+
+            // Handle navigation if URL exists
+            if (searchItem.url) {
+                router.push(searchItem.url);
+                if (onOpenChange) {
+                    onOpenChange(false);
+                }
+            }
+          },
+        };
+    });
+  }, [query.data, defaultItems, search, router, onOpenChange]);
+
   return (
     <SearchDialog
       search={search}
       onSearchChange={setSearch}
       isLoading={query.isLoading}
-      {...props}
+      onOpenChange={onOpenChange}
+      {...otherProps}
     >
       <SearchDialogOverlay />
       <SearchDialogContent>
@@ -102,11 +147,8 @@ export function CustomSearchDialog({
           <SearchDialogInput />
           <SearchDialogClose />
         </SearchDialogHeader>
-        <SearchDialogList
-          items={
-            query.data !== "empty" && query.data ? query.data : defaultItems
-          }
-        />
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        <SearchDialogList items={trackedItems as any} />
       </SearchDialogContent>
       <SearchDialogFooter>
         {tags.length > 0 && (

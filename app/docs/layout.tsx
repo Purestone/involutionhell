@@ -4,6 +4,7 @@ import { baseOptions } from "@/lib/layout.shared";
 import type { ReactNode } from "react";
 import { DocsRouteFlag } from "@/app/components/RouteFlags";
 import type { PageTree } from "fumadocs-core/server";
+import { CopyTracking } from "@/app/components/CopyTracking";
 
 function pruneEmptyFolders(root: PageTree.Root): PageTree.Root {
   const transformNode = (node: PageTree.Node): PageTree.Node | null => {
@@ -68,6 +69,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
   return (
     <>
       {/* Add a class on <html> while in docs to adjust global backgrounds */}
+      <CopyTracking />
       <DocsRouteFlag />
       <DocsLayout
         tree={tree}

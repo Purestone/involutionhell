@@ -128,6 +128,9 @@ export function Footer() {
                 <li>
                   <a
                     href="#features"
+                    data-umami-event="navigation_click"
+                    data-umami-event-region="footer"
+                    data-umami-event-label="Mission Brief"
                     className="hover:text-[#CC0000] transition-colors"
                   >
                     Mission Brief
@@ -136,6 +139,9 @@ export function Footer() {
                 <li>
                   <a
                     href="#community"
+                    data-umami-event="navigation_click"
+                    data-umami-event-region="footer"
+                    data-umami-event-label="Network Status"
                     className="hover:text-[#CC0000] transition-colors"
                   >
                     Network Status
