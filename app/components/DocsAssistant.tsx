@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useAISDKRuntime } from "@assistant-ui/react-ai-sdk";
@@ -34,11 +34,20 @@ export function DocsAssistant({ pageContext }: DocsAssistantProps) {
 function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   const { provider, openaiApiKey, geminiApiKey } = useAssistantSettings();
 
+  // Use useRef to keep the latest settings, avoiding closure capturing old values
+  const settingsRef = useRef({ provider, openaiApiKey, geminiApiKey });
+
+  useEffect(() => {
+    settingsRef.current = { provider, openaiApiKey, geminiApiKey };
+  }, [provider, openaiApiKey, geminiApiKey]);
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
         body: () => {
+          const { provider, openaiApiKey, geminiApiKey } = settingsRef.current;
+
           const apiKey =
             provider === "openai"
               ? openaiApiKey
@@ -49,13 +58,13 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
           return { pageContext, provider, apiKey };
         },
       }),
-    [geminiApiKey, openaiApiKey, pageContext, provider],
+    [pageContext], // Remove provider and key dependencies to prevent transport recreation
   );
 
   const chat = useChat({
     transport,
     onFinish: () => {
-      // 当对话结束时（流式传输完成），记录一次查询行为
+      // Track AI query when chat finishes (streaming completes)
       if (window.umami) {
         window.umami.track("ai_assistant_query");
       }
@@ -67,6 +76,11 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
     status: chatStatus,
     clearError: clearChatError,
   } = chat;
+
+  // Clear previous error when Provider changes
+  useEffect(() => {
+    clearChatError();
+  }, [provider, clearChatError]);
 
   useEffect(() => {
     if (chatStatus === "submitted" || chatStatus === "streaming") {
