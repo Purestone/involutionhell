@@ -34,20 +34,11 @@ export function DocsAssistant({ pageContext }: DocsAssistantProps) {
 function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   const { provider, openaiApiKey, geminiApiKey } = useAssistantSettings();
 
-  // Use useRef to keep the latest settings, avoiding closure capturing old values
-  const settingsRef = useRef({ provider, openaiApiKey, geminiApiKey });
-
-  useEffect(() => {
-    settingsRef.current = { provider, openaiApiKey, geminiApiKey };
-  }, [provider, openaiApiKey, geminiApiKey]);
-
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
         body: () => {
-          const { provider, openaiApiKey, geminiApiKey } = settingsRef.current;
-
           const apiKey =
             provider === "openai"
               ? openaiApiKey
@@ -58,7 +49,7 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
           return { pageContext, provider, apiKey };
         },
       }),
-    [pageContext], // Remove provider and key dependencies to prevent transport recreation
+    [pageContext, provider, openaiApiKey, geminiApiKey],
   );
 
   const chat = useChat({
