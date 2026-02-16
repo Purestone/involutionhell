@@ -34,28 +34,33 @@ export function DocsAssistant({ pageContext }: DocsAssistantProps) {
 function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   const { provider, openaiApiKey, geminiApiKey } = useAssistantSettings();
 
+  const apiKey =
+    provider === "openai"
+      ? openaiApiKey
+      : provider === "gemini"
+        ? geminiApiKey
+        : "";
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: () => {
-          const apiKey =
-            provider === "openai"
-              ? openaiApiKey
-              : provider === "gemini"
-                ? geminiApiKey
-                : ""; // intern provider doesn't need API key
-
-          return { pageContext, provider, apiKey };
+        body: {
+          pageContext,
+          provider,
+          apiKey,
         },
       }),
-    [geminiApiKey, openaiApiKey, pageContext, provider],
+    [pageContext, provider, apiKey],
   );
 
   const chat = useChat({
+    id: `assistant-${provider}-${apiKey}`, // Force chat reset when provider OR key changes
+    // 当 Provider 或 Key 更改时强制重置聊天
     transport,
     onFinish: () => {
       // 当对话结束时（流式传输完成），记录一次查询行为
+      // Track AI query when chat finishes (streaming completes)
       if (window.umami) {
         window.umami.track("ai_assistant_query");
       }
@@ -67,6 +72,12 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
     status: chatStatus,
     clearError: clearChatError,
   } = chat;
+
+  // Clear previous error when Provider changes
+  // 当 Provider 更改时清除之前的错误
+  useEffect(() => {
+    clearChatError();
+  }, [provider, clearChatError]);
 
   useEffect(() => {
     if (chatStatus === "submitted" || chatStatus === "streaming") {
@@ -175,6 +186,7 @@ function deriveAssistantError(
   let showSettingsCTA = false;
 
   // For intern provider, don't show settings CTA for API key related errors
+  // 对于书生，不要显示 API 密钥相关的错误
   if (
     provider !== "intern" &&
     (statusCode === 400 ||
@@ -244,6 +256,7 @@ function extractErrorFromResponseBody(body: string): string | undefined {
     }
   } catch {
     // Ignore JSON parsing issues and fall back to the raw body text.
+    // 忽略 JSON 解析问题，回退到原始正文文本。
   }
 
   return trimmed;
