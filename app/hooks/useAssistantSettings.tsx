@@ -16,7 +16,7 @@ interface AssistantSettingsState {
   provider: Provider;
   openaiApiKey: string;
   geminiApiKey: string;
-  saveToLocalStorage: boolean; // Whether to save API keys to localStorage
+  saveToLocalStorage: boolean; // 是否将API Key保存到localStorage
 }
 
 interface AssistantSettingsContextValue extends AssistantSettingsState {
@@ -57,6 +57,7 @@ const parseStoredSettings = (raw: string | null): AssistantSettingsState => {
             ? "intern"
             : "openai",
       // Use only stored key if saveToLocalStorage is true
+      // 只有在saveToLocalStorage为true时才使用存储的key
       openaiApiKey:
         saveToLocalStorage && typeof parsed.openaiApiKey === "string"
           ? parsed.openaiApiKey
@@ -101,6 +102,7 @@ export const AssistantSettingsProvider = ({
 
     try {
       // Decide whether to save API keys based on saveToLocalStorage
+      // 根据saveToLocalStorage决定是否保存API key
       const dataToSave = settings.saveToLocalStorage
         ? settings
         : {
