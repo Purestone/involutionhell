@@ -299,7 +299,7 @@ const Composer: FC<ComposerProps> = ({
         data-key-required={!hasActiveKey}
       >
         {!hasActiveKey && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-[var(--background)]/90 px-6 text-center backdrop-blur-sm">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-[var(--background)] px-6 text-center">
             <p className="text-sm text-muted-foreground">
               Add your {providerLabel} API key in Settings to start chatting.
             </p>
@@ -422,7 +422,7 @@ const AssistantMessage: FC = () => {
         className="aui-assistant-message-root relative mx-auto w-full max-w-[var(--thread-max-width)] animate-in py-4 duration-200 fade-in slide-in-from-bottom-1 last:mb-24"
         data-role="assistant"
       >
-        <div className="aui-assistant-message-content mx-2 leading-7 break-words text-foreground">
+        <div className="aui-assistant-message-content mx-2 leading-7 break-words text-foreground bg-muted px-5 py-3">
           <MessagePrimitive.Parts
             components={{
               Text: MarkdownText,

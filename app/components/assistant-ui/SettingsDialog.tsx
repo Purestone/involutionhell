@@ -44,7 +44,7 @@ export const SettingsDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="bg-[var(--background)]">
         <DialogHeader>
           <DialogTitle>AI Assistant Settings</DialogTitle>
         </DialogHeader>
