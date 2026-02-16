@@ -56,6 +56,7 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
 
   const chat = useChat({
     id: `assistant-${provider}-${apiKey}`, // Force chat reset when provider OR key changes
+    // 当 Provider 或 Key 更改时强制重置聊天
     transport,
     onFinish: () => {
       // 当对话结束时（流式传输完成），记录一次查询行为
@@ -73,6 +74,7 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   } = chat;
 
   // Clear previous error when Provider changes
+  // 当 Provider 更改时清除之前的错误
   useEffect(() => {
     clearChatError();
   }, [provider, clearChatError]);
