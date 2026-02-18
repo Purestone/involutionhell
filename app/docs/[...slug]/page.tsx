@@ -14,31 +14,8 @@ import { Contributors } from "@/app/components/Contributors";
 import { DocsAssistant } from "@/app/components/DocsAssistant";
 import { LicenseNotice } from "@/app/components/LicenseNotice";
 import { PageFeedback } from "@/app/components/PageFeedback";
-import fs from "fs/promises";
-import path from "path";
-
-// Extract clean text content from MDX
-function extractTextFromMDX(content: string): string {
-  let text = content
-    .replace(/^---[\s\S]*?---/m, "") // Remove frontmatter
-    .replace(/```[\s\S]*?```/g, "") // Remove code blocks
-    .replace(/`([^`]+)`/g, "$1"); // Remove inline code
-  // Remove HTML/MDX tags recursively to prevent incomplete multi-character sanitization
-  let prevText;
-  do {
-    prevText = text;
-    text = text.replace(/<[^>]+>/g, "");
-  } while (text !== prevText);
-  return text
-    .replace(/\*\*([^*]+)\*\*/g, "$1") // Remove bold
-    .replace(/\*([^*]+)\*/g, "$1") // Remove italic
-    .replace(/#{1,6}\s+/g, "") // Remove headers
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Remove links, keep text
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1") // Remove images, keep alt text
-    .replace(/[#*`()[!\]!]/g, "") // Remove common markdown symbols
-    .replace(/\n{2,}/g, "\n") // Normalize line breaks
-    .trim();
-}
+// Extract clean text content from MDX - no longer used on client/page side
+// content fetching moved to API route for performance
 
 interface Param {
   params: Promise<{
@@ -67,20 +44,6 @@ export default async function DocPage({ params }: Param) {
     getDocContributorsByDocId(docIdFromPage);
   const Mdx = page.data.body;
 
-  // Prepare page content for AI assistant
-  let pageContentForAI = "";
-  try {
-    const fullFilePath = path.join(process.cwd(), "app/docs", page.file.path);
-    const rawContent = await fs.readFile(fullFilePath, "utf-8");
-    const extractedText = extractTextFromMDX(rawContent);
-    // Use full extracted content without truncation
-    pageContentForAI = extractedText;
-  } catch (error) {
-    console.warn("Failed to read file content for AI assistant:", error);
-    // Fallback to using page metadata
-    pageContentForAI = `${page.data.title}\n${page.data.description || ""}`;
-  }
-
   return (
     <>
       <DocsPage toc={page.data.toc}>
@@ -104,7 +67,6 @@ export default async function DocPage({ params }: Param) {
         pageContext={{
           title: page.data.title,
           description: page.data.description,
-          content: pageContentForAI,
           slug: slug?.join("/"),
         }}
       />

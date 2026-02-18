@@ -1,6 +1,9 @@
 import { streamText, UIMessage, convertToModelMessages } from "ai";
 import { getModel, requiresApiKey, type AIProvider } from "@/lib/ai/models";
 import { buildSystemMessage } from "@/lib/ai/prompt";
+import { source } from "@/lib/source";
+import fs from "fs/promises";
+import path from "path";
 
 // 流式响应最长30秒
 export const maxDuration = 30;
@@ -39,6 +42,26 @@ export async function POST(req: Request) {
       );
     }
 
+    // 如果有 slug 但没有 content，尝试在服务端读取内容
+    if (pageContext?.slug && !pageContext.content) {
+      try {
+        const slugArray = pageContext.slug.split("/");
+        const page = source.getPage(slugArray);
+
+        if (page) {
+          const fullFilePath = path.join(process.cwd(), "app/docs", page.path);
+          const rawContent = await fs.readFile(fullFilePath, "utf-8");
+          pageContext.content = extractTextFromMDX(rawContent);
+        }
+      } catch (error) {
+        console.warn(
+          `Failed to fetch content for slug ${pageContext.slug}:`,
+          error,
+        );
+        // 出错时不中断，只是缺少上下文
+      }
+    }
+
     // 构建系统消息，包含页面上下文
     const systemMessage = buildSystemMessage(system, pageContext);
 
@@ -66,4 +89,29 @@ export async function POST(req: Request) {
       { status: 500 },
     );
   }
+}
+
+// 提取纯文本内容，过滤掉 MDX 语法
+function extractTextFromMDX(content: string): string {
+  let text = content
+    .replace(/^---[\s\S]*?---/m, "") // 移除头部元数据 (frontmatter)
+    .replace(/```[\s\S]*?```/g, "") // 移除代码块
+    .replace(/`([^`]+)`/g, "$1"); // 移除内联代码符号，保留内容
+
+  // 递归移除 HTML/MDX 标签，防止嵌套标签清理不干净
+  let prevText;
+  do {
+    prevText = text;
+    text = text.replace(/<[^>]+>/g, "");
+  } while (text !== prevText);
+
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, "$1") // 移除粗体符号，保留文字
+    .replace(/\*([^*]+)\*/g, "$1") // 移除斜体符号，保留文字
+    .replace(/#{1,6}\s+/g, "") // 移除标题符号 (#)
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // 移除链接语法，仅保留链接文本
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1") // 移除图片语法，保留 alt 文本
+    .replace(/[#*`()[!\]!]/g, "") // 移除剩余的常用 Markdown 符号
+    .replace(/\n{2,}/g, "\n") // 规范化换行，将多余的空行合并
+    .trim();
 }
