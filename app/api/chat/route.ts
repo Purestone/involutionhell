@@ -55,7 +55,8 @@ export async function POST(req: Request) {
         }
       } catch (error) {
         console.warn(
-          `Failed to fetch content for slug ${pageContext.slug}:`,
+          "Failed to fetch content for slug:",
+          pageContext.slug,
           error,
         );
         // 出错时不中断，只是缺少上下文
