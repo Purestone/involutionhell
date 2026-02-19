@@ -40,6 +40,11 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
         ? geminiApiKey
         : "";
 
+  // 生成唯一的会话 ID
+  const [chatId] = useState(
+    () => `chat-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  );
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
@@ -48,23 +53,55 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
           pageContext,
           provider,
           apiKey,
+          chatId,
         },
       }),
-    [pageContext, provider, apiKey],
+    [pageContext, provider, apiKey, chatId],
   );
 
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
+  // 埋点上报函数
+  const logAnalyticsEvent = useCallback(
+    async (eventType: string, eventData?: any) => {
+      try {
+        await fetch("/api/analytics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            eventType,
+            eventData: {
+              ...eventData,
+              chatId,
+              url: window.location.href,
+              provider,
+            },
+          }),
+        });
+      } catch (e) {
+        console.error("Failed to log analytics event:", e);
+      }
+    },
+    [chatId, provider],
+  );
+
+  // 组件挂载时上报打开事件
+  useEffect(() => {
+    logAnalyticsEvent("assistant_opened");
+  }, [logAnalyticsEvent]);
+
   const chat = useChat({
-    id: `assistant-${provider}-${apiKey}`, // Force chat reset when provider OR key changes
-    // 当 Provider 或 Key 更改时强制重置聊天
+    id: chatId,
+    // 当 Provider 或 Key 更改时强制重置聊天 (但保持 chatId 不变会不会有问题？可能需要重新生成)
+    // 这里我们暂时保留 chatId 不变，视为同一会话切换了模型
     transport,
     onFinish: () => {
       // 聊天流式传输完成后（onFinish），记录一次查询行为
       if (window.umami) {
         window.umami.track("ai_assistant_query");
       }
+      logAnalyticsEvent("message_completed");
     },
   });
 
@@ -113,6 +150,9 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
             const data = await response.json();
             if (data && Array.isArray(data.questions)) {
               setSuggestions(data.questions);
+              logAnalyticsEvent("suggestions_generated", {
+                count: data.questions.length,
+              });
             }
           }
         } catch (error) {

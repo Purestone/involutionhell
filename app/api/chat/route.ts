@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/db";
 import { streamText, UIMessage, convertToModelMessages } from "ai";
 import { getModel, requiresApiKey, type AIProvider } from "@/lib/ai/models";
 import { buildSystemMessage } from "@/lib/ai/prompt";
@@ -19,6 +20,7 @@ interface ChatRequest {
   };
   provider?: AIProvider;
   apiKey?: string;
+  chatId?: string;
 }
 
 export async function POST(req: Request) {
@@ -29,6 +31,7 @@ export async function POST(req: Request) {
       pageContext,
       provider = "intern", // 默认使用书生模型
       apiKey,
+      chatId,
     }: ChatRequest = await req.json();
 
     // 对指定Provider验证key是否存在
@@ -69,11 +72,48 @@ export async function POST(req: Request) {
     // 根据Provider获取 AI 模型实例
     const model = getModel(provider, apiKey);
 
+    // 确保有 chatId (如果前端没传，就生成一个临时的，虽然这会导致每次请求都是新会话)
+    // 理想情况是前端应该维护 chatId
+    const effectiveChatId = chatId || crypto.randomUUID();
+
     // 生成流式响应
     const result = streamText({
       model: model,
       system: systemMessage,
       messages: convertToModelMessages(messages),
+      onFinish: async ({ text }) => {
+        try {
+          // 1. 保存/更新会话
+          await prisma.chat.upsert({
+            where: { id: effectiveChatId },
+            update: { updatedAt: new Date() },
+            create: { id: effectiveChatId },
+          });
+
+          // 2. 保存用户消息 (取最后一条)
+          const lastUserMessage = messages[messages.length - 1];
+          if (lastUserMessage && lastUserMessage.role === "user") {
+            await prisma.message.create({
+              data: {
+                chatId: effectiveChatId,
+                role: "user",
+                content: lastUserMessage.content,
+              },
+            });
+          }
+
+          // 3. 保存 AI 回复
+          await prisma.message.create({
+            data: {
+              chatId: effectiveChatId,
+              role: "assistant",
+              content: text,
+            },
+          });
+        } catch (error) {
+          console.error("Failed to save chat history:", error);
+        }
+      },
     });
 
     return result.toUIMessageStreamResponse();
