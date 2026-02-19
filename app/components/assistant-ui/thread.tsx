@@ -5,6 +5,7 @@ import {
   ErrorPrimitive,
   MessagePrimitive,
   ThreadPrimitive,
+  useMessage,
 } from "@assistant-ui/react";
 import {
   AlertCircleIcon,
@@ -38,16 +39,26 @@ import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
 
 interface ThreadProps {
+  // 错误信息
   errorMessage?: string;
+  // 是否显示设置操作按钮
   showSettingsAction?: boolean;
+  // 清除错误的回调函数
   onClearError?: () => void;
+  // AI 生成的后续问题建议
+  suggestions?: string[];
+  // 是否正在加载建议
+  isLoadingSuggestions?: boolean;
 }
 
 export const Thread: FC<ThreadProps> = ({
   errorMessage,
   showSettingsAction = false,
   onClearError,
+  suggestions,
+  isLoadingSuggestions,
 }) => {
+  // 控制设置对话框是否打开的状态
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleSettingsChange = useCallback(
@@ -60,6 +71,7 @@ export const Thread: FC<ThreadProps> = ({
     [onClearError],
   );
 
+  // 打开设置对话框的处理函数
   const handleOpenSettings = useCallback(() => {
     handleSettingsChange(true);
   }, [handleSettingsChange]);
@@ -74,8 +86,10 @@ export const Thread: FC<ThreadProps> = ({
           }}
         >
           <ThreadPrimitive.Viewport className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll px-4 scrollbar-thin scrollbar-thumb-[var(--foreground)] scrollbar-track-transparent">
+            {/* 欢迎界面，当没有消息时显示 */}
             <ThreadWelcome />
 
+            {/* 消息列表，包含用户消息和 AI 消息 */}
             <ThreadPrimitive.Messages
               components={{
                 UserMessage,
@@ -92,7 +106,13 @@ export const Thread: FC<ThreadProps> = ({
                 }
               />
             ) : null}
+
+            {/* 如果非空（有消息），显示后续建议和底部输入框 */}
             <ThreadPrimitive.If empty={false}>
+              <ThreadFollowupSuggestions
+                suggestions={suggestions}
+                isLoading={isLoadingSuggestions}
+              />
               <div className="aui-thread-viewport-spacer min-h-8 grow" />
             </ThreadPrimitive.If>
             <Composer
@@ -168,6 +188,7 @@ const ThreadScrollToBottom: FC = () => {
   );
 };
 
+// 欢迎界面组件
 const ThreadWelcome: FC = () => {
   return (
     <ThreadPrimitive.Empty>
@@ -180,7 +201,7 @@ const ThreadWelcome: FC = () => {
               exit={{ opacity: 0, y: 10 }}
               className="aui-thread-welcome-message-motion-1 text-2xl font-serif font-bold text-[var(--foreground)]"
             >
-              Hello there!
+              你好！
             </m.div>
             <m.div
               initial={{ opacity: 0, y: 10 }}
@@ -189,7 +210,7 @@ const ThreadWelcome: FC = () => {
               transition={{ delay: 0.1 }}
               className="aui-thread-welcome-message-motion-2 text-2xl text-neutral-500 font-serif italic"
             >
-              How can I help you today?
+              今天有什么可以帮你的吗？
             </m.div>
           </div>
         </div>
@@ -198,6 +219,7 @@ const ThreadWelcome: FC = () => {
   );
 };
 
+// 欢迎页面的初始建议组件
 const ThreadWelcomeSuggestions: FC = () => {
   return (
     <div className="aui-thread-welcome-suggestions grid w-full gap-2 @md:grid-cols-2">
@@ -256,12 +278,14 @@ const ThreadWelcomeSuggestions: FC = () => {
   );
 };
 
+// 输入框组件 Props
 interface ComposerProps {
   isSettingsOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onClearError?: () => void;
 }
 
+// 输入框组件，负责处理用户输入和发送消息
 const Composer: FC<ComposerProps> = ({
   isSettingsOpen,
   onOpenChange,
@@ -291,6 +315,7 @@ const Composer: FC<ComposerProps> = ({
     <div className="aui-composer-wrapper sticky bottom-0 mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 overflow-visible bg-[var(--background)] pb-4 md:pb-6 pt-2 border-t border-[var(--foreground)]">
       <ThreadScrollToBottom />
       <ThreadPrimitive.Empty>
+        {/* 当没有消息时，显示初始建议 */}
         <ThreadWelcomeSuggestions />
       </ThreadPrimitive.Empty>
       <ComposerPrimitive.Root
@@ -342,6 +367,7 @@ interface ComposerActionProps {
   onClearError?: () => void;
 }
 
+// 输入框操作按钮组件（发送、设置、取消）
 const ComposerAction: FC<ComposerActionProps> = ({
   canSend,
   isSettingsOpen,
@@ -415,6 +441,54 @@ const MessageError: FC = () => {
   );
 };
 
+// AI 消息组件
+// 正在思考的加载状态组件
+const ThreadThinking: FC = () => {
+  return (
+    <span className="aui-thread-thinking inline-flex items-center gap-1 h-5 ml-2">
+      <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+      <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+      <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce"></span>
+    </span>
+  );
+};
+
+const AssistantMessageContent: FC = () => {
+  const message = useMessage() as any;
+
+  const isRunning =
+    message.status === "in_progress" ||
+    (typeof message.status === "object" && message.status?.type === "running");
+
+  const hasContent =
+    message.content &&
+    (typeof message.content === "string"
+      ? message.content.length > 0
+      : Array.isArray(message.content)
+        ? message.content.length > 0
+        : !!message.content);
+
+  return (
+    <>
+      <MessagePrimitive.Parts
+        components={{
+          Text: MarkdownText,
+          tools: { Fallback: ToolFallback },
+        }}
+      />
+
+      {/* 当正在生成且内容为空时显示加载动画 */}
+      {isRunning && !hasContent && (
+        <div className="absolute top-4 left-4">
+          <ThreadThinking />
+        </div>
+      )}
+
+      <MessageError />
+    </>
+  );
+};
+
 const AssistantMessage: FC = () => {
   return (
     <MessagePrimitive.Root asChild>
@@ -422,14 +496,8 @@ const AssistantMessage: FC = () => {
         className="aui-assistant-message-root relative mx-auto w-full max-w-[var(--thread-max-width)] animate-in py-4 duration-200 fade-in slide-in-from-bottom-1 last:mb-24"
         data-role="assistant"
       >
-        <div className="aui-assistant-message-content mx-2 leading-7 break-words text-foreground bg-muted px-5 py-3">
-          <MessagePrimitive.Parts
-            components={{
-              Text: MarkdownText,
-              tools: { Fallback: ToolFallback },
-            }}
-          />
-          <MessageError />
+        <div className="aui-assistant-message-content mx-2 leading-7 break-words text-foreground bg-muted px-5 py-3 min-h-[3.25rem]">
+          <AssistantMessageContent />
         </div>
 
         <div className="aui-assistant-message-footer mt-2 ml-2 flex">
@@ -441,6 +509,7 @@ const AssistantMessage: FC = () => {
   );
 };
 
+// AI 消息操作栏（复制、刷新）
 const AssistantActionBar: FC = () => {
   return (
     <ActionBarPrimitive.Root
@@ -468,6 +537,7 @@ const AssistantActionBar: FC = () => {
   );
 };
 
+// 用户消息组件
 const UserMessage: FC = () => {
   return (
     <MessagePrimitive.Root asChild>
@@ -492,6 +562,7 @@ const UserMessage: FC = () => {
   );
 };
 
+// 用户消息操作栏（编辑）
 const UserActionBar: FC = () => {
   return (
     <ActionBarPrimitive.Root
@@ -508,6 +579,7 @@ const UserActionBar: FC = () => {
   );
 };
 
+// 编辑输入框组件（用于编辑已发送的消息）
 const EditComposer: FC = () => {
   return (
     <div className="aui-edit-composer-wrapper mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 px-2 first:mt-4">
@@ -534,6 +606,7 @@ const EditComposer: FC = () => {
   );
 };
 
+// 分支切换组件（用于在多次生成的回复之间切换）
 const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({
   className,
   ...rest
@@ -561,5 +634,55 @@ const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({
         </TooltipIconButton>
       </BranchPickerPrimitive.Next>
     </BranchPickerPrimitive.Root>
+  );
+};
+
+// 后续问题建议组件 Props
+interface ThreadFollowupSuggestionsProps {
+  suggestions?: string[];
+  isLoading?: boolean;
+}
+
+// 后续问题建议组件，显示 AI 生成的建议问题
+const ThreadFollowupSuggestions: FC<ThreadFollowupSuggestionsProps> = ({
+  suggestions,
+  isLoading,
+}) => {
+  if (isLoading) {
+    return (
+      <div className="flex w-full max-w-[var(--thread-max-width)] flex-col items-start gap-2 mx-auto px-4 py-4">
+        <div className="flex items-center gap-2 text-muted-foreground text-sm animate-pulse">
+          正在思考后续问题...
+        </div>
+      </div>
+    );
+  }
+
+  if (!suggestions || suggestions.length === 0) return null;
+
+  return (
+    <div className="flex w-full max-w-[var(--thread-max-width)] flex-col gap-2 mx-auto px-4 py-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+        建议提问
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {suggestions.map((suggestion, index) => (
+          <ThreadPrimitive.Suggestion
+            key={`suggestion-${index}`}
+            prompt={suggestion}
+            method="replace"
+            autoSend
+            asChild
+          >
+            <Button
+              variant="outline"
+              className="h-auto whitespace-normal text-left justify-start px-3 py-2 text-sm rounded-xl border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-colors"
+            >
+              {suggestion}
+            </Button>
+          </ThreadPrimitive.Suggestion>
+        ))}
+      </div>
+    </div>
   );
 };

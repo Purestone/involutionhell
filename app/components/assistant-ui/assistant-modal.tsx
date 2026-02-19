@@ -12,12 +12,16 @@ interface AssistantModalProps {
   errorMessage?: string;
   showSettingsAction?: boolean;
   onClearError?: () => void;
+  suggestions?: string[];
+  isLoadingSuggestions?: boolean;
 }
 
 export const AssistantModal: FC<AssistantModalProps> = ({
   errorMessage,
   showSettingsAction = false,
   onClearError,
+  suggestions,
+  isLoadingSuggestions,
 }) => {
   const [showBubble, setShowBubble] = useState(false);
 
@@ -84,6 +88,8 @@ export const AssistantModal: FC<AssistantModalProps> = ({
           errorMessage={errorMessage}
           showSettingsAction={showSettingsAction}
           onClearError={onClearError}
+          suggestions={suggestions}
+          isLoadingSuggestions={isLoadingSuggestions}
         />
       </AssistantModalPrimitive.Content>
     </AssistantModalPrimitive.Root>

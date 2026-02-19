@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useAISDKRuntime } from "@assistant-ui/react-ai-sdk";
@@ -53,13 +53,15 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
     [pageContext, provider, apiKey],
   );
 
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+
   const chat = useChat({
     id: `assistant-${provider}-${apiKey}`, // Force chat reset when provider OR key changes
     // 当 Provider 或 Key 更改时强制重置聊天
     transport,
     onFinish: () => {
-      // 当对话结束时（流式传输完成），记录一次查询行为
-      // Track AI query when chat finishes (streaming completes)
+      // 聊天流式传输完成后（onFinish），记录一次查询行为
       if (window.umami) {
         window.umami.track("ai_assistant_query");
       }
@@ -69,15 +71,73 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   const {
     error: chatError,
     status: chatStatus,
+    messages,
     clearError: clearChatError,
+    // 其他需要的属性...
   } = chat;
 
-  // Clear previous error when Provider changes
+  // 跟踪上一次的状态，用于检测对话结束
+  const prevStatusRef = useRef(chatStatus);
+
+  useEffect(() => {
+    const prevStatus = prevStatusRef.current;
+
+    // 当状态从 'streaming' 变为 'submitted' (或不再是 streaming) 时
+    // 注意：具体状态变化取决于 AI SDK 版本，通常 streaming -> dom ready
+    // 这里我们假设当 user 没在输入且不在 loading 时，可以获取建议
+    // 更准确的是监听 status 变化
+    if (
+      prevStatus === "streaming" &&
+      chatStatus !== "streaming" &&
+      chatStatus !== "submitted"
+    ) {
+      // 聊天结束，获取建议
+      setIsLoadingSuggestions(true);
+
+      const currentMessages = messages;
+
+      (async () => {
+        try {
+          const response = await fetch("/api/suggestions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: currentMessages,
+              pageContext,
+              provider,
+              apiKey,
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data && Array.isArray(data.questions)) {
+              setSuggestions(data.questions);
+            }
+          }
+        } catch (error) {
+          console.error("获取建议失败:", error);
+        } finally {
+          setIsLoadingSuggestions(false);
+        }
+      })();
+    }
+    prevStatusRef.current = chatStatus;
+  }, [chatStatus, messages, pageContext, provider, apiKey]);
+
+  // 当用户发送新消息时清空建议
+  useEffect(() => {
+    if (chatStatus === "streaming" || chatStatus === "submitted") {
+      setSuggestions([]);
+    }
+  }, [chatStatus]);
+
   // 当 Provider 更改时清除之前的错误
   useEffect(() => {
     clearChatError();
   }, [provider, clearChatError]);
 
+  // 当对话状态重置时也清除错误
   useEffect(() => {
     if (chatStatus === "submitted" || chatStatus === "streaming") {
       clearChatError();
@@ -101,6 +161,8 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
         errorMessage={assistantError?.message}
         showSettingsAction={assistantError?.showSettingsCTA ?? false}
         onClearError={assistantError ? handleClearError : undefined}
+        suggestions={suggestions}
+        isLoadingSuggestions={isLoadingSuggestions}
       />
     </AssistantRuntimeProvider>
   );
