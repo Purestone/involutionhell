@@ -1,5 +1,6 @@
 import { generateText } from "ai";
 import { getModel, requiresApiKey, type AIProvider } from "@/lib/ai/models";
+import { createGlmFlashModel } from "@/lib/ai/providers/glm";
 
 // 允许流式响应最长30秒
 export const maxDuration = 30;
@@ -32,34 +33,39 @@ export async function POST(req: Request) {
       );
     }
 
-    // 获取模型实例
-    const model = getModel(provider, apiKey);
+    // 模型选择策略：
+    // - 若用户选了自己的 Provider（openai/gemini），用用户的模型
+    // - 否则（默认 intern）优先用 GLM-4-Flash（免费且快速），若 ZHIPU_API_KEY 未配置则回退到 intern
+    let model;
+    if (provider !== "intern") {
+      // 用户自选模型（openai / gemini）
+      model = getModel(provider, apiKey);
+    } else if (process.env.ZHIPU_API_KEY) {
+      // 默认使用智谱 GLM-4-Flash（免费轻量）
+      model = createGlmFlashModel();
+    } else {
+      // 兜底：仍使用 intern
+      model = getModel("intern");
+    }
 
-    // 当前页面上下文
-    const contextInfo = pageContext
-      ? `当前页面上下文 (Current Page Context):
-Title: ${pageContext.title || "未知"}
-Description: ${pageContext.description || "无"}
-Slug: ${pageContext.slug || "无"}`
-      : "";
+    // 只取最后一条用户消息，减少 token 消耗
+    const lastUserMsg = messages
+      .filter((m: any) => m.role === "user")
+      .slice(-1)[0];
+    const lastText =
+      lastUserMsg?.parts
+        ?.filter((p: any) => p.type === "text")
+        .map((p: any) => p.text)
+        .join(" ") ??
+      lastUserMsg?.content ??
+      "";
 
-    // 生成建议
-    // 使用 generateText 而不是 generateObject，以获得更好的兼容性（即使模型不支持工具调用）
-    const prompt = `
-      你是一个乐于助人的文档助手。
-      基于以下对话历史和当前页面上下文，建议 3 个用户可能会问的简短的后续问题。
-      问题应该简洁（最多 10-15 个字），并帮助用户进一步探索文档。
+    // 语言检测：简单判断是否包含中文字符
+    const isChinese = /[\u4e00-\u9fa5]/.test(lastText);
 
-      重要：请检测用户最后一条消息的语言。如果用户使用英文，请生成英文建议；如果用户使用中文，请生成中文建议。保持与用户当前语言一致。
-      
-      ${contextInfo}
-      
-      对话历史 (Conversation History):
-      ${JSON.stringify(messages.slice(-4))} // 仅使用最后几条消息作为上下文
-      
-      请直接返回一个 JSON 数组，包含 3 个字符串问题，不要包含任何 Markdown 格式或其他文本。
-      例如：["如何安装？", "怎么配置 API？", "查看示例代码"]
-    `;
+    const prompt = isChinese
+      ? `用户问："${lastText}"。给出3个简短中文追问（每个不超过15字），直接返回JSON数组，例如：["问题1","问题2","问题3"]`
+      : `User asked: "${lastText}". Suggest 3 short follow-up questions (max 10 words each). Return a JSON array only, e.g. ["Q1","Q2","Q3"]`;
 
     const { text } = await generateText({
       model,
