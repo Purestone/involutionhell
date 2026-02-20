@@ -8,12 +8,16 @@ import { AssistantModalPrimitive } from "@assistant-ui/react";
 import { Thread } from "@/app/components/assistant-ui/thread";
 import { TooltipIconButton } from "@/app/components/assistant-ui/tooltip-icon-button";
 
+import { WelcomeSuggestion } from "@/app/components/DocsAssistant";
+
 interface AssistantModalProps {
   errorMessage?: string;
   showSettingsAction?: boolean;
   onClearError?: () => void;
   suggestions?: string[];
   isLoadingSuggestions?: boolean;
+  welcomeSuggestions?: WelcomeSuggestion[];
+  isLoadingWelcome?: boolean;
 }
 
 export const AssistantModal: FC<AssistantModalProps> = ({
@@ -22,6 +26,8 @@ export const AssistantModal: FC<AssistantModalProps> = ({
   onClearError,
   suggestions,
   isLoadingSuggestions,
+  welcomeSuggestions,
+  isLoadingWelcome,
 }) => {
   const [showBubble, setShowBubble] = useState(false);
 
@@ -90,6 +96,8 @@ export const AssistantModal: FC<AssistantModalProps> = ({
           onClearError={onClearError}
           suggestions={suggestions}
           isLoadingSuggestions={isLoadingSuggestions}
+          welcomeSuggestions={welcomeSuggestions}
+          isLoadingWelcome={isLoadingWelcome}
         />
       </AssistantModalPrimitive.Content>
     </AssistantModalPrimitive.Root>

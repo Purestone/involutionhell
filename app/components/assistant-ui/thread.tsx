@@ -38,6 +38,12 @@ import { cn } from "@/lib/utils";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
 
+export interface WelcomeSuggestion {
+  title: string;
+  label: string;
+  action: string;
+}
+
 interface ThreadProps {
   // 错误信息
   errorMessage?: string;
@@ -49,6 +55,10 @@ interface ThreadProps {
   suggestions?: string[];
   // 是否正在加载建议
   isLoadingSuggestions?: boolean;
+  // AI 生成的欢迎问题建议
+  welcomeSuggestions?: WelcomeSuggestion[];
+  // 是否正在加载欢迎建议
+  isLoadingWelcome?: boolean;
 }
 
 export const Thread: FC<ThreadProps> = ({
@@ -57,6 +67,8 @@ export const Thread: FC<ThreadProps> = ({
   onClearError,
   suggestions,
   isLoadingSuggestions,
+  welcomeSuggestions,
+  isLoadingWelcome,
 }) => {
   // 控制设置对话框是否打开的状态
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -88,6 +100,12 @@ export const Thread: FC<ThreadProps> = ({
           <ThreadPrimitive.Viewport className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll px-4 scrollbar-thin scrollbar-thumb-[var(--foreground)] scrollbar-track-transparent">
             {/* 欢迎界面，当没有消息时显示 */}
             <ThreadWelcome />
+            <ThreadPrimitive.Empty>
+              <ThreadWelcomeSuggestions
+                suggestions={welcomeSuggestions}
+                isLoading={isLoadingWelcome}
+              />
+            </ThreadPrimitive.Empty>
 
             {/* 消息列表，包含用户消息和 AI 消息 */}
             <ThreadPrimitive.Messages
@@ -220,31 +238,65 @@ const ThreadWelcome: FC = () => {
 };
 
 // 欢迎页面的初始建议组件
-const ThreadWelcomeSuggestions: FC = () => {
+interface ThreadWelcomeSuggestionsProps {
+  suggestions?: WelcomeSuggestion[];
+  isLoading?: boolean;
+}
+
+const ThreadWelcomeSuggestions: FC<ThreadWelcomeSuggestionsProps> = ({
+  suggestions,
+  isLoading,
+}) => {
+  if (isLoading) {
+    return (
+      <div className="aui-thread-welcome-suggestions grid w-full gap-2 @md:grid-cols-2">
+        {/* 显示4个骨架屏来代表四条预取建议 */}
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={`skeleton-${i}`}
+            className="aui-thread-welcome-suggestion-display [&:nth-child(n+3)]:hidden @md:[&:nth-child(n+3)]:block"
+          >
+            <div className="aui-thread-welcome-suggestion h-auto w-full flex-1 flex-col items-start justify-start gap-2 rounded-3xl border border-muted px-5 py-4 animate-pulse bg-muted/30">
+              <div className="h-4 w-1/2 rounded bg-muted-foreground/20"></div>
+              <div className="h-3 w-1/3 rounded bg-muted-foreground/10"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // 如果建议为空也没显示骨架屏（例如出错或加载失败），依然展示默认退避问题
+  const defaultSuggestions: WelcomeSuggestion[] = [
+    {
+      title: "总结本文",
+      label: "内容要点",
+      action: "请帮我总结一下当前页面的主要内容和要点",
+    },
+    {
+      title: "什么是基座大模型",
+      label: "概念解释",
+      action: "什么是基座大模型？请详细解释一下",
+    },
+    {
+      title: "解释技术概念",
+      label: "深入理解",
+      action: "请解释一下这个页面中提到的核心技术概念",
+    },
+    {
+      title: "学习建议",
+      label: "如何入门",
+      action: "基于当前内容，你能给出一些学习建议和入门路径吗？",
+    },
+  ];
+
+  const displaySuggestions = suggestions?.length
+    ? suggestions
+    : defaultSuggestions;
+
   return (
     <div className="aui-thread-welcome-suggestions grid w-full gap-2 @md:grid-cols-2">
-      {[
-        {
-          title: "总结本文",
-          label: "内容要点",
-          action: "请帮我总结一下当前页面的主要内容和要点",
-        },
-        {
-          title: "什么是基座大模型",
-          label: "概念解释",
-          action: "什么是基座大模型？请详细解释一下",
-        },
-        {
-          title: "解释技术概念",
-          label: "深入理解",
-          action: "请解释一下这个页面中提到的核心技术概念",
-        },
-        {
-          title: "学习建议",
-          label: "如何入门",
-          action: "基于当前内容，你能给出一些学习建议和入门路径吗？",
-        },
-      ].map((suggestedAction, index) => (
+      {displaySuggestions.map((suggestedAction, index) => (
         <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -314,10 +366,7 @@ const Composer: FC<ComposerProps> = ({
   return (
     <div className="aui-composer-wrapper sticky bottom-0 mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 overflow-visible bg-[var(--background)] pb-4 md:pb-6 pt-2 border-t border-[var(--foreground)]">
       <ThreadScrollToBottom />
-      <ThreadPrimitive.Empty>
-        {/* 当没有消息时，显示初始建议 */}
-        <ThreadWelcomeSuggestions />
-      </ThreadPrimitive.Empty>
+      {/* 当没有消息时，显示空状态内容（现已经移到上面的Viewport内以统一滑动，这里可以置空或保留其它用途）*/}
       <ComposerPrimitive.Root
         className="aui-composer-root relative flex w-full flex-col rounded-none border border-[var(--foreground)] bg-[var(--background)] px-1 pt-2 shadow-none"
         aria-disabled={!hasActiveKey}

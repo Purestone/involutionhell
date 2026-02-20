@@ -18,6 +18,12 @@ interface PageContext {
   slug?: string;
 }
 
+export interface WelcomeSuggestion {
+  title: string;
+  label: string;
+  action: string;
+}
+
 interface DocsAssistantProps {
   pageContext: PageContext;
 }
@@ -66,6 +72,13 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   const [showSuggestionsLoader, setShowSuggestionsLoader] = useState(false);
   // 缓存获取好的建议，等待主回答结束后才推给 Thread 渲染
   const [pendingSuggestions, setPendingSuggestions] = useState<string[]>([]);
+
+  // 欢迎页建议相关的 state
+  const [welcomeSuggestions, setWelcomeSuggestions] = useState<
+    WelcomeSuggestion[]
+  >([]);
+  const [isLoadingWelcome, setIsLoadingWelcome] = useState(false);
+  const fetchedWelcomeRef = useRef(false);
 
   // 埋点上报函数
   const logAnalyticsEvent = useCallback(
@@ -117,6 +130,42 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
     clearError: clearChatError,
     // 其他需要的属性...
   } = chat;
+
+  // 初次加载欢迎建议的 Effect
+  useEffect(() => {
+    // 只有在没消息、且还没尝试获取过时才去拉取
+    if (messages.length === 0 && !fetchedWelcomeRef.current) {
+      fetchedWelcomeRef.current = true;
+      setIsLoadingWelcome(true);
+
+      (async () => {
+        try {
+          const response = await fetch("/api/suggestions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: [],
+              pageContext,
+              provider,
+              apiKey,
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data && Array.isArray(data.questions)) {
+              // 这里的 questions 实际上在欢迎时是个对象数组
+              setWelcomeSuggestions(data.questions);
+            }
+          }
+        } catch (error) {
+          console.error("获取欢迎建议失败:", error);
+        } finally {
+          setIsLoadingWelcome(false);
+        }
+      })();
+    }
+  }, [messages.length, pageContext, provider, apiKey]);
 
   // 跟踪上一次的状态，用于检测对话结束
   const prevStatusRef = useRef(chatStatus);
@@ -255,6 +304,8 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
         onClearError={assistantError ? handleClearError : undefined}
         suggestions={suggestions}
         isLoadingSuggestions={showSuggestionsLoader}
+        welcomeSuggestions={welcomeSuggestions}
+        isLoadingWelcome={isLoadingWelcome}
       />
     </AssistantRuntimeProvider>
   );

@@ -48,31 +48,47 @@ export async function POST(req: Request) {
       model = getModel("intern");
     }
 
-    // 只取最后一条用户消息，减少 token 消耗
-    const lastUserMsg = messages
-      .filter((m: any) => m.role === "user")
-      .slice(-1)[0];
-    const lastText =
-      lastUserMsg?.parts
-        ?.filter((p: any) => p.type === "text")
-        .map((p: any) => p.text)
-        .join(" ") ??
-      lastUserMsg?.content ??
-      "";
+    const isWelcomeRequest = messages.length === 0;
 
-    // 语言检测：简单判断是否包含中文字符
-    const isChinese = /[\u4e00-\u9fa5]/.test(lastText);
+    let prompt = "";
+    if (isWelcomeRequest) {
+      // 欢迎页面的初始动态建议
+      const contextInfo = [
+        pageContext?.title ? `标题: ${pageContext.title}` : "",
+        pageContext?.description ? `描述: ${pageContext.description}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n");
 
-    const prompt = isChinese
-      ? `用户问："${lastText}"。给出3个简短中文追问（每个不超过15字），直接返回JSON数组，例如：["问题1","问题2","问题3"]`
-      : `User asked: "${lastText}". Suggest 3 short follow-up questions (max 10 words each). Return a JSON array only, e.g. ["Q1","Q2","Q3"]`;
+      prompt = `请根据以下当前页面的上下文信息，生成4个引导新手用户提问的建议框内容。\n\n上下文:\n${contextInfo || "未知页面"}\n\n只返回纯JSON数组，包含4个对象，格式如：\n[{"title":"总结本文","label":"内容要点","action":"请帮我总结一下文章主要内容"}]\n其中title简短明确，label为右上角浅色标签，action为点击后自动发送的提问语句。`;
+    } else {
+      // 普通的跟进提问建议
+      // 只取最后一条用户消息，减少 token 消耗
+      const lastUserMsg = messages
+        .filter((m: any) => m.role === "user")
+        .slice(-1)[0];
+      const lastText =
+        lastUserMsg?.parts
+          ?.filter((p: any) => p.type === "text")
+          .map((p: any) => p.text)
+          .join(" ") ??
+        lastUserMsg?.content ??
+        "";
+
+      // 语言检测：简单判断是否包含中文字符
+      const isChinese = /[\u4e00-\u9fa5]/.test(lastText);
+
+      prompt = isChinese
+        ? `用户问："${lastText}"。给出3个简短中文追问（每个不超过15字），直接返回JSON数组，例如：["问题1","问题2","问题3"]`
+        : `User asked: "${lastText}". Suggest 3 short follow-up questions (max 10 words each). Return a JSON array only, e.g. ["Q1","Q2","Q3"]`;
+    }
 
     const { text } = await generateText({
       model,
       prompt,
     });
 
-    let questions: string[] = [];
+    let questions: any[] = [];
     try {
       // 尝试解析 JSON
       // 清理可能存在的 Markdown 代码块标记
@@ -93,38 +109,50 @@ export async function POST(req: Request) {
       questions = JSON.parse(cleanedText);
     } catch (e) {
       console.error("解析建议 JSON 失败:", e, "原始文本:", text);
-      // 如果解析失败，尝试通过正则提取引号中的内容（兼容中英文引号）
-      const fallbackMatches = text.match(/(?:["“])([^"”]+)(?:["”])/g);
-      if (fallbackMatches && fallbackMatches.length > 0) {
-        questions = fallbackMatches
-          .map((m) => m.replace(/["“”]/g, "").trim())
-          .filter((line) => line.length > 0);
+
+      if (isWelcomeRequest) {
+        // 把报错原因和原始文本暴露出来方便我调试
+        return Response.json({
+          questions: [],
+          debugError: String(e),
+          debugText: text,
+        });
       } else {
-        // 如果连引号都没有，尝试按行分割兜底
-        questions = text
-          .split("\n")
-          .map((line) =>
-            line
-              .replace(/^\d+\.\s*/, "")
-              .replace(/[`"“”]/g, "")
-              .trim(),
-          )
-          .filter(
-            (line) =>
-              line.length > 0 &&
-              !line.startsWith("json") &&
-              !line.startsWith("[") &&
-              !line.startsWith("]"),
-          );
+        // 如果解析失败，尝试通过正则提取引号中的内容（兼容中英文引号）
+        const fallbackMatches = text.match(/(?:["“])([^"”]+)(?:["”])/g);
+        if (fallbackMatches && fallbackMatches.length > 0) {
+          questions = fallbackMatches
+            .map((m) => m.replace(/["“”]/g, "").trim())
+            .filter((line) => line.length > 0);
+        } else {
+          // 如果连引号都没有，尝试按行分割兜底
+          questions = text
+            .split("\n")
+            .map((line) =>
+              line
+                .replace(/^\d+\.\s*/, "")
+                .replace(/[`"“”]/g, "")
+                .trim(),
+            )
+            .filter(
+              (line) =>
+                line.length > 0 &&
+                !line.startsWith("json") &&
+                !line.startsWith("[") &&
+                !line.startsWith("]"),
+            );
+        }
       }
     }
 
-    // 确保返回的是数组且不超过3个
+    // 确保返回的是数组
     if (!Array.isArray(questions)) {
       questions = [];
     }
 
-    return Response.json({ questions: questions.slice(0, 3) });
+    // 对于跟进建议最多返回 3 个，对于欢迎建议最多返回 4 个
+    const maxCount = isWelcomeRequest ? 4 : 3;
+    return Response.json({ questions: questions.slice(0, maxCount) });
   } catch (error) {
     console.error("建议 API 错误 (Suggestions API error):", error);
     return Response.json(
