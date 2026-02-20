@@ -91,13 +91,20 @@ export async function POST(req: Request) {
           });
 
           // 2. 保存用户消息 (取最后一条)
+          // AI SDK v5 中，UIMessage 不再有 content 字段，内容在 parts 数组中
           const lastUserMessage = messages[messages.length - 1];
           if (lastUserMessage && lastUserMessage.role === "user") {
+            // 从 parts 数组中提取所有文本内容并拼接
+            const userContent = lastUserMessage.parts
+              .filter((part) => part.type === "text")
+              .map((part) => (part as { type: "text"; text: string }).text)
+              .join("\n");
+
             await prisma.message.create({
               data: {
                 chatId: effectiveChatId,
                 role: "user",
-                content: lastUserMessage.content,
+                content: userContent,
               },
             });
           }

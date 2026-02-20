@@ -1,23 +1,14 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import GitHub from "next-auth/providers/github";
-import { Pool } from "@neondatabase/serverless";
-import NeonAdapter from "@auth/neon-adapter";
-
-type NeonAdapterPool = Parameters<typeof NeonAdapter>[0];
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { prisma } from "@/lib/db";
 
 export const { handlers, auth, signIn, signOut } = NextAuth(() => {
-  // Neon 连接只在有数据库配置时启用；本地协作者若没有 `.env`，将回退为纯 JWT 会话，避免直接抛错阻塞开发。
-  const databaseUrl = process.env.DATABASE_URL;
-  const adapter = databaseUrl
-    ? NeonAdapter(
-        new Pool({
-          connectionString: databaseUrl,
-        }) as unknown as NeonAdapterPool,
-      )
-    : undefined;
+  // 数据库适配器：仅在有 DATABASE_URL 时启用
+  const adapter = process.env.DATABASE_URL ? PrismaAdapter(prisma) : undefined;
 
-  if (!databaseUrl) {
+  if (!process.env.DATABASE_URL) {
     console.warn("[auth] DATABASE_URL missing – running without Neon adapter");
   }
   return {
