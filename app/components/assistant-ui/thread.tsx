@@ -503,6 +503,7 @@ const ThreadThinking: FC = () => {
 };
 
 const AssistantMessageContent: FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const message = useMessage() as any;
 
   const isRunning =

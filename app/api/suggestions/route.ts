@@ -5,8 +5,10 @@ import { createGlmFlashModel } from "@/lib/ai/providers/glm";
 // 允许流式响应最长30秒
 export const maxDuration = 30;
 
+import type { CoreMessage, TextPart } from "ai";
+
 interface SuggestionsRequest {
-  messages: any[];
+  messages: CoreMessage[];
   pageContext?: {
     title?: string;
     description?: string;
@@ -65,15 +67,15 @@ export async function POST(req: Request) {
       // 普通的跟进提问建议
       // 只取最后一条用户消息，减少 token 消耗
       const lastUserMsg = messages
-        .filter((m: any) => m.role === "user")
+        .filter((m) => m.role === "user")
         .slice(-1)[0];
       const lastText =
-        lastUserMsg?.parts
-          ?.filter((p: any) => p.type === "text")
-          .map((p: any) => p.text)
-          .join(" ") ??
-        lastUserMsg?.content ??
-        "";
+        (Array.isArray(lastUserMsg?.content)
+          ? lastUserMsg.content
+              .filter((p): p is TextPart => p.type === "text")
+              .map((p) => p.text)
+              .join(" ")
+          : lastUserMsg?.content) ?? "";
 
       // 语言检测：简单判断是否包含中文字符
       const isChinese = /[\u4e00-\u9fa5]/.test(lastText);
@@ -88,7 +90,8 @@ export async function POST(req: Request) {
       prompt,
     });
 
-    let questions: any[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let questions: string[] | any[] = [];
     try {
       // 尝试解析 JSON
       // 清理可能存在的 Markdown 代码块标记

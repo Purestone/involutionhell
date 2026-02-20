@@ -82,7 +82,7 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
 
   // 埋点上报函数
   const logAnalyticsEvent = useCallback(
-    async (eventType: string, eventData?: any) => {
+    async (eventType: string, eventData?: Record<string, unknown>) => {
       try {
         await fetch("/api/analytics", {
           method: "POST",
@@ -245,6 +245,7 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
     apiKey,
     isFetchingSuggestions,
     pendingSuggestions,
+    logAnalyticsEvent,
   ]);
 
   // 当建议获取状态或 pending 数据改变，且主回答已经不是打字状态时，更新 UI
