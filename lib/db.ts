@@ -9,8 +9,8 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 const pool = new Pool({ connectionString });
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const adapter = new PrismaPg(pool as any);
+
+const adapter = new PrismaPg(pool);
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

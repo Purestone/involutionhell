@@ -503,8 +503,10 @@ const ThreadThinking: FC = () => {
 };
 
 const AssistantMessageContent: FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const message = useMessage() as any;
+  const message = useMessage() as unknown as {
+    status?: string | { type: string };
+    content?: string | unknown[];
+  };
 
   const isRunning =
     message.status === "in_progress" ||

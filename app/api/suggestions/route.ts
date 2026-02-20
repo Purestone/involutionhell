@@ -75,8 +75,7 @@ export async function POST(req: Request) {
               .filter((p): p is TextUIPart => p.type === "text")
               .map((p) => p.text)
               .join(" ")
-          : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (lastUserMsg as any)?.content) ?? "";
+          : (lastUserMsg as unknown as { content?: string })?.content) ?? "";
 
       // 语言检测：简单判断是否包含中文字符
       const isChinese = /[\u4e00-\u9fa5]/.test(lastText);
@@ -91,8 +90,7 @@ export async function POST(req: Request) {
       prompt,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let questions: string[] | any[] = [];
+    let questions: unknown[] = [];
     try {
       // 尝试解析 JSON
       // 清理可能存在的 Markdown 代码块标记
