@@ -5,10 +5,10 @@ import { createGlmFlashModel } from "@/lib/ai/providers/glm";
 // 允许流式响应最长30秒
 export const maxDuration = 30;
 
-import type { CoreMessage, TextPart } from "ai";
+import type { UIMessage, TextUIPart } from "ai";
 
 interface SuggestionsRequest {
-  messages: CoreMessage[];
+  messages: UIMessage[];
   pageContext?: {
     title?: string;
     description?: string;
@@ -70,12 +70,13 @@ export async function POST(req: Request) {
         .filter((m) => m.role === "user")
         .slice(-1)[0];
       const lastText =
-        (Array.isArray(lastUserMsg?.content)
-          ? lastUserMsg.content
-              .filter((p): p is TextPart => p.type === "text")
+        (Array.isArray(lastUserMsg?.parts)
+          ? lastUserMsg.parts
+              .filter((p): p is TextUIPart => p.type === "text")
               .map((p) => p.text)
               .join(" ")
-          : lastUserMsg?.content) ?? "";
+          : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (lastUserMsg as any)?.content) ?? "";
 
       // 语言检测：简单判断是否包含中文字符
       const isChinese = /[\u4e00-\u9fa5]/.test(lastText);
