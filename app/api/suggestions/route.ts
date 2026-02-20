@@ -75,20 +75,48 @@ export async function POST(req: Request) {
     let questions: string[] = [];
     try {
       // 尝试解析 JSON
-      // 清理可能存在的 Markdown 代码块标记 inside the text
-      const cleanedText = text
-        .replace(/```json/g, "")
+      // 清理可能存在的 Markdown 代码块标记
+      let cleanedText = text
+        .replace(/```json/gi, "")
         .replace(/```/g, "")
         .trim();
+
+      // 修复大模型可能生成的中文引号
+      cleanedText = cleanedText.replace(/“/g, '"').replace(/”/g, '"');
+
+      // 尝试仅提取数组部分，防止 AI 返回了前缀描述文本
+      const arrayMatch = cleanedText.match(/\[[\s\S]*\]/);
+      if (arrayMatch) {
+        cleanedText = arrayMatch[0];
+      }
+
       questions = JSON.parse(cleanedText);
     } catch (e) {
       console.error("解析建议 JSON 失败:", e, "原始文本:", text);
-      // 如果解析失败，尝试按行分割兜底
-      questions = text
-        .split("\n")
-        .map((line) => line.replace(/^\d+\.\s*/, "").trim())
-        .filter((line) => line.length > 0)
-        .slice(0, 3);
+      // 如果解析失败，尝试通过正则提取引号中的内容（兼容中英文引号）
+      const fallbackMatches = text.match(/(?:["“])([^"”]+)(?:["”])/g);
+      if (fallbackMatches && fallbackMatches.length > 0) {
+        questions = fallbackMatches
+          .map((m) => m.replace(/["“”]/g, "").trim())
+          .filter((line) => line.length > 0);
+      } else {
+        // 如果连引号都没有，尝试按行分割兜底
+        questions = text
+          .split("\n")
+          .map((line) =>
+            line
+              .replace(/^\d+\.\s*/, "")
+              .replace(/[`"“”]/g, "")
+              .trim(),
+          )
+          .filter(
+            (line) =>
+              line.length > 0 &&
+              !line.startsWith("json") &&
+              !line.startsWith("[") &&
+              !line.startsWith("]"),
+          );
+      }
     }
 
     // 确保返回的是数组且不超过3个

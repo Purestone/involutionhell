@@ -60,7 +60,12 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   );
 
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  // 仅标志后台是否正在获取建议（用于逻辑判断）
+  const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
+  // 控制 UI 上是否显示“正在思考...”加载状态（只有主回答结束后，由于建议还在获取，才显示骨架屏）
+  const [showSuggestionsLoader, setShowSuggestionsLoader] = useState(false);
+  // 缓存获取好的建议，等待主回答结束后才推给 Thread 渲染
+  const [pendingSuggestions, setPendingSuggestions] = useState<string[]>([]);
 
   // 埋点上报函数
   const logAnalyticsEvent = useCallback(
@@ -119,17 +124,18 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   useEffect(() => {
     const prevStatus = prevStatusRef.current;
 
-    // 当状态从 'streaming' 变为 'submitted' (或不再是 streaming) 时
-    // 注意：具体状态变化取决于 AI SDK 版本，通常 streaming -> dom ready
-    // 这里我们假设当 user 没在输入且不在 loading 时，可以获取建议
-    // 更准确的是监听 status 变化
-    if (
-      prevStatus === "streaming" &&
-      chatStatus !== "streaming" &&
-      chatStatus !== "submitted"
-    ) {
-      // 聊天结束，获取建议
-      setIsLoadingSuggestions(true);
+    // 当用户发送新消息时（状态从非提交/流式跳转为提交/流式状态）
+    const isNewRequest =
+      (chatStatus === "submitted" || chatStatus === "streaming") &&
+      prevStatus !== "submitted" &&
+      prevStatus !== "streaming";
+
+    if (isNewRequest) {
+      // 对话开始，清空旧建议，准备在后台预先获取新建议并行处理
+      setSuggestions([]);
+      setPendingSuggestions([]);
+      setIsFetchingSuggestions(true);
+      setShowSuggestionsLoader(false);
 
       const currentMessages = messages;
 
@@ -149,7 +155,7 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
           if (response.ok) {
             const data = await response.json();
             if (data && Array.isArray(data.questions)) {
-              setSuggestions(data.questions);
+              setPendingSuggestions(data.questions);
               logAnalyticsEvent("suggestions_generated", {
                 count: data.questions.length,
               });
@@ -158,17 +164,63 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
         } catch (error) {
           console.error("获取建议失败:", error);
         } finally {
-          setIsLoadingSuggestions(false);
+          setIsFetchingSuggestions(false);
         }
       })();
     }
-    prevStatusRef.current = chatStatus;
-  }, [chatStatus, messages, pageContext, provider, apiKey]);
 
-  // 当用户发送新消息时清空建议
+    // 监控 AI 主流程是否结束：当从 'streaming' 变为 'submitted' / 结束状态时
+    const isChatFinished =
+      prevStatus === "streaming" &&
+      chatStatus !== "streaming" &&
+      chatStatus !== "submitted";
+
+    if (isChatFinished) {
+      // 如果到主回答结束时，后台的预取建议还在进行，就开始在UI显示“正在思考”
+      if (isFetchingSuggestions) {
+        setShowSuggestionsLoader(true);
+      } else {
+        // 如果当时预取就已经完成了，则直接显示收集好的预取建议
+        setSuggestions(pendingSuggestions);
+        setShowSuggestionsLoader(false);
+      }
+    }
+
+    // 最关键：更新过去的聊天状态
+    prevStatusRef.current = chatStatus;
+  }, [
+    chatStatus,
+    messages,
+    pageContext,
+    provider,
+    apiKey,
+    isFetchingSuggestions,
+    pendingSuggestions,
+  ]);
+
+  // 当建议获取状态或 pending 数据改变，且主回答已经不是打字状态时，更新 UI
+  useEffect(() => {
+    // 假设非正在打字且非提交中，即为主回复闲置状态
+    const isIdle = chatStatus !== "streaming" && chatStatus !== "submitted";
+
+    // 如果后台刚刚完成了预取，并且主回复已经闲置，而且存在建议可以展示
+    if (!isFetchingSuggestions && isIdle && pendingSuggestions.length > 0) {
+      // 检查当前建议是否为空且 pending 建议非空，来避免多次重复触发渲染
+      setSuggestions((prev) => {
+        if (prev.length === 0) {
+          return pendingSuggestions;
+        }
+        return prev;
+      });
+      setShowSuggestionsLoader(false);
+    }
+  }, [isFetchingSuggestions, pendingSuggestions, chatStatus]);
+
+  // 当对话状态重置或开始时清空建议
   useEffect(() => {
     if (chatStatus === "streaming" || chatStatus === "submitted") {
       setSuggestions([]);
+      setShowSuggestionsLoader(false);
     }
   }, [chatStatus]);
 
@@ -202,7 +254,7 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
         showSettingsAction={assistantError?.showSettingsCTA ?? false}
         onClearError={assistantError ? handleClearError : undefined}
         suggestions={suggestions}
-        isLoadingSuggestions={isLoadingSuggestions}
+        isLoadingSuggestions={showSuggestionsLoader}
       />
     </AssistantRuntimeProvider>
   );
