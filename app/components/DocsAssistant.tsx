@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useAISDKRuntime } from "@assistant-ui/react-ai-sdk";
@@ -16,6 +16,12 @@ interface PageContext {
   title?: string;
   description?: string;
   slug?: string;
+}
+
+export interface WelcomeSuggestion {
+  title: string;
+  label: string;
+  action: string;
 }
 
 interface DocsAssistantProps {
@@ -40,6 +46,11 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
         ? geminiApiKey
         : "";
 
+  // 生成唯一的会话 ID
+  const [chatId] = useState(
+    () => `chat-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  );
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
@@ -48,36 +59,227 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
           pageContext,
           provider,
           apiKey,
+          chatId,
         },
       }),
-    [pageContext, provider, apiKey],
+    [pageContext, provider, apiKey, chatId],
   );
 
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  // 仅标志后台是否正在获取建议（用于逻辑判断）
+  const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
+  // 控制 UI 上是否显示“正在思考...”加载状态（只有主回答结束后，由于建议还在获取，才显示骨架屏）
+  const [showSuggestionsLoader, setShowSuggestionsLoader] = useState(false);
+  // 缓存获取好的建议，等待主回答结束后才推给 Thread 渲染
+  const [pendingSuggestions, setPendingSuggestions] = useState<string[]>([]);
+
+  // 欢迎页建议相关的 state
+  const [welcomeSuggestions, setWelcomeSuggestions] = useState<
+    WelcomeSuggestion[]
+  >([]);
+  const [isLoadingWelcome, setIsLoadingWelcome] = useState(false);
+  const fetchedWelcomeRef = useRef(false);
+
+  // 埋点上报函数
+  const logAnalyticsEvent = useCallback(
+    async (eventType: string, eventData?: Record<string, unknown>) => {
+      try {
+        await fetch("/api/analytics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            eventType,
+            eventData: {
+              ...eventData,
+              chatId,
+              url: window.location.href,
+              provider,
+            },
+          }),
+        });
+      } catch (e) {
+        console.error("Failed to log analytics event:", e);
+      }
+    },
+    [chatId, provider],
+  );
+
+  // 组件挂载时上报打开事件
+  useEffect(() => {
+    logAnalyticsEvent("assistant_opened");
+  }, [logAnalyticsEvent]);
+
   const chat = useChat({
-    id: `assistant-${provider}-${apiKey}`, // Force chat reset when provider OR key changes
-    // 当 Provider 或 Key 更改时强制重置聊天
+    id: chatId,
+    // 当 Provider 或 Key 更改时强制重置聊天 (但保持 chatId 不变会不会有问题？可能需要重新生成)
+    // 这里我们暂时保留 chatId 不变，视为同一会话切换了模型
     transport,
     onFinish: () => {
-      // 当对话结束时（流式传输完成），记录一次查询行为
-      // Track AI query when chat finishes (streaming completes)
+      // 聊天流式传输完成后（onFinish），记录一次查询行为
       if (window.umami) {
         window.umami.track("ai_assistant_query");
       }
+      logAnalyticsEvent("message_completed");
     },
   });
 
   const {
     error: chatError,
     status: chatStatus,
+    messages,
     clearError: clearChatError,
+    // 其他需要的属性...
   } = chat;
 
-  // Clear previous error when Provider changes
+  // 初次加载欢迎建议的 Effect
+  useEffect(() => {
+    // 只有在没消息、且还没尝试获取过时才去拉取
+    if (messages.length === 0 && !fetchedWelcomeRef.current) {
+      fetchedWelcomeRef.current = true;
+      setIsLoadingWelcome(true);
+
+      (async () => {
+        try {
+          const response = await fetch("/api/suggestions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: [],
+              pageContext,
+              provider,
+              apiKey,
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data && Array.isArray(data.questions)) {
+              // 这里的 questions 实际上在欢迎时是个对象数组
+              setWelcomeSuggestions(data.questions);
+            }
+          }
+        } catch (error) {
+          console.error("获取欢迎建议失败:", error);
+        } finally {
+          setIsLoadingWelcome(false);
+        }
+      })();
+    }
+  }, [messages.length, pageContext, provider, apiKey]);
+
+  // 跟踪上一次的状态，用于检测对话结束
+  const prevStatusRef = useRef(chatStatus);
+
+  useEffect(() => {
+    const prevStatus = prevStatusRef.current;
+
+    // 当用户发送新消息时（状态从非提交/流式跳转为提交/流式状态）
+    const isNewRequest =
+      (chatStatus === "submitted" || chatStatus === "streaming") &&
+      prevStatus !== "submitted" &&
+      prevStatus !== "streaming";
+
+    if (isNewRequest) {
+      // 对话开始，清空旧建议，准备在后台预先获取新建议并行处理
+      setSuggestions([]);
+      setPendingSuggestions([]);
+      setIsFetchingSuggestions(true);
+      setShowSuggestionsLoader(false);
+
+      const currentMessages = messages;
+
+      (async () => {
+        try {
+          const response = await fetch("/api/suggestions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: currentMessages,
+              pageContext,
+              provider,
+              apiKey,
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data && Array.isArray(data.questions)) {
+              setPendingSuggestions(data.questions);
+              logAnalyticsEvent("suggestions_generated", {
+                count: data.questions.length,
+              });
+            }
+          }
+        } catch (error) {
+          console.error("获取建议失败:", error);
+        } finally {
+          setIsFetchingSuggestions(false);
+        }
+      })();
+    }
+
+    // 监控 AI 主流程是否结束：当从 'streaming' 变为 'submitted' / 结束状态时
+    const isChatFinished =
+      prevStatus === "streaming" &&
+      chatStatus !== "streaming" &&
+      chatStatus !== "submitted";
+
+    if (isChatFinished) {
+      // 如果到主回答结束时，后台的预取建议还在进行，就开始在UI显示“正在思考”
+      if (isFetchingSuggestions) {
+        setShowSuggestionsLoader(true);
+      } else {
+        // 如果当时预取就已经完成了，则直接显示收集好的预取建议
+        setSuggestions(pendingSuggestions);
+        setShowSuggestionsLoader(false);
+      }
+    }
+
+    // 最关键：更新过去的聊天状态
+    prevStatusRef.current = chatStatus;
+  }, [
+    chatStatus,
+    messages,
+    pageContext,
+    provider,
+    apiKey,
+    isFetchingSuggestions,
+    pendingSuggestions,
+    logAnalyticsEvent,
+  ]);
+
+  // 当建议获取状态或 pending 数据改变，且主回答已经不是打字状态时，更新 UI
+  useEffect(() => {
+    // 假设非正在打字且非提交中，即为主回复闲置状态
+    const isIdle = chatStatus !== "streaming" && chatStatus !== "submitted";
+
+    // 如果后台刚刚完成了预取，并且主回复已经闲置，而且存在建议可以展示
+    if (!isFetchingSuggestions && isIdle && pendingSuggestions.length > 0) {
+      // 检查当前建议是否为空且 pending 建议非空，来避免多次重复触发渲染
+      setSuggestions((prev) => {
+        if (prev.length === 0) {
+          return pendingSuggestions;
+        }
+        return prev;
+      });
+      setShowSuggestionsLoader(false);
+    }
+  }, [isFetchingSuggestions, pendingSuggestions, chatStatus]);
+
+  // 当对话状态重置或开始时清空建议
+  useEffect(() => {
+    if (chatStatus === "streaming" || chatStatus === "submitted") {
+      setSuggestions([]);
+      setShowSuggestionsLoader(false);
+    }
+  }, [chatStatus]);
+
   // 当 Provider 更改时清除之前的错误
   useEffect(() => {
     clearChatError();
   }, [provider, clearChatError]);
 
+  // 当对话状态重置时也清除错误
   useEffect(() => {
     if (chatStatus === "submitted" || chatStatus === "streaming") {
       clearChatError();
@@ -101,6 +303,10 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
         errorMessage={assistantError?.message}
         showSettingsAction={assistantError?.showSettingsCTA ?? false}
         onClearError={assistantError ? handleClearError : undefined}
+        suggestions={suggestions}
+        isLoadingSuggestions={showSuggestionsLoader}
+        welcomeSuggestions={welcomeSuggestions}
+        isLoadingWelcome={isLoadingWelcome}
       />
     </AssistantRuntimeProvider>
   );

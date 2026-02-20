@@ -1,11 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model accounts {
@@ -61,11 +60,13 @@ model sessions {
 }
 
 model users {
-  id            Int       @id @default(autoincrement())
-  name          String?   @db.VarChar(255)
-  email         String?   @db.VarChar(255)
-  emailVerified DateTime? @db.Timestamptz(6)
-  image         String?
+  id              Int              @id @default(autoincrement())
+  name            String?          @db.VarChar(255)
+  email           String?          @db.VarChar(255)
+  emailVerified   DateTime?        @db.Timestamptz(6)
+  image           String?
+  chats           Chat[]
+  analyticsEvents AnalyticsEvent[]
 }
 
 model verification_token {
@@ -86,4 +87,41 @@ model doc_paths {
 
   @@id([doc_id, path])
   @@index([path])
+}
+
+model Chat {
+  id        String    @id @default(cuid())
+  userId    Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+
+  user users? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  chatId    String
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    Int?
+  eventType String
+  eventData Json?
+  createdAt DateTime @default(now())
+
+  user users? @relation(fields: [userId], references: [id])
+
+  @@index([eventType])
+  @@index([userId])
 }
