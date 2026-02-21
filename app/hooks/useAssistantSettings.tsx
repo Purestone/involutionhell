@@ -49,23 +49,36 @@ const parseStoredSettings = (raw: string | null): AssistantSettingsState => {
     const parsed = JSON.parse(raw) as Partial<AssistantSettingsState>;
     const saveToLocalStorage = parsed.saveToLocalStorage === true;
 
+    let provider =
+      parsed.provider === "gemini"
+        ? "gemini"
+        : parsed.provider === "intern"
+          ? "intern"
+          : "openai";
+
+    const openaiApiKey =
+      saveToLocalStorage && typeof parsed.openaiApiKey === "string"
+        ? parsed.openaiApiKey
+        : "";
+    const geminiApiKey =
+      saveToLocalStorage && typeof parsed.geminiApiKey === "string"
+        ? parsed.geminiApiKey
+        : "";
+
+    // 如果用户之前默认在 openai/gemini 但现在没有对应的 API Key，则回退到免配置的 intern 模型
+    if (provider === "openai" && !openaiApiKey) {
+      provider = "intern";
+    }
+    if (provider === "gemini" && !geminiApiKey) {
+      provider = "intern";
+    }
+
     return {
-      provider:
-        parsed.provider === "gemini"
-          ? "gemini"
-          : parsed.provider === "intern"
-            ? "intern"
-            : "openai",
+      provider: provider as Provider,
       // Use only stored key if saveToLocalStorage is true
       // 只有在saveToLocalStorage为true时才使用存储的key
-      openaiApiKey:
-        saveToLocalStorage && typeof parsed.openaiApiKey === "string"
-          ? parsed.openaiApiKey
-          : "",
-      geminiApiKey:
-        saveToLocalStorage && typeof parsed.geminiApiKey === "string"
-          ? parsed.geminiApiKey
-          : "",
+      openaiApiKey,
+      geminiApiKey,
       saveToLocalStorage,
     };
   } catch (error) {
