@@ -61,7 +61,11 @@ import fg from "fast-glob";
 import matter from "gray-matter";
 // Prisma7更改到了client.ts
 import * as PrismaModule from "../generated/prisma/client.ts";
-const PrismaClient = PrismaModule.PrismaClient;
+const PrismaClient =
+  PrismaModule.default?.PrismaClient || PrismaModule.PrismaClient;
+import pg from "pg";
+const { Pool } = pg;
+import { PrismaPg } from "@prisma/adapter-pg";
 
 // Node >=18 在 Actions 下自带 fetch；若需兼容性可加 undici，但默认不必。
 // import fetch from "node-fetch";
@@ -106,7 +110,10 @@ const shouldSyncDb = (() => {
 
 let prisma = null;
 if (shouldSyncDb) {
-  prisma = new PrismaClient();
+  const connectionString = `${process.env.DATABASE_URL}`;
+  const pool = new Pool({ connectionString });
+  const adapter = new PrismaPg(pool);
+  prisma = new PrismaClient({ adapter });
 }
 
 // 预设

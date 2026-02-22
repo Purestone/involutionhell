@@ -42,9 +42,17 @@ import process from "node:process";
 // 可选：DB（Prisma）
 let prisma = null;
 try {
-  const { PrismaClient } = await import("../generated/prisma/index.js");
+  const PrismaModule = await import("../generated/prisma/client.ts");
+  const PrismaClient =
+    PrismaModule.default?.PrismaClient || PrismaModule.PrismaClient;
   if (process.env.DATABASE_URL) {
-    prisma = new PrismaClient();
+    const { default: pg } = await import("pg");
+    const { Pool } = pg;
+    const { PrismaPg } = await import("@prisma/adapter-pg");
+    const connectionString = `${process.env.DATABASE_URL}`;
+    const pool = new Pool({ connectionString });
+    const adapter = new PrismaPg(pool);
+    prisma = new PrismaClient({ adapter });
   }
 } catch {
   // 没有 prisma 也可运行（映射文件模式）
