@@ -59,8 +59,9 @@ import { fileURLToPath } from "node:url";
 import "dotenv/config";
 import fg from "fast-glob";
 import matter from "gray-matter";
-// 注意：按你的项目结构，这里是 "../generated/prisma/index.js"
-import { PrismaClient } from "../generated/prisma/index.js";
+// Prisma7更改到了client.ts
+import * as PrismaModule from "../generated/prisma/client.ts";
+const PrismaClient = PrismaModule.PrismaClient;
 
 // Node >=18 在 Actions 下自带 fetch；若需兼容性可加 undici，但默认不必。
 // import fetch from "node-fetch";

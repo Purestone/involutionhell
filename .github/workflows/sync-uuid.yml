@@ -61,7 +61,7 @@ jobs:
         run: pnpm exec node scripts/uuid.mjs
 
       - name: Backfill contributors & sync DB
-        run: pnpm exec node scripts/backfill-contributors.mjs
+        run: pnpm exec tsx scripts/backfill-contributors.mjs
 
       - name: Auto-commit doc metadata (if any)
         uses: stefanzweifel/git-auto-commit-action@v5
