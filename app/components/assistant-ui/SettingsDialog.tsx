@@ -33,12 +33,10 @@ export const SettingsDialog = ({
     setGeminiApiKey,
     saveToLocalStorage,
     setSaveToLocalStorage,
-    refreshFromStorage,
   } = useAssistantSettings();
 
   const handleSave = () => {
-    // Force refresh from localStorage to ensure all components get the latest values
-    refreshFromStorage();
+    // 设置已在内存状态中实时更新，这里只关闭弹窗，避免回读 localStorage 覆盖新值。
     onOpenChange(false);
   };
 
