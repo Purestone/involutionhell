@@ -28,6 +28,18 @@ interface DocsAssistantProps {
   pageContext: PageContext;
 }
 
+function hashTransportConfig(value: string): string {
+  // 使用FNV-1a（32位）算法，避免在客户端聊天ID中嵌入原始API密钥。
+  let hash = 0x811c9dc5;
+
+  for (let i = 0; i < value.length; i += 1) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+
+  return (hash >>> 0).toString(36);
+}
+
 export function DocsAssistant({ pageContext }: DocsAssistantProps) {
   return (
     <AssistantSettingsProvider>
@@ -49,6 +61,10 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   // 生成唯一的会话 ID
   const [chatId] = useState(
     () => `chat-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  );
+  const chatRuntimeId = useMemo(
+    () => `${chatId}:${provider}:${hashTransportConfig(apiKey)}`,
+    [chatId, provider, apiKey],
   );
 
   const transport = useMemo(
@@ -110,9 +126,10 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   }, [logAnalyticsEvent]);
 
   const chat = useChat({
-    id: chatId,
-    // 当 Provider 或 Key 更改时强制重置聊天 (但保持 chatId 不变会不会有问题？可能需要重新生成)
-    // 这里我们暂时保留 chatId 不变，视为同一会话切换了模型
+    // ai-sdk/react 的 useChat 只在 id 改变时重建内部 Chat 实例；
+    // transport/body 变化不会自动生效。这里用 runtime id 触发重建，
+    // 同时保留 body.chatId 作为后端持久化会话 id。
+    id: chatRuntimeId,
     transport,
     onFinish: () => {
       // 聊天流式传输完成后（onFinish），记录一次查询行为
@@ -277,7 +294,7 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   // 当 Provider 更改时清除之前的错误
   useEffect(() => {
     clearChatError();
-  }, [provider, clearChatError]);
+  }, [provider, apiKey, clearChatError]);
 
   // 当对话状态重置时也清除错误
   useEffect(() => {
