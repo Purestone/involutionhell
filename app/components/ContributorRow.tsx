@@ -34,7 +34,7 @@ export function ContributorRow({
             <img
               src={user.avatarUrl}
               alt={user.name}
-              className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+              className="w-full h-full object-cover transition-all duration-300"
             />
           </div>
           <div className="flex-1 min-w-[150px] overflow-hidden">

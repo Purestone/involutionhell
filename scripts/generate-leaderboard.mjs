@@ -71,7 +71,9 @@ async function main() {
       if (pathMatch && pathMatch[1]) {
         const docPath = pathMatch[1];
         let title = docPath.replace(/\.mdx?$/, "");
-        const url = `/docs/${title}`;
+        // 对于 Fumadocs 以及 Next.js 路由，以 index.md/mdx 结尾的文件实际上对应着目录的根路径
+        // 所以我们把拼接出的 `/docs/xxx/index` 最后的 `/index` 去掉
+        const url = `/docs/${title}`.replace(/\/index$/, "") || "/docs";
 
         let docIdFromFm = null;
         // 为了获取确切的 title 和 docId，我们需要打开实际的文件获取 frontmatter，
