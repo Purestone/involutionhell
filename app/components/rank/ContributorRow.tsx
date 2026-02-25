@@ -156,21 +156,36 @@ export function ContributorRow({
             </h4>
             <div className="flex flex-col gap-0 border-t border-[#111111]/20 dark:border-neutral-200/20">
               {user.contributedDocs && user.contributedDocs.length > 0 ? (
-                user.contributedDocs.map((doc) => (
-                  <Link
-                    key={doc.id}
-                    href={doc.url}
-                    className="flex w-full items-center justify-between group/link border-b border-[#111111]/20 dark:border-neutral-200/20 py-3 hover:bg-[#111111]/5 dark:hover:bg-white/5 transition-colors px-2"
-                    data-umami-event="click_contributor_doc"
-                    data-umami-event-doc={doc.title}
-                    data-umami-event-user={user.name}
-                  >
-                    <span className="font-mono text-sm text-[#111111] dark:text-neutral-200 group-hover/link:underline decoration-2 decoration-[#CC0000] underline-offset-4 truncate pr-4">
-                      {doc.title}
-                    </span>
-                    <ExternalLink className="h-4 w-4 text-[#111111]/50 dark:text-neutral-400 group-hover/link:text-[#CC0000] transition-colors shrink-0" />
-                  </Link>
-                ))
+                (() => {
+                  // 过滤掉 title 直接等于 id 的脏数据（通常是已被删除或解析失败的文档遗留在数据库中）
+                  const validDocs = user.contributedDocs.filter(
+                    (doc) => doc.title !== doc.id,
+                  );
+
+                  if (validDocs.length === 0) {
+                    return (
+                      <div className="text-sm font-body italic text-neutral-500 pt-4">
+                        No valid document history found.
+                      </div>
+                    );
+                  }
+
+                  return validDocs.map((doc) => (
+                    <Link
+                      key={doc.id}
+                      href={doc.url}
+                      className="flex w-full items-center justify-between group/link border-b border-[#111111]/20 dark:border-neutral-200/20 py-3 hover:bg-[#111111]/5 dark:hover:bg-white/5 transition-colors px-2"
+                      data-umami-event="click_contributor_doc"
+                      data-umami-event-doc={doc.title}
+                      data-umami-event-user={user.name}
+                    >
+                      <span className="font-mono text-sm text-[#111111] dark:text-neutral-200 group-hover/link:underline decoration-2 decoration-[#CC0000] underline-offset-4 truncate pr-4">
+                        {doc.title}
+                      </span>
+                      <ExternalLink className="h-4 w-4 text-[#111111]/50 dark:text-neutral-400 group-hover/link:text-[#CC0000] transition-colors shrink-0" />
+                    </Link>
+                  ));
+                })()
               ) : (
                 <div className="text-sm font-body italic text-neutral-500 pt-4">
                   No explicit document history found.
