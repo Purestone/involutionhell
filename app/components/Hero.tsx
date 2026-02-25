@@ -6,6 +6,7 @@ import { ActivityTicker } from "@/app/components/ActivityTicker";
 import { cn } from "@/lib/utils";
 import { AnimatedBar } from "@/app/components/AnimatedBar";
 import leaderboardData from "@/generated/site-leaderboard.json";
+import { MAINTAINERS } from "@/lib/admins";
 
 export function Hero() {
   const categories: { title: string; desc: string; href: string }[] = [
@@ -168,16 +169,20 @@ export function Hero() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {(
-              leaderboardData as {
+            {(() => {
+              const rawData = leaderboardData as {
                 id: string;
                 name: string;
                 points: number;
                 avatarUrl: string;
-              }[]
-            )
-              .slice(0, 3)
-              .map((user, idx) => (
+              }[];
+              const filteredData = rawData.filter(
+                (user) => !MAINTAINERS.includes(user.name),
+              );
+              const top3 = filteredData.slice(0, 3);
+              const maxPoints = top3.length > 0 ? top3[0].points : 100;
+
+              return top3.map((user, idx) => (
                 <div
                   key={user.id}
                   className="border border-[var(--foreground)] p-6 bg-[var(--background)] relative hard-shadow-hover transition-all group"
@@ -189,7 +194,7 @@ export function Hero() {
                     <img
                       src={user.avatarUrl}
                       alt={user.name}
-                      className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-300"
+                      className="w-full h-full object-cover transition-all duration-300"
                     />
                   </div>
                   <div className="font-serif text-2xl font-bold uppercase text-[var(--foreground)] mb-1 truncate">
@@ -200,9 +205,10 @@ export function Hero() {
                   </div>
 
                   {/* Visual bar chart representing points using motion */}
-                  <AnimatedBar value={user.points} max={12500} />
+                  <AnimatedBar value={user.points} max={maxPoints} />
                 </div>
-              ))}
+              ));
+            })()}
           </div>
         </div>
       </div>

@@ -6,6 +6,8 @@ import { ContributorRow } from "@/app/components/ContributorRow";
 
 import leaderboardData from "@/generated/site-leaderboard.json";
 
+import { MAINTAINERS } from "@/lib/admins";
+
 // We use the generated JSON
 const rawRanks = leaderboardData as {
   id: string;
@@ -15,9 +17,6 @@ const rawRanks = leaderboardData as {
   avatarUrl: string;
   contributedDocs?: { id: string; title: string; url: string }[];
 }[];
-
-// 维护一个容器（数组），填写需要从排行榜中屏蔽的维护者或用户的名称
-const MAINTAINERS = ["longsizhuo", "Mira190"];
 
 const mockRanks = rawRanks.filter((user) => !MAINTAINERS.includes(user.name));
 
