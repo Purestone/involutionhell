@@ -26,7 +26,11 @@ export function ContributorRow({
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <button className="w-full text-left group flex flex-col md:flex-row md:items-center gap-4 border border-[var(--foreground)] p-4 bg-[var(--background)] hard-shadow-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 cursor-pointer">
+        <button
+          className="w-full text-left group flex flex-col md:flex-row md:items-center gap-4 border border-[var(--foreground)] p-4 bg-[var(--background)] hard-shadow-hover transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 cursor-pointer"
+          data-umami-event="open_contributor_dialog"
+          data-umami-event-user={user.name}
+        >
           <div className="font-mono text-2xl font-bold w-12 text-center text-[var(--foreground)] shrink-0">
             #{idx + 1}
           </div>
@@ -91,6 +95,9 @@ export function ContributorRow({
                     key={doc.id}
                     href={doc.url}
                     className="flex w-full items-center justify-between group/link border-b border-[#111111]/20 dark:border-neutral-200/20 py-3 hover:bg-[#111111]/5 dark:hover:bg-white/5 transition-colors px-2"
+                    data-umami-event="click_contributor_doc"
+                    data-umami-event-doc={doc.title}
+                    data-umami-event-user={user.name}
                   >
                     <span className="font-mono text-sm text-[#111111] dark:text-neutral-200 group-hover/link:underline decoration-2 decoration-[#CC0000] underline-offset-4 truncate pr-4">
                       {doc.title}

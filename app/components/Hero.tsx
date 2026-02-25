@@ -4,7 +4,7 @@ import { Contribute } from "@/app/components/Contribute";
 import Image from "next/image";
 import { ActivityTicker } from "@/app/components/ActivityTicker";
 import { cn } from "@/lib/utils";
-import { AnimatedBar } from "@/app/components/AnimatedBar";
+import { AnimatedBar } from "@/app/components/rank/AnimatedBar";
 import leaderboardData from "@/generated/site-leaderboard.json";
 import { MAINTAINERS } from "@/lib/admins";
 
@@ -160,6 +160,7 @@ export function Hero() {
               className="font-mono text-xs uppercase tracking-widest font-bold text-[var(--foreground)] hover:text-[var(--color-accent)] transition-colors flex items-center gap-2 group"
               data-umami-event="navigation_click"
               data-umami-event-region="hero_leaderboard"
+              data-umami-event-label="FULL RANK"
             >
               FULL RANK
               <span className="transform group-hover:translate-x-1 transition-transform">
