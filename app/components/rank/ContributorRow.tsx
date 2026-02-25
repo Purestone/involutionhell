@@ -66,27 +66,93 @@ export function ContributorRow({
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/60 z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
         <Dialog.Content className="fixed left-[50%] outline-none top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border-2 border-[#111111] bg-[#F9F9F7] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#111111] duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] max-h-[85vh] flex col dark:bg-neutral-950 dark:border-neutral-200 dark:shadow-[8px_8px_0px_0px_#e5e5e5]">
-          <div className="flex justify-between items-start border-b-4 border-[#111111] dark:border-neutral-200 pb-4 mb-2 shrink-0">
-            <div className="min-w-0 pr-4">
-              <Dialog.Title className="font-serif text-3xl font-black uppercase text-[#111111] dark:text-neutral-100 leading-none truncate">
-                {user.name}
-              </Dialog.Title>
-              <Dialog.Description className="font-mono text-xs uppercase tracking-widest mt-2 text-neutral-600 dark:text-neutral-400">
-                Contributions Dossier
-              </Dialog.Description>
+          {/* 弹窗核心内容：左侧头像，右侧个人基础信息 */}
+          <div className="flex justify-between items-start border-b-4 border-[#111111] dark:border-neutral-200 pb-6 mb-4 shrink-0 relative">
+            <div className="flex gap-5 md:gap-6 items-start w-full pr-12">
+              {/* 用户头像 */}
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-neutral-200 dark:bg-neutral-800 border-2 border-[#111111] dark:border-neutral-200 shrink-0 overflow-hidden">
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* 用户信息与统计摘要区 */}
+              <div className="flex flex-col gap-3 min-w-0 flex-1">
+                <div className="flex flex-col gap-1 items-start">
+                  {/* 用户名，点击也可跳转 GitHub */}
+                  <Dialog.Title className="font-serif text-2xl md:text-3xl font-black uppercase leading-none truncate pr-4">
+                    <a
+                      href={`https://github.com/${user.name}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#111111] dark:text-neutral-100 hover:text-[#CC0000] dark:hover:text-[#CC0000] transition-colors"
+                      data-umami-event="click_github_profile_name"
+                      data-umami-event-user={user.name}
+                    >
+                      {user.name}
+                    </a>
+                  </Dialog.Title>
+                  <Dialog.Description className="sr-only">
+                    Contributions Dossier
+                  </Dialog.Description>
+
+                  {/* GitHub 个人主页跳转链接，带有 Umami 点击事件追踪埋点 */}
+                  <a
+                    href={`https://github.com/${user.name}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-[#111111]/70 hover:text-[#CC0000] dark:text-neutral-400 dark:hover:text-[#CC0000] transition-colors w-max"
+                    data-umami-event="click_github_profile"
+                    data-umami-event-user={user.name}
+                  >
+                    GITHUB PROFILE <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+
+                {/* 贡献统计数据展示 */}
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-2">
+                  {/* 总积分面板 */}
+                  <div className="flex flex-col">
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-[#111111]/70 dark:text-neutral-400 mb-0.5">
+                      Total Score
+                    </span>
+                    <span className="font-serif font-black text-xl md:text-2xl text-[#CC0000] leading-none">
+                      {user.points.toLocaleString()}{" "}
+                      <span className="text-xs font-mono text-[#111111] dark:text-neutral-200 tracking-normal leading-none inline-block align-baseline">
+                        PTS
+                      </span>
+                    </span>
+                  </div>
+
+                  {/* 分隔线 */}
+                  <div className="w-px h-8 bg-[#111111]/20 dark:bg-neutral-200/20"></div>
+
+                  {/* 提交次数面板 */}
+                  <div className="flex flex-col">
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-[#111111]/70 dark:text-neutral-400 mb-0.5">
+                      Commits
+                    </span>
+                    <span className="font-serif font-black text-xl md:text-2xl text-[#111111] dark:text-neutral-100 leading-none">
+                      {user.commits}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <Dialog.Close className="h-8 w-8 flex items-center justify-center border border-[#111111] dark:border-neutral-200 hover:bg-[#111111] hover:text-[#F9F9F7] dark:hover:bg-neutral-200 dark:hover:text-neutral-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CC0000] shrink-0">
+
+            {/* 弹窗关闭按钮 */}
+            <Dialog.Close className="absolute top-0 right-0 h-8 w-8 flex items-center justify-center border border-[#111111] dark:border-neutral-200 hover:bg-[#111111] hover:text-[#F9F9F7] dark:hover:bg-neutral-200 dark:hover:text-neutral-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CC0000] shrink-0">
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </Dialog.Close>
           </div>
 
+          {/* 文章贡献历史列表展示 */}
           <div className="overflow-y-auto pr-2 flex-grow min-h-[150px] relative">
-            <h4 className="font-serif text-lg font-bold mb-4 text-[#111111] dark:text-neutral-100 flex items-center gap-2">
-              Document Commits
-              <span className="font-mono text-xs bg-[#111111] text-[#F9F9F7] dark:bg-neutral-200 dark:text-neutral-950 px-2 py-0.5">
-                {user.commits}
-              </span>
+            <h4 className="font-mono text-xs uppercase tracking-widest mb-3 text-[#111111]/70 dark:text-neutral-400 flex items-center gap-2">
+              Document History
             </h4>
             <div className="flex flex-col gap-0 border-t border-[#111111]/20 dark:border-neutral-200/20">
               {user.contributedDocs && user.contributedDocs.length > 0 ? (
@@ -110,20 +176,6 @@ export function ContributorRow({
                   No explicit document history found.
                 </div>
               )}
-            </div>
-          </div>
-
-          <div className="pt-4 border-t-2 border-[#111111] dark:border-neutral-200 mt-2 shrink-0 bg-[#F9F9F7] dark:bg-neutral-950">
-            <div className="flex justify-between items-center">
-              <span className="font-mono text-xs uppercase tracking-widest text-[#111111] dark:text-neutral-200">
-                Total Score
-              </span>
-              <span className="font-serif font-black text-2xl text-[#CC0000]">
-                {user.points.toLocaleString()}{" "}
-                <span className="text-sm font-mono text-[#111111] dark:text-neutral-200 tracking-normal">
-                  PTS
-                </span>
-              </span>
             </div>
           </div>
         </Dialog.Content>
