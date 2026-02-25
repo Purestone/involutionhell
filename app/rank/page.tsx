@@ -7,7 +7,7 @@ import { ContributorRow } from "@/app/components/ContributorRow";
 import leaderboardData from "@/generated/site-leaderboard.json";
 
 // We use the generated JSON
-const mockRanks = leaderboardData as {
+const rawRanks = leaderboardData as {
   id: string;
   name: string;
   points: number;
@@ -16,8 +16,13 @@ const mockRanks = leaderboardData as {
   contributedDocs?: { id: string; title: string; url: string }[];
 }[];
 
+// 维护一个容器（数组），填写需要从排行榜中屏蔽的维护者或用户的名称
+const MAINTAINERS = ["longsizhuo", "Mira190"];
+
+const mockRanks = rawRanks.filter((user) => !MAINTAINERS.includes(user.name));
+
 export default function RankPage() {
-  const maxPoints = mockRanks[0].points;
+  const maxPoints = mockRanks.length > 0 ? mockRanks[0].points : 100;
 
   return (
     <>
