@@ -52,7 +52,7 @@ export function ContributorRow({
               className="absolute top-0 left-0 h-full bg-[var(--foreground)] transition-all duration-1000 origin-left"
               style={{ width: `${(user.points / maxPoints) * 100}%` }}
             />
-            <div className="absolute inset-0 flex items-center px-2 font-mono text-[10px] text-[var(--background)] mix-blend-difference uppercase tracking-widest">
+            <div className="absolute inset-0 flex items-center px-2 font-mono text-[10px] text-white mix-blend-difference uppercase tracking-widest z-10 pointer-events-none">
               POWER LEVEL
             </div>
           </div>
