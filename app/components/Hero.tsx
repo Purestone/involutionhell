@@ -4,6 +4,9 @@ import { Contribute } from "@/app/components/Contribute";
 import Image from "next/image";
 import { ActivityTicker } from "@/app/components/ActivityTicker";
 import { cn } from "@/lib/utils";
+import { AnimatedBar } from "@/app/components/rank/AnimatedBar";
+import leaderboardData from "@/generated/site-leaderboard.json";
+import { MAINTAINERS } from "@/lib/admins";
 
 export function Hero() {
   const categories: { title: string; desc: string; href: string }[] = [
@@ -116,7 +119,8 @@ export function Hero() {
                   className="p-8 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors h-full flex flex-col hard-shadow-hover"
                   // Umami 埋点: 首页分类卡片点击
                   data-umami-event="navigation_click"
-                  data-umami-event-region="home_categories" data-umami-event-label={c.title}
+                  data-umami-event-region="home_categories"
+                  data-umami-event-label={c.title}
                 >
                   <div className="font-mono text-[10px] text-neutral-400 mb-4">
                     00{idx + 1}
@@ -138,6 +142,75 @@ export function Hero() {
 
         <div className="mt-16">
           <ZoteroFeedLazy groupId={6053219} limit={8} />
+        </div>
+
+        {/* Leaderboard Preview */}
+        <div className="mt-16 border-t-4 border-[var(--foreground)] pt-8 transition-colors duration-300">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-8 border-b border-[var(--foreground)] pb-4 gap-4">
+            <div>
+              <h2 className="text-4xl md:text-5xl font-serif font-black uppercase text-[var(--foreground)]">
+                Top Rank
+              </h2>
+              <p className="font-mono text-xs uppercase tracking-widest text-neutral-500 mt-2">
+                Real-time Hall of Fame
+              </p>
+            </div>
+            <Link
+              href="/rank"
+              className="font-mono text-xs uppercase tracking-widest font-bold text-[var(--foreground)] hover:text-[var(--color-accent)] transition-colors flex items-center gap-2 group"
+              data-umami-event="navigation_click"
+              data-umami-event-region="hero_leaderboard"
+              data-umami-event-label="FULL RANK"
+            >
+              FULL RANK
+              <span className="transform group-hover:translate-x-1 transition-transform">
+                &rarr;
+              </span>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {(() => {
+              const rawData = leaderboardData as {
+                id: string;
+                name: string;
+                points: number;
+                avatarUrl: string;
+              }[];
+              const filteredData = rawData.filter(
+                (user) => !MAINTAINERS.includes(user.name),
+              );
+              const top3 = filteredData.slice(0, 3);
+              const maxPoints = top3.length > 0 ? top3[0].points : 100;
+
+              return top3.map((user, idx) => (
+                <div
+                  key={user.id}
+                  className="border border-[var(--foreground)] p-6 bg-[var(--background)] relative hard-shadow-hover transition-all group"
+                >
+                  <div className="absolute top-0 right-0 w-12 h-12 bg-[var(--foreground)] text-[var(--background)] flex items-center justify-center font-mono font-bold text-xl border-b border-l border-[var(--foreground)] z-10">
+                    #{idx + 1}
+                  </div>
+                  <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 border border-[var(--foreground)] mb-4 transition-transform group-hover:scale-110 overflow-hidden">
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.name}
+                      className="w-full h-full object-cover transition-all duration-300"
+                    />
+                  </div>
+                  <div className="font-serif text-2xl font-bold uppercase text-[var(--foreground)] mb-1 truncate">
+                    {user.name}
+                  </div>
+                  <div className="font-mono text-xs text-neutral-500 uppercase tracking-widest mb-4">
+                    {user.points.toLocaleString()} PTS
+                  </div>
+
+                  {/* Visual bar chart representing points using motion */}
+                  <AnimatedBar value={user.points} max={maxPoints} />
+                </div>
+              ));
+            })()}
+          </div>
         </div>
       </div>
     </section>
