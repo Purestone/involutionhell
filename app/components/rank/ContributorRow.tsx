@@ -3,7 +3,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { X, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 type Contributor = {
   id: string;
@@ -35,9 +35,11 @@ export function ContributorRow({
             #{idx + 1}
           </div>
           <div className="w-12 h-12 bg-neutral-200 dark:bg-neutral-800 border border-[var(--foreground)] transition-transform group-hover:scale-110 overflow-hidden shrink-0">
-            <img
+            <Image
               src={user.avatarUrl}
               alt={user.name}
+              width={48}
+              height={48}
               className="w-full h-full object-cover transition-all duration-300"
             />
           </div>
@@ -71,9 +73,11 @@ export function ContributorRow({
             <div className="flex gap-5 md:gap-6 items-start w-full pr-12">
               {/* 用户头像 */}
               <div className="w-20 h-20 md:w-24 md:h-24 bg-neutral-200 dark:bg-neutral-800 border-2 border-[#111111] dark:border-neutral-200 shrink-0 overflow-hidden">
-                <img
+                <Image
                   src={user.avatarUrl}
                   alt={user.name}
+                  width={96}
+                  height={96}
                   className="w-full h-full object-cover"
                 />
               </div>

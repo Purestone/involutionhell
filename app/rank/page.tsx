@@ -1,7 +1,5 @@
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
-import { AnimatedBar } from "@/app/components/rank/AnimatedBar";
-import { cn } from "@/lib/utils";
 import { ContributorRow } from "@/app/components/rank/ContributorRow";
 
 import leaderboardData from "@/generated/site-leaderboard.json";

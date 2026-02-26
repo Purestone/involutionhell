@@ -192,9 +192,11 @@ export function Hero() {
                     #{idx + 1}
                   </div>
                   <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 border border-[var(--foreground)] mb-4 transition-transform group-hover:scale-110 overflow-hidden">
-                    <img
+                    <Image
                       src={user.avatarUrl}
                       alt={user.name}
+                      width={64}
+                      height={64}
                       className="w-full h-full object-cover transition-all duration-300"
                     />
                   </div>
