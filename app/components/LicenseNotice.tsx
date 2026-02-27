@@ -33,7 +33,7 @@ export function LicenseNotice({ className }: LicenseNoticeProps) {
       >
         CC BY-NC-SA 4.0
       </a>
-      <span className="flex items-center gap-0.5 grayscale opacity-50">
+      <span className="flex items-center gap-0.5 opacity-50">
         <Image
           src="https://mirrors.creativecommons.org/presskit/icons/cc.svg"
           alt="CC"

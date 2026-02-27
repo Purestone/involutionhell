@@ -7,7 +7,7 @@ export const ActivityEventSchema = z.object({
   /** Discord 活动入口链接 */
   discord: z.string().min(1, "discord 入口不能为空"),
   /** 活动回放链接，deprecated 为 true 时展示 */
-  playback: z.string().min(1, "playback 链接不能为空").optional(),
+  playback: z.string().optional(),
   /** 活动封面，可以是静态资源相对路径或完整 URL */
   coverUrl: z.string().min(1, "coverUrl 不能为空"),
   /** 是否为已结束活动，true 时展示 Playback 按钮 */

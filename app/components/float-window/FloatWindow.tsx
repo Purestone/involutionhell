@@ -127,7 +127,7 @@ export function FloatWindow() {
                   src={currentEvent.coverUrl}
                   alt={currentEvent.name}
                   fill
-                  className="object-cover grayscale dark:grayscale-0 group-hover:grayscale-0 group-hover:sepia transition-all duration-500"
+                  className="object-cover transition-all duration-500"
                   sizes="280px"
                   draggable={false}
                 />

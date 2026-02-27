@@ -63,7 +63,7 @@ export function Hero() {
           </div>
 
           <div className="lg:col-span-4 flex flex-col gap-8">
-            <div className="border border-[var(--foreground)] p-1 grayscale hover:grayscale-0 dark:grayscale-0 dark:hover:grayscale transition-all duration-500 bg-[var(--background)]">
+            <div className="border border-[var(--foreground)] p-1 transition-all duration-500 bg-[var(--background)]">
               <Image
                 src="/mascot.webp"
                 alt="Mascot"
