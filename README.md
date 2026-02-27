@@ -19,11 +19,10 @@
 
 <p align="center">
   <img alt="Next.js" src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
-  <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white" />
   <img alt="Vercel" src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" />
   <a href="https://github.com/InvolutionHell/involutionhell/blob/main/LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/InvolutionHell/involutionhell?style=for-the-badge&color=blue">
+  <a href="https://involutionhell.com">
+    <img src="https://img.shields.io/badge/Website-involutionhell.com-blue?style=for-the-badge" alt="Official Website">
   </a>
 </p>
 
