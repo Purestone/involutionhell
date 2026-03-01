@@ -26,6 +26,19 @@ export interface ContributorsDataset {
 
 const contributorsDataset = dataset as unknown as ContributorsDataset;
 
+// 预先构建 Map 缓存，将查找的时间复杂度从 O(N) 降低到 O(1)
+const contributorsByPath = new Map<string, DocContributorsRecord>();
+const contributorsByDocId = new Map<string, DocContributorsRecord>();
+
+for (const result of contributorsDataset.results) {
+  if (result.path) {
+    contributorsByPath.set(result.path, result);
+  }
+  if (result.docId) {
+    contributorsByDocId.set(result.docId, result);
+  }
+}
+
 function normalizeRelativePath(relativePath: string): string {
   const cleaned = relativePath.replace(/^\/+/, "").replace(/\\/g, "/");
   return `app/docs/${cleaned}`;
@@ -40,19 +53,14 @@ export function getDocContributorsByPath(
 ): DocContributorsRecord | null {
   if (!relativeDocPath) return null;
   const normalized = normalizeRelativePath(relativeDocPath);
-  return (
-    contributorsDataset.results.find((entry) => entry.path === normalized) ??
-    null
-  );
+  return contributorsByPath.get(normalized) ?? null;
 }
 
 export function getDocContributorsByDocId(
   docId: string | undefined | null,
 ): DocContributorsRecord | null {
   if (!docId) return null;
-  return (
-    contributorsDataset.results.find((entry) => entry.docId === docId) ?? null
-  );
+  return contributorsByDocId.get(docId) ?? null;
 }
 
 export function listDocContributors(): DocContributorsRecord[] {
