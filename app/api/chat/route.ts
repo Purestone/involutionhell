@@ -6,6 +6,9 @@ import { source } from "@/lib/source";
 import fs from "fs/promises";
 import path from "path";
 
+// 缓存解析后的 MDX 文本，减少重复的磁盘 I/O 和正则解析开销
+const mdxContentCache = new Map<string, string>();
+
 // 流式响应最长30秒
 export const maxDuration = 30;
 
@@ -52,9 +55,24 @@ export async function POST(req: Request) {
         const page = source.getPage(slugArray);
 
         if (page) {
-          const fullFilePath = path.join(process.cwd(), "app/docs", page.path);
-          const rawContent = await fs.readFile(fullFilePath, "utf-8");
-          pageContext.content = extractTextFromMDX(rawContent);
+          const cachedContent = mdxContentCache.get(page.path);
+
+          // 在生产环境下使用缓存，开发环境下不使用以支持文档热更新
+          if (cachedContent) {
+            console.log("[Cache hit!!!!]", page.path);
+            pageContext.content = cachedContent;
+          } else {
+            const fullFilePath = path.join(
+              process.cwd(),
+              "app/docs",
+              page.path,
+            );
+            const rawContent = await fs.readFile(fullFilePath, "utf-8");
+            const content = extractTextFromMDX(rawContent);
+
+            mdxContentCache.set(page.path, content);
+            pageContext.content = content;
+          }
         }
       } catch (error) {
         console.warn(
@@ -80,7 +98,7 @@ export async function POST(req: Request) {
     const result = streamText({
       model: model,
       system: systemMessage,
-      messages: convertToModelMessages(messages),
+      messages: convertToModelMessages(messages || []),
       onFinish: async ({ text }) => {
         try {
           // 1. 保存/更新会话
@@ -92,13 +110,17 @@ export async function POST(req: Request) {
 
           // 2. 保存用户消息 (取最后一条)
           // AI SDK v5 中，UIMessage 不再有 content 字段，内容在 parts 数组中
-          const lastUserMessage = messages[messages.length - 1];
+          const safeMessages = messages || [];
+          const lastUserMessage = safeMessages[safeMessages.length - 1];
           if (lastUserMessage && lastUserMessage.role === "user") {
             // 从 parts 数组中提取所有文本内容并拼接
-            const userContent = lastUserMessage.parts
-              .filter((part) => part.type === "text")
-              .map((part) => (part as { type: "text"; text: string }).text)
-              .join("\n");
+            const userContent = Array.isArray(lastUserMessage.parts)
+              ? lastUserMessage.parts
+                  .filter((part) => part.type === "text")
+                  .map((part) => (part as { type: "text"; text: string }).text)
+                  .join("\n")
+              : (lastUserMessage as unknown as { content?: string })?.content ||
+                "";
 
             await prisma.message.create({
               data: {
