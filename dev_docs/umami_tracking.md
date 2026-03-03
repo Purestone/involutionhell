@@ -6,15 +6,15 @@
 
 **内部导航 (Internal Navigation)**: 仅用于网站内部页面的跳转。
 
-| 区域 (Region)        | 元素说明                      | 触发行为 | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                                                                 |
-| :------------------- | :---------------------------- | :------- | :---------------------- | :------------------------------------------------------------------------------------ |
-| **header**           | 导航链接 (特点, 社区等)       | 点击     | `navigation_click`      | `region`: "header", `label`: 链接名 (e.g., "features"), `path`: 目标路径              |
-| **footer**           | 归档/资源链接                 | 点击     | `navigation_click`      | `region`: "footer", `label`: 链接名 (e.g., "Mission Brief"), `category`: "archive"    |
-| **sidebar**          | 文档侧边栏链接                | 点击     | `navigation_click`      | `region`: "sidebar", `label`: 页面标题, `path`: 目标路径                              |
-| **toc**              | 目录 (Table of Contents) 链接 | 点击     | `navigation_click`      | `region`: "toc", `label`: 章节标题                                                    |
-| **pagination**       | 上一篇/下一篇                 | 点击     | `navigation_click`      | `region`: "pagination", `label`: "prev" / "next", `path`: 目标路径                    |
-| **hero_cta**         | 首页 Hero 按钮                | 点击     | `navigation_click`      | `region`: "hero_cta", `label`: "Access Articles"                                      |
-| **home_categories**  | 首页分类卡片                  | 点击     | `navigation_click`      | `region`: "home_categories", `label`: 分类标题 (e.g., "AI")                           |
+| 区域 (Region)       | 元素说明                      | 触发行为 | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                                                              |
+| :------------------ | :---------------------------- | :------- | :---------------------- | :--------------------------------------------------------------------------------- |
+| **header**          | 导航链接 (特点, 社区等)       | 点击     | `navigation_click`      | `region`: "header", `label`: 链接名 (e.g., "features"), `path`: 目标路径           |
+| **footer**          | 归档/资源链接                 | 点击     | `navigation_click`      | `region`: "footer", `label`: 链接名 (e.g., "Mission Brief"), `category`: "archive" |
+| **sidebar**         | 文档侧边栏链接                | 点击     | `navigation_click`      | `region`: "sidebar", `label`: 页面标题, `path`: 目标路径                           |
+| **toc**             | 目录 (Table of Contents) 链接 | 点击     | `navigation_click`      | `region`: "toc", `label`: 章节标题                                                 |
+| **pagination**      | 上一篇/下一篇                 | 点击     | `navigation_click`      | `region`: "pagination", `label`: "prev" / "next", `path`: 目标路径                 |
+| **hero_cta**        | 首页 Hero 按钮                | 点击     | `navigation_click`      | `region`: "hero_cta", `label`: "Access Articles"                                   |
+| **home_categories** | 首页分类卡片                  | 点击     | `navigation_click`      | `region`: "home_categories", `label`: 分类标题 (e.g., "AI")                        |
 
 **资源与外部链接 (Resources & External Links)**: 用于追踪外部资源、工具或社交媒体的点击。
 
@@ -37,18 +37,18 @@
 
 ## 3. 内容互动与反馈 (Content Interaction & Feedback)
 
-| 区域             | 元素说明                   | 触发行为 | 埋点事件名 (Event Name)      | 埋点传参 (Event Data)                                        |
-| :--------------- | :------------------------- | :------- | :--------------------------- | :----------------------------------------------------------- |
-| **Content**      | 复制生词/代码块            | 复制     | `content_copy`               | `type`: "code"/"text", `content_length`: 字符数 (number)     |
-| **Content**      | 页面反馈 (Helpful)         | 点击     | `feedback_submit`            | `page`: 当前页面路径, `vote`: "helpful" / "not_helpful"      |
-| **Feature**      | 投稿 (Contribute)          | 点击     | `contribute_trigger`         | `location`: "hero" / "docs"                                  |
-| **Feature**      | 投稿跳转 (Github Redirect) | 跳转     | `contribute_github_redirect` | `dir`: 目标目录, `filename`: 文件名                          |
-| **AI Assistant** | 提问                       | 完成     | `ai_assistant_query`         | _(暂未包含具体参数)_                                         |
+| 区域             | 元素说明                   | 触发行为 | 埋点事件名 (Event Name)      | 埋点传参 (Event Data)                                    |
+| :--------------- | :------------------------- | :------- | :--------------------------- | :------------------------------------------------------- |
+| **Content**      | 复制生词/代码块            | 复制     | `content_copy`               | `type`: "code"/"text", `content_length`: 字符数 (number) |
+| **Content**      | 页面反馈 (Helpful)         | 点击     | `feedback_submit`            | `page`: 当前页面路径, `vote`: "helpful" / "not_helpful"  |
+| **Feature**      | 投稿 (Contribute)          | 点击     | `contribute_trigger`         | `location`: "hero" / "docs"                              |
+| **Feature**      | 投稿跳转 (Github Redirect) | 跳转     | `contribute_github_redirect` | `dir`: 目标目录, `filename`: 文件名                      |
+| **AI Assistant** | 提问                       | 完成     | `ai_assistant_query`         | _(暂未包含具体参数)_                                     |
 
 ## 4. 异常与错误 (Errors)
 
-| 场景    | 说明       | 触发条件      | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                            |
-| :------ | :--------- | :------------ | :---------------------- | :----------------------------------------------- |
+| 场景    | 说明       | 触发条件      | 埋点事件名 (Event Name) | 埋点传参 (Event Data)                                      |
+| :------ | :--------- | :------------ | :---------------------- | :--------------------------------------------------------- |
 | **404** | 页面未找到 | 访问 404 页面 | `error_404`             | `path`: 访问路径, `referrer`: 来源页面 (document.referrer) |
 
 ## 实施指南
