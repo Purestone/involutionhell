@@ -7,12 +7,12 @@ datasource db {
   provider = "postgresql"
 }
 
-model accounts {
-  id                Int     @id @default(autoincrement())
+model Account {
+  id                Int    @id @default(autoincrement())
   userId            Int
-  type              String  @db.VarChar(255)
-  provider          String  @db.VarChar(255)
-  providerAccountId String  @db.VarChar(255)
+  type              String @db.VarChar(255)
+  provider          String @db.VarChar(255)
+  providerAccountId String @db.VarChar(255)
   refresh_token     String?
   access_token      String?
   expires_at        BigInt?
@@ -20,6 +20,11 @@ model accounts {
   scope             String?
   session_state     String?
   token_type        String?
+  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
 }
 
 model doc_contributors {
@@ -52,29 +57,38 @@ model docs {
   doc_paths         doc_paths[]
 }
 
-model sessions {
+model Session {
   id           Int      @id @default(autoincrement())
   userId       Int
   expires      DateTime @db.Timestamptz(6)
-  sessionToken String   @db.VarChar(255)
+  sessionToken String   @unique @db.VarChar(255)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
 }
 
-model users {
+model User {
   id              Int              @id @default(autoincrement())
   name            String?          @db.VarChar(255)
-  email           String?          @db.VarChar(255)
+  email           String?          @unique @db.VarChar(255)
   emailVerified   DateTime?        @db.Timestamptz(6)
   image           String?
+  accounts        Account[]
+  sessions        Session[]
   chats           Chat[]
   analyticsEvents AnalyticsEvent[]
+
+  @@map("users")
 }
 
-model verification_token {
+model VerificationToken {
   identifier String
   expires    DateTime @db.Timestamptz(6)
   token      String
 
   @@id([identifier, token])
+  @@map("verification_token")
 }
 
 model doc_paths {
@@ -96,7 +110,7 @@ model Chat {
   updatedAt DateTime  @updatedAt
   messages  Message[]
 
-  user users? @relation(fields: [userId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
@@ -120,7 +134,7 @@ model AnalyticsEvent {
   eventData Json?
   createdAt DateTime @default(now())
 
-  user users? @relation(fields: [userId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
 
   @@index([eventType])
   @@index([userId])
