@@ -1,8 +1,8 @@
 {
   "repo": "InvolutionHell/involutionhell",
-  "generatedAt": "2026-03-04T14:17:25.549Z",
+  "generatedAt": "2026-03-09T17:47:42.725Z",
   "docsDir": "app/docs",
-  "totalDocs": 146,
+  "totalDocs": 148,
   "results": [
     {
       "docId": "ue27z7z95yzw3lhhfj7nit1c",
@@ -2069,6 +2069,23 @@
       ]
     },
     {
+      "docId": "zuoplhoodv7tzfgku0pwzi6w",
+      "path": "app/docs/CommunityShare/Leetcode/[1545]找出第 N 个二进制字符串中的第 K 位.md",
+      "contributorStats": {
+        "114939201": 1
+      },
+      "contributors": [
+        {
+          "githubId": "114939201",
+          "contributions": 1,
+          "lastContributedAt": "2026-03-09T17:41:04.000Z",
+          "login": "longsizhuo",
+          "avatarUrl": "https://avatars.githubusercontent.com/u/114939201?v=4",
+          "htmlUrl": "https://github.com/longsizhuo"
+        }
+      ]
+    },
+    {
       "docId": "rv6egbynttb4mt1n0412bue0",
       "path": "app/docs/CommunityShare/Leetcode/[213]打家劫舍 II_translated.md",
       "contributorStats": {
@@ -2700,6 +2717,23 @@
           "githubId": "114939201",
           "contributions": 2,
           "lastContributedAt": "2025-11-15T03:07:06.000Z",
+          "login": "longsizhuo",
+          "avatarUrl": "https://avatars.githubusercontent.com/u/114939201?v=4",
+          "htmlUrl": "https://github.com/longsizhuo"
+        }
+      ]
+    },
+    {
+      "docId": "aslw60tfyzxqga598pt4ociu",
+      "path": "app/docs/CommunityShare/Leetcode/index.mdx",
+      "contributorStats": {
+        "114939201": 1
+      },
+      "contributors": [
+        {
+          "githubId": "114939201",
+          "contributions": 1,
+          "lastContributedAt": "2026-03-09T17:41:04.000Z",
           "login": "longsizhuo",
           "avatarUrl": "https://avatars.githubusercontent.com/u/114939201?v=4",
           "htmlUrl": "https://github.com/longsizhuo"
