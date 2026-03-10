@@ -15,6 +15,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => {
     ...authConfig,
     providers: [
       GitHub({
+        clientId:
+          process.env.NODE_ENV !== "production" &&
+          process.env.AUTH_GITHUB_ID_DEV
+            ? process.env.AUTH_GITHUB_ID_DEV
+            : process.env.AUTH_GITHUB_ID,
+        clientSecret:
+          process.env.NODE_ENV !== "production" &&
+          process.env.AUTH_GITHUB_SECRET_DEV
+            ? process.env.AUTH_GITHUB_SECRET_DEV
+            : process.env.AUTH_GITHUB_SECRET,
         profile(profile) {
           return {
             id: profile.id.toString(), // 与数据库的整数主键兼容

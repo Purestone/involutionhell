@@ -1,4 +1,6 @@
-import { signIn } from "@/auth";
+"use client";
+
+import { signIn } from "next-auth/react";
 import { Button } from "@/app/components/ui/button";
 
 interface SignInButtonProps {
@@ -10,33 +12,20 @@ interface SignInButtonProps {
   callbackUrl?: string;
 }
 
-export function SignInButton({
-  className,
-  redirectTo,
-  callbackUrl,
-}: SignInButtonProps) {
-  const targetUrl = redirectTo ?? callbackUrl ?? "/";
+export function SignInButton({ className, redirectTo }: SignInButtonProps) {
+  const targetUrl = redirectTo ?? "/";
 
   return (
-    <form
+    <Button
       className={className}
-      action={async () => {
-        "use server";
-        await signIn("github", {
-          redirectTo: targetUrl,
-        });
-      }}
+      onClick={() => signIn("github", { redirectTo: targetUrl })}
+      size="sm"
+      variant="outline"
+      data-umami-event="auth_click"
+      data-umami-event-action="signin"
+      data-umami-event-location="header"
     >
-      <Button
-        type="submit"
-        size="sm"
-        variant="outline"
-        data-umami-event="auth_click"
-        data-umami-event-action="signin"
-        data-umami-event-location="header"
-      >
-        SignIn
-      </Button>
-    </form>
+      SignIn
+    </Button>
   );
 }

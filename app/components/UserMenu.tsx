@@ -1,4 +1,6 @@
-import { signOut } from "@/auth";
+"use client";
+
+import { signOut } from "next-auth/react";
 import {
   Avatar,
   AvatarFallback,
@@ -56,19 +58,12 @@ export function UserMenu({ user, provider }: UserMenuProps) {
           </a>
         ) : null}
 
-        <form
-          action={async () => {
-            "use server";
-            await signOut();
-          }}
+        <button
+          onClick={() => signOut()}
+          className="w-full px-4 py-2 text-left text-sm text-foreground transition hover:bg-muted"
         >
-          <button
-            type="submit"
-            className="w-full px-4 py-2 text-left text-sm text-foreground transition hover:bg-muted"
-          >
-            Sign out
-          </button>
-        </form>
+          Sign out
+        </button>
       </div>
     </details>
   );

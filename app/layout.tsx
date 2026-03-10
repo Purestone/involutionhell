@@ -7,8 +7,8 @@ import "./globals.css";
 import "katex/dist/katex.min.css";
 import { ThemeProvider } from "@/app/components/ThemeProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { auth } from "@/auth";
 import { UmamiIdentity } from "@/app/components/UmamiIdentity";
+import { SessionProvider } from "next-auth/react";
 // import { SearchWrapper } from "@/app/components/SearchWrapper";
 import { CustomSearchDialog } from "@/app/components/CustomSearchDialog";
 
@@ -126,7 +126,6 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const session = await auth();
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
@@ -205,17 +204,20 @@ export default async function RootLayout({
       >
         <div className="site-bg site-bg--stars" aria-hidden />
         <ThemeProvider defaultTheme="dark" storageKey="ih-theme">
-          <RootProvider
-            search={{
-              SearchDialog: CustomSearchDialog,
-              // 使用静态索引，兼容 next export 与本地开发
-              options: { type: "static", api: "/search.json" },
-            }}
-          >
-            <main id="main-content" className="relative z-10">
-              {children}
-            </main>
-          </RootProvider>
+          <SessionProvider>
+            <RootProvider
+              search={{
+                SearchDialog: CustomSearchDialog,
+                // 使用静态索引，兼容 next export 与本地开发
+                options: { type: "static", api: "/search.json" },
+              }}
+            >
+              <main id="main-content" className="relative z-10">
+                {children}
+              </main>
+              <UmamiIdentity />
+            </RootProvider>
+          </SessionProvider>
         </ThemeProvider>
         {/* 谷歌分析 */}
         <Script
@@ -238,7 +240,7 @@ export default async function RootLayout({
           strategy="lazyOnload"
         />
         {/* User Identification */}
-        <UmamiIdentity user={session?.user} />
+        {/* moved inside SessionProvider */}
         {/* 性能分析 */}
         <SpeedInsights />
       </body>
