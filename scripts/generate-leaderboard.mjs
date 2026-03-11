@@ -34,10 +34,19 @@ async function ensureParentDir(filePath) {
 }
 
 async function main() {
+  const outputAbs = path.resolve(REPO_ROOT, OUTPUT);
+
   if (!process.env.DATABASE_URL) {
     console.error(
-      "[generate-leaderboard] 未找到 DATABASE_URL，跳过生成排行榜。 | No DATABASE_URL found. Skipping.",
+      "[generate-leaderboard] 未找到 DATABASE_URL，跳过生成排行榜。正在为您生成空榜单以放行构建... | No DATABASE_URL found. Skipping. Generating an empty leaderboard for build pass...",
     );
+    await ensureParentDir(outputAbs);
+    try {
+      // 检查是否已经存在，存在则不覆盖（或者为了容错直接写入空的 array 也行）
+      await fs.writeFile(outputAbs, "[]", "utf-8");
+    } catch (e) {
+      // Ignore
+    }
     process.exit(0);
   }
 
@@ -191,7 +200,6 @@ async function main() {
       }
     }
 
-    const outputAbs = path.resolve(REPO_ROOT, OUTPUT);
     await ensureParentDir(outputAbs);
 
     await fs.writeFile(outputAbs, JSON.stringify(leaderboard, null, 2), "utf8");

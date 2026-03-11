@@ -8,8 +8,8 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const dynamic = "force-static";
+// 采用 force-static，使该接口在 Vercel 构建 (Build) 时直接生成静态结果，后续所有访问永远不再消耗 CPU，直到下次由于发版重新构建。
 
 type DirNode = {
   name: string;

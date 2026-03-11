@@ -1,4 +1,5 @@
 import { generateText } from "ai";
+import { unstable_cache } from "next/cache";
 import { getModel, requiresApiKey, type AIProvider } from "@/lib/ai/models";
 import { createGlmFlashModel } from "@/lib/ai/providers/glm";
 
@@ -85,10 +86,62 @@ export async function POST(req: Request) {
         : `User asked: "${lastText}". Suggest 3 short follow-up questions (max 10 words each). Return a JSON array only, e.g. ["Q1","Q2","Q3"]`;
     }
 
-    const { text } = await generateText({
-      model,
-      prompt,
-    });
+    // 将核心请求提取为一个辅助函数以便于使用 Vercel Cache
+    // 注意：unstable_cache 序列化函数只能接收可序列化的对象，因此仅传递必需的参数
+    const fetchSuggestionsWithCache = unstable_cache(
+      async (cPrompt: string, cModelId: string) => {
+        // 由于 model 不能序列化传入，在缓存函数内侧由于无法动态构建，所以此处传递标识再创建
+        const m =
+          cModelId === "intern"
+            ? getModel("intern")
+            : cModelId === "glm"
+              ? createGlmFlashModel()
+              : // 无法传递用户动态 key，对于配置了 key 的情况不走此函数
+                getModel("intern");
+
+        const { text } = await generateText({
+          model: m,
+          prompt: cPrompt,
+        });
+        return text;
+      },
+      // 使用明确具有区分度的 cache key
+      [`suggestions-cache-${isWelcomeRequest ? "welcome" : "followup"}`],
+      {
+        revalidate: 60 * 60 * 24, // 对同一个页面的建议缓存 24 小时
+        tags: ["suggestions"],
+      },
+    );
+
+    let text = "";
+    // 判断是否可以使用缓存（如果使用了自定义 apiKey，为了防止数据交叉，不采用公用缓存）
+    if (provider !== "intern" && !process.env.ZHIPU_API_KEY) {
+      const { text: directText } = await generateText({
+        model,
+        prompt,
+      });
+      text = directText;
+    } else {
+      // 确定内部用于缓存匹配的模型标识
+      const internalModelId =
+        provider === "intern"
+          ? process.env.ZHIPU_API_KEY
+            ? "glm"
+            : "intern"
+          : "intern";
+      // 将缓存粒度关联到请求本身的内容上
+      const suggestionKey = isWelcomeRequest
+        ? `welcome-${pageContext?.slug || "default"}`
+        : `followup-${prompt}`;
+
+      const cachedFn = unstable_cache(
+        async (pPrompt: string, pModelId: string) =>
+          fetchSuggestionsWithCache(pPrompt, pModelId),
+        [`suggestion-key-${suggestionKey}`],
+        { revalidate: 3600 * 24 }, // 24小时
+      );
+      text = await cachedFn(prompt, internalModelId);
+    }
 
     let questions: unknown[] = [];
     try {
