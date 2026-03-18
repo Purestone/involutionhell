@@ -52,7 +52,7 @@ jobs:
       - name: Check pnpm version
         run: node scripts/check-pnpm-version.mjs
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
       
       # Verify lockfile wasn't modified by install
       - name: Check lockfile consistency

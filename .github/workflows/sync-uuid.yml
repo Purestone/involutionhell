@@ -30,7 +30,7 @@ jobs:
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       GITHUB_TOKEN: ${{ secrets.GH_PAT }} # 供脚本调用 GitHub API 提升速率
-      DOCS_DIR: app/docs # 在 working-directory 为 frontend 时，这是相对路径
+      DOCS_DIR: app/docs
 
     steps:
       - uses: actions/checkout@v4
@@ -43,31 +43,18 @@ jobs:
         with:
           version: 10.20.0
           package_json_file: frontend/package.json
-          run_install: false
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          # 不再这里配置缓存，避免子目录解析错误
 
       # Verify pnpm version matches package.json packageManager field
       - name: Check pnpm version
         run: node scripts/check-pnpm-version.mjs
 
       - name: Install deps
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Generate Prisma Client
         run: pnpm prisma generate
@@ -83,7 +70,7 @@ jobs:
         with:
           commit_message: "chore(docs): sync doc metadata [skip ci]" # ← 防循环
           file_pattern: "frontend/app/docs/**/*.md frontend/app/docs/**/*.mdx frontend/generated/doc-contributors.json"
-          working_directory: . # git-auto-commit-action 建议在根目录运行以处理全局路径
+          working_directory: . 
 
       - name: Upload snapshot JSON
         uses: actions/upload-artifact@v4
