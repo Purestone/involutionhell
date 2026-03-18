@@ -2,9 +2,7 @@ name: Docs Backfill (on docs changes)
 
 on:
   push:
-    branches:
-      - main
-      - feat/contributor
+    branches: ["**"]
     paths:
       - "frontend/app/docs/**"
       - "frontend/scripts/uuid.mjs"
@@ -21,10 +19,8 @@ concurrency:
 
 jobs:
   backfill:
-    # 防止 fork、限定 main、并避免机器人循环
-    if:
-      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/contributor') &&
-      github.actor != 'github-actions[bot]'
+    # 防止 fork 并避免机器人循环
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: write
