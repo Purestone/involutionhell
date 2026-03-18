@@ -55,7 +55,10 @@ jobs:
             echo "This indicates a pnpm version mismatch or corrupted lockfile"
             echo ""
             echo "Expected pnpm version from package.json:"
-            grep '"packageManager"' package.json | grep -o 'pnpm@[^"]*' || echo "not specified"
+            # Use multiple fallback methods to extract version
+            grep '"packageManager"' package.json | grep -o 'pnpm@[^"]*' || \
+              node -e "try { console.log(require('./package.json').packageManager || 'not specified') } catch(e) { console.log('Could not read') }" || \
+              echo "Could not extract version"
             echo ""
             echo "Actual pnpm version:"
             pnpm --version || echo "pnpm not found"
