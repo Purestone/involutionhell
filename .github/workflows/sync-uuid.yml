@@ -41,13 +41,26 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
+          version: 10.20.0
           package_json_file: frontend/package.json
+          run_install: false
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm" # 顺便启用 pnpm 缓存，加速
-          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       # Verify pnpm version matches package.json packageManager field
       - name: Check pnpm version

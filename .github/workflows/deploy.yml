@@ -33,13 +33,28 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
+          version: 10.20.0 # 明确指定版本或让它去 frontend/package.json 找
           package_json_file: frontend/package.json
+          run_install: false
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
+          # 注意：这里不再使用 cache: pnpm，改为使用 pnpm action 自带的缓存或手动处理
+
+      # 使用 pnpm 官方推荐的缓存方式
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       # Verify pnpm version matches package.json packageManager field
       - name: Check pnpm version
@@ -55,7 +70,6 @@ jobs:
             echo "This indicates a pnpm version mismatch or corrupted lockfile"
             echo ""
             echo "Expected pnpm version from package.json:"
-            # Use multiple fallback methods to extract version
             grep '"packageManager"' package.json | grep -o 'pnpm@[^"]*' || \
               node -e "try { console.log(require('./package.json').packageManager || 'not specified') } catch(e) { console.log('Could not read') }" || \
               echo "Could not extract version"
@@ -83,18 +97,15 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Note: we need to run git commands from the root but parse paths correctly
           cd ..
           git fetch --depth=2 origin ${{ github.ref }} || true
           CHANGED="$(git diff --name-only HEAD~1 HEAD || true)"
-          # Updated regex to include frontend/ prefix
           CHANGED_DOCS="$(echo "$CHANGED" | grep -E '^frontend/(app/docs/|content/docs/).*\.(mdx?|tsx?)$' || true)"
 
           URLS=()
 
           while IFS= read -r f; do
             [ -z "$f" ] && continue
-            # Match frontend/app/docs/path/page.tsx -> /docs/path
             if [[ "$f" =~ ^frontend/app/docs/(.*)/page\.(mdx|md|tsx|ts|jsx|js)$ ]]; then
               slug="${BASH_REMATCH[1]}"
               URLS+=("$SITE_ORIGIN/docs/$slug")
@@ -103,7 +114,6 @@ jobs:
 
           while IFS= read -r f; do
             [ -z "$f" ] && continue
-            # Match frontend/content/docs/path.md -> /docs/path
             if [[ "$f" =~ ^frontend/content/docs/(.*)\.(md|mdx)$ ]]; then
               slug="${BASH_REMATCH[1]}"
               slug="${slug%/index}"
