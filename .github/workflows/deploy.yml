@@ -7,12 +7,19 @@ permissions:
 on:
   push:
     branches: [main]
+    paths:
+      - "frontend/**"
   pull_request:
+    paths:
+      - "frontend/**"
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     env:
       NEXT_TELEMETRY_DISABLED: "1"
       CI: "true"
@@ -30,6 +37,7 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
 
       # Verify pnpm version matches package.json packageManager field
       - name: Check pnpm version
@@ -45,10 +53,7 @@ jobs:
             echo "This indicates a pnpm version mismatch or corrupted lockfile"
             echo ""
             echo "Expected pnpm version from package.json:"
-            # Use multiple fallback methods to extract version
-            grep '"packageManager"' package.json | grep -o 'pnpm@[^"]*' || \
-              node -e "try { console.log(require('./package.json').packageManager || 'not specified') } catch(e) { console.log('Could not read') }" || \
-              echo "Could not extract version"
+            grep '"packageManager"' package.json | grep -o 'pnpm@[^"]*' || echo "not specified"
             echo ""
             echo "Actual pnpm version:"
             pnpm --version || echo "pnpm not found"
@@ -73,15 +78,19 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Note: we need to run git commands from the root but parse paths correctly
+          cd ..
           git fetch --depth=2 origin ${{ github.ref }} || true
           CHANGED="$(git diff --name-only HEAD~1 HEAD || true)"
-          CHANGED_DOCS="$(echo "$CHANGED" | grep -E '^(app/docs/|content/docs/).*\.(mdx?|tsx?)$' || true)"
+          # Updated regex to include frontend/ prefix
+          CHANGED_DOCS="$(echo "$CHANGED" | grep -E '^frontend/(app/docs/|content/docs/).*\.(mdx?|tsx?)$' || true)"
 
           URLS=()
 
           while IFS= read -r f; do
             [ -z "$f" ] && continue
-            if [[ "$f" =~ ^app/docs/(.*)/page\.(mdx|md|tsx|ts|jsx|js)$ ]]; then
+            # Match frontend/app/docs/path/page.tsx -> /docs/path
+            if [[ "$f" =~ ^frontend/app/docs/(.*)/page\.(mdx|md|tsx|ts|jsx|js)$ ]]; then
               slug="${BASH_REMATCH[1]}"
               URLS+=("$SITE_ORIGIN/docs/$slug")
             fi
@@ -89,7 +98,8 @@ jobs:
 
           while IFS= read -r f; do
             [ -z "$f" ] && continue
-            if [[ "$f" =~ ^content/docs/(.*)\.(md|mdx)$ ]]; then
+            # Match frontend/content/docs/path.md -> /docs/path
+            if [[ "$f" =~ ^frontend/content/docs/(.*)\.(md|mdx)$ ]]; then
               slug="${BASH_REMATCH[1]}"
               slug="${slug%/index}"
               URLS+=("$SITE_ORIGIN/docs/$slug")

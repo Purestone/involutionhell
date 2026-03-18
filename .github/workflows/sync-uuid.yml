@@ -6,13 +6,13 @@ on:
       - main
       - feat/contributor
     paths:
-      - "app/docs/**"
-      - "scripts/uuid.mjs"
-      - "scripts/backfill-contributors.mjs"
-      - "package.json"
-      - "pnpm-lock.yaml"
+      - "frontend/app/docs/**"
+      - "frontend/scripts/uuid.mjs"
+      - "frontend/scripts/backfill-contributors.mjs"
+      - "frontend/package.json"
+      - "frontend/pnpm-lock.yaml"
       - ".github/workflows/sync-uuid.yml"
-      - "generated/doc-contributors.json"
+      - "frontend/generated/doc-contributors.json"
   workflow_dispatch: {}
 
 concurrency:
@@ -28,10 +28,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    defaults:
+      run:
+        working-directory: frontend
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       GITHUB_TOKEN: ${{ secrets.GH_PAT }} # 供脚本调用 GitHub API 提升速率
-      DOCS_DIR: app/docs
+      DOCS_DIR: app/docs # 在 working-directory 为 frontend 时，这是相对路径
 
     steps:
       - uses: actions/checkout@v4
@@ -46,6 +49,7 @@ jobs:
         with:
           node-version: 20
           cache: "pnpm" # 顺便启用 pnpm 缓存，加速
+          cache-dependency-path: frontend/pnpm-lock.yaml
 
       # Verify pnpm version matches package.json packageManager field
       - name: Check pnpm version
@@ -67,11 +71,12 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(docs): sync doc metadata [skip ci]" # ← 防循环
-          file_pattern: "app/docs/**/*.md app/docs/**/*.mdx generated/doc-contributors.json"
+          file_pattern: "frontend/app/docs/**/*.md frontend/app/docs/**/*.mdx frontend/generated/doc-contributors.json"
+          working_directory: . # git-auto-commit-action 建议在根目录运行以处理全局路径
 
       - name: Upload snapshot JSON
         uses: actions/upload-artifact@v4
         with:
           name: doc-contributors-snapshot
-          path: generated/doc-contributors.json
+          path: frontend/generated/doc-contributors.json
           if-no-files-found: ignore

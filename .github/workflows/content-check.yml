@@ -7,24 +7,14 @@ permissions:
 on:
   pull_request:
     paths:
-      - "**/*.md"
-      - "**/*.mdx"
-      - "source.config.ts"
-      - "app/docs/**"
-      - "data/**"
-      - "tests/**"
-      - "lib/source.ts"
-      - "mdx-components.tsx"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "next.config.mjs"
-      - "postcss.config.mjs"
-      - "tailwind.config.ts"
-      - "tsconfig.json"
+      - "frontend/**"
 
 jobs:
   check-content:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     env:
       NEXT_TELEMETRY_DISABLED: "1"
       CI: "true"
@@ -41,6 +31,7 @@ jobs:
         with:
           node-version: 20
           cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
 
       # Verify pnpm version matches package.json packageManager field
       - name: Check pnpm version
@@ -56,10 +47,7 @@ jobs:
             echo "This indicates a pnpm version mismatch or corrupted lockfile"
             echo ""
             echo "Expected pnpm version from package.json:"
-            # Use multiple fallback methods to extract version
-            grep '"packageManager"' package.json | grep -o 'pnpm@[^"]*' || \
-              node -e "try { console.log(require('./package.json').packageManager || 'not specified') } catch(e) { console.log('Could not read') }" || \
-              echo "Could not extract version"
+            grep '"packageManager"' package.json | grep -o 'pnpm@[^"]*' || echo "not specified"
             echo ""
             echo "Actual pnpm version:"
             pnpm --version || echo "pnpm not found"

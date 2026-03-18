@@ -1,0 +1,22 @@
+# Next.js Build
+/.next/
+/out/
+/build/
+
+# Dependencies
+node_modules/
+
+# Local env files (These are symlinks, but we should still ignore them)
+.env*.local
+.env
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Contentlayer & Source
+.contentlayer/
+.source/
+
+# Generated
+/generated/
