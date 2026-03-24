@@ -1,24 +1,21 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { Button } from "@/app/components/ui/button";
 
 interface SignInButtonProps {
   className?: string;
-  redirectTo?: string;
-  /**
-   * @deprecated Use `redirectTo` (NextAuth v5). Kept for backward compatibility.
-   */
-  callbackUrl?: string;
 }
 
-export function SignInButton({ className, redirectTo }: SignInButtonProps) {
-  const targetUrl = redirectTo ?? "/";
+export function SignInButton({ className }: SignInButtonProps) {
+  // 跳转到后端 GitHub OAuth 入口，后端完成授权后会带着 token 重定向回前端首页
+  const handleSignIn = () => {
+    window.location.href = "/api/v1/oauth/render/github";
+  };
 
   return (
     <Button
       className={className}
-      onClick={() => signIn("github", { redirectTo: targetUrl })}
+      onClick={handleSignIn}
       size="sm"
       variant="outline"
       data-umami-event="auth_click"

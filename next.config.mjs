@@ -21,6 +21,16 @@ const withNextIntl = createNextIntlPlugin("./i18n.ts");
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
+  async rewrites() {
+    // 将 /api/v1/* 请求转发到本地 Spring Boot 后端（端口 8080）
+    // 好处：前端和后端同源，无需处理 CORS，开发体验更好
+    return [
+      {
+        source: "/api/v1/:path*",
+        destination: "http://localhost:8080/api/v1/:path*",
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
