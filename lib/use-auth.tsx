@@ -33,10 +33,14 @@ function getStoredToken(): string | null {
   return localStorage.getItem("satoken");
 }
 
-// 调用后端 /api/v1/auth/me 验证 token 并获取用户信息
+// 后端地址（浏览器直接访问，Next.js public env var）
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8080";
+
+// 调用后端 /auth/me 验证 token 并获取用户信息
 async function fetchCurrentUser(token: string): Promise<UserView | null> {
   try {
-    const res = await fetch("/api/v1/auth/me", {
+    const res = await fetch(`${BACKEND_URL}/auth/me`, {
       headers: { satoken: token },
     });
     if (!res.ok) return null;
@@ -94,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const token = getStoredToken();
     if (token) {
       try {
-        await fetch("/api/v1/auth/logout", {
+        await fetch(`${BACKEND_URL}/auth/logout`, {
           method: "POST",
           headers: { satoken: token },
         });

@@ -7,9 +7,12 @@ interface SignInButtonProps {
 }
 
 export function SignInButton({ className }: SignInButtonProps) {
-  // 跳转到后端 GitHub OAuth 入口，后端完成授权后会带着 token 重定向回前端首页
+  // 直接跳转到后端 GitHub OAuth 授权入口（NEXT_PUBLIC_BACKEND_URL）
+  // 后端完成授权后带着 token 重定向回前端首页 /?token=xxx
   const handleSignIn = () => {
-    window.location.href = "/api/v1/oauth/render/github";
+    const backendUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8080";
+    window.location.href = `${backendUrl}/oauth/render/github`;
   };
 
   return (

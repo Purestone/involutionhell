@@ -42,8 +42,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "未授权访问" }, { status: 401 });
     }
 
-    // 调用后端 /api/v1/auth/me 验证 token 并获取用户信息
-    const meRes = await fetch("http://localhost:8080/api/v1/auth/me", {
+    // 调用后端 /auth/me 验证 token（服务端直连后端，走 BACKEND_URL 环境变量）
+    const backendUrl = process.env.BACKEND_URL ?? "http://localhost:8080";
+    const meRes = await fetch(`${backendUrl}/auth/me`, {
       headers: { satoken: token },
     });
     if (!meRes.ok) {

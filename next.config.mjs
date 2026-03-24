@@ -22,12 +22,13 @@ const withNextIntl = createNextIntlPlugin("./i18n.ts");
 const config = {
   reactStrictMode: true,
   async rewrites() {
-    // 将 /api/v1/* 请求转发到本地 Spring Boot 后端（端口 8080）
-    // 好处：前端和后端同源，无需处理 CORS，开发体验更好
+    const backendUrl = process.env.BACKEND_URL ?? "http://localhost:8080";
     return [
       {
-        source: "/api/v1/:path*",
-        destination: "http://localhost:8080/api/v1/:path*",
+        // GitHub OAuth 回调：GitHub 重定向到 Next.js，Next.js 再转发给后端
+        // 路径与 GitHub OAuth App 注册的 callback URL 保持一致，无需改 GitHub App 设置
+        source: "/api/auth/callback/github",
+        destination: `${backendUrl}/api/auth/callback/github`,
       },
     ];
   },
