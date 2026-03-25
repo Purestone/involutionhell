@@ -7,9 +7,13 @@ datasource db {
   provider = "postgresql"
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
+// NextAuth 遗留表（auth.js 已迁移到后端 Sa-Token，这三张表不再写入新数据）
+// users.id 是 Int（自增），与 user_accounts.id（BigInt）是两套独立的用户体系
+// ──────────────────────────────────────────────────────────────────────────────
 model Account {
   id                Int    @id @default(autoincrement())
-  userId            Int
+  userId            Int    // 关联 users.id（NextAuth Int 主键，非 user_accounts）
   type              String @db.VarChar(255)
   provider          String @db.VarChar(255)
   providerAccountId String @db.VarChar(255)
@@ -59,7 +63,7 @@ model docs {
 
 model Session {
   id           Int      @id @default(autoincrement())
-  userId       Int
+  userId       Int      // 关联 users.id（NextAuth Int 主键，非 user_accounts）
   expires      DateTime @db.Timestamptz(6)
   sessionToken String   @unique @db.VarChar(255)
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -69,15 +73,13 @@ model Session {
 }
 
 model User {
-  id              Int              @id @default(autoincrement())
-  name            String?          @db.VarChar(255)
-  email           String?          @unique @db.VarChar(255)
-  emailVerified   DateTime?        @db.Timestamptz(6)
-  image           String?
-  accounts        Account[]
-  sessions        Session[]
-  chats           Chat[]
-  analyticsEvents AnalyticsEvent[]
+  id            Int       @id @default(autoincrement())
+  name          String?   @db.VarChar(255)
+  email         String?   @unique @db.VarChar(255)
+  emailVerified DateTime? @db.Timestamptz(6)
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
 
   @@map("users")
 }
@@ -105,12 +107,11 @@ model doc_paths {
 
 model Chat {
   id        String    @id @default(cuid())
-  userId    Int?
+  // 对应 user_accounts.id（Sa-Token 用户），与 Prisma users 表解耦
+  userId    BigInt?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   messages  Message[]
-
-  user User? @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
@@ -129,12 +130,11 @@ model Message {
 
 model AnalyticsEvent {
   id        String   @id @default(cuid())
-  userId    Int?
+  // 对应 user_accounts.id（Sa-Token 用户），与 Prisma users 表解耦
+  userId    BigInt?
   eventType String
   eventData Json?
   createdAt DateTime @default(now())
-
-  user User? @relation(fields: [userId], references: [id])
 
   @@index([eventType])
   @@index([userId])

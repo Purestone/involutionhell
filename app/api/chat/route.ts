@@ -26,8 +26,11 @@ interface ChatRequest {
   chatId?: string;
 }
 
+import { resolveUserId } from "@/lib/server-auth";
+
 export async function POST(req: Request) {
   try {
+    // 先把 body 消费掉，再并行验证用户身份
     const {
       messages,
       system,
@@ -36,6 +39,9 @@ export async function POST(req: Request) {
       apiKey,
       chatId,
     }: ChatRequest = await req.json();
+
+    // 并行解析用户身份（不阻塞主流程，失败静默降级为匿名）
+    const userIdPromise = resolveUserId(req);
 
     // 对指定Provider验证key是否存在
     if (requiresApiKey(provider) && (!apiKey || apiKey.trim() === "")) {
@@ -90,8 +96,6 @@ export async function POST(req: Request) {
     // 根据Provider获取 AI 模型实例
     const model = getModel(provider, apiKey);
 
-    // 确保有 chatId (如果前端没传，就生成一个临时的，虽然这会导致每次请求都是新会话)
-    // 理想情况是前端应该维护 chatId
     const effectiveChatId = chatId || crypto.randomUUID();
 
     // 生成流式响应
@@ -101,11 +105,21 @@ export async function POST(req: Request) {
       messages: convertToModelMessages(messages || []),
       onFinish: async ({ text }) => {
         try {
-          // 1. 保存/更新会话
+          // 等待用户身份解析（与流式传输并行运行，此时大概率已完成）
+          const userId = await userIdPromise;
+
+          // 1. 保存/更新会话，绑定用户 ID
+          // update 也写入 userId：覆盖此前匿名创建的记录（用户登录后继续同一 chatId）
           await prisma.chat.upsert({
             where: { id: effectiveChatId },
-            update: { updatedAt: new Date() },
-            create: { id: effectiveChatId },
+            update: {
+              updatedAt: new Date(),
+              ...(userId != null && { userId }),
+            },
+            create: {
+              id: effectiveChatId,
+              ...(userId != null && { userId }),
+            },
           });
 
           // 2. 保存用户消息 (取最后一条)

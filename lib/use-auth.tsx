@@ -11,6 +11,9 @@ export interface UserView {
   enabled: boolean;
   roles: string[];
   permissions: string[];
+  avatarUrl: string | null; // GitHub 头像 URL
+  email: string | null; // GitHub 邮箱
+  githubId: number | null; // GitHub 数字用户 ID
 }
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";

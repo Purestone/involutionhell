@@ -58,10 +58,21 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
         ? geminiApiKey
         : "";
 
-  // 生成唯一的会话 ID
-  const [chatId] = useState(
-    () => `chat-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-  );
+  // 按 slug 从 localStorage 读取或生成持久化会话 ID
+  // 同一文档页关闭后再打开依然复用同一 chatId，保持会话连续性
+  const [chatId] = useState<string>(() => {
+    // SSR 阶段无法访问 localStorage，生成占位 ID（不影响 DOM，不产生 hydration 警告）
+    if (typeof window === "undefined") {
+      return `chat-ssr-${Math.random().toString(36).slice(2)}`;
+    }
+    const key = `chat_id:${pageContext.slug ?? "__global__"}`;
+    const stored = localStorage.getItem(key);
+    if (stored) return stored;
+    const newId = `chat-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem(key, newId);
+    return newId;
+  });
+
   const chatRuntimeId = useMemo(
     () => `${chatId}:${provider}:${hashTransportConfig(apiKey)}`,
     [chatId, provider, apiKey],
@@ -76,6 +87,16 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
           provider,
           apiKey,
           chatId,
+        },
+        // 在每次请求时动态读取 satoken，避免用户登录前创建 transport 导致 token 为空
+        fetch: async (url, init) => {
+          const token =
+            typeof window !== "undefined"
+              ? localStorage.getItem("satoken")
+              : null;
+          const headers = new Headers(init?.headers);
+          if (token) headers.set("x-satoken", token);
+          return fetch(url, { ...init, headers });
         },
       }),
     [pageContext, provider, apiKey, chatId],
@@ -97,12 +118,22 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
   const fetchedWelcomeRef = useRef(false);
 
   // 埋点上报函数
+  // x-satoken 由服务端验证身份，不在 body 里传 userId（服务端自己解析）
   const logAnalyticsEvent = useCallback(
     async (eventType: string, eventData?: Record<string, unknown>) => {
       try {
+        const token =
+          typeof window !== "undefined"
+            ? localStorage.getItem("satoken")
+            : null;
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (token) headers["x-satoken"] = token;
+
         await fetch("/api/analytics", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({
             eventType,
             eventData: {
