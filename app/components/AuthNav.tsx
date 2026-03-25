@@ -13,7 +13,11 @@ export function AuthNav() {
 
   return user ? (
     <UserMenu
-      user={{ name: user.displayName, email: null, image: null }}
+      user={{
+        name: user.displayName,
+        email: user.email ?? null,
+        image: user.avatarUrl ?? null,
+      }}
       provider="github"
       logout={logout}
     />
