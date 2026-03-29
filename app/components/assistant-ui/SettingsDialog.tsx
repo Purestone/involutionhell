@@ -53,12 +53,12 @@ export const SettingsDialog = ({
             <RadioGroup
               value={provider}
               onValueChange={(value) =>
-                setProvider(value as "openai" | "gemini" | "intern")
+                setProvider(value as "openai" | "gemini" | "deepseek")
               }
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="intern" id="intern" />
-                <Label htmlFor="intern">InternS1 (Free)</Label>
+                <RadioGroupItem value="deepseek" id="deepseek" />
+                <Label htmlFor="deepseek">Deepseek (Free)</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="openai" id="openai" />
@@ -175,7 +175,7 @@ export const SettingsDialog = ({
             </div>
           )}
 
-          {provider === "intern" && (
+          {provider === "deepseek" && (
             <div className="space-y-2">
               <div className="text-sm text-muted-foreground">
                 感谢上海AILab的书生大模型对本项目的算力支持，Intern-AI

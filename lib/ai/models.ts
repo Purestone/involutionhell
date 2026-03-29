@@ -1,8 +1,9 @@
 import { createOpenAIModel } from "./providers/openai";
 import { createGeminiModel } from "./providers/gemini";
 import { createInternModel } from "./providers/intern";
+import { createDeepseekModel } from "./providers/deepseek";
 
-export type AIProvider = "openai" | "gemini" | "intern";
+export type AIProvider = "openai" | "gemini" | "intern" | "deepseek";
 
 /**
  * Model工厂 用于返回对应的 AI 模型实例
@@ -28,6 +29,9 @@ export function getModel(provider: AIProvider, apiKey?: string) {
       // Intern 书生模型不需要用户提供 API key
       return createInternModel();
 
+    case "deepseek":
+      return createDeepseekModel();
+
     default:
       throw new Error(`Unsupported AI provider: ${provider}`);
   }
@@ -39,5 +43,5 @@ export function getModel(provider: AIProvider, apiKey?: string) {
  * @returns 如果需要 API key，返回 true，否则返回 false
  */
 export function requiresApiKey(provider: AIProvider): boolean {
-  return provider !== "intern";
+  return provider !== "intern" && provider !== "deepseek";
 }

@@ -29,13 +29,59 @@ interface ChatRequest {
 import { resolveUserId } from "@/lib/server-auth";
 
 export async function POST(req: Request) {
+  // 1. 克隆请求，因为如果代理失败，后面的代码还需要读取 req.json()
+  const proxyReq = req.clone();
+
+  // ====== 尝试优雅降级代理到 Java 后端 ======
+  try {
+    const backendUrl = process.env.BACKEND_URL ?? "http://localhost:8080";
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
+
+    // 原封不动把前端的参数丢给 Java
+    const proxyRes = await fetch(`${backendUrl}/openai/responses/stream`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-satoken": req.headers.get("x-satoken") || "",
+      },
+      body: await proxyReq.text(),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    // 如果 Java 后端返回成功，则直接把它的流传回浏览器，提前结束
+    if (proxyRes.ok && proxyRes.body) {
+      console.log(
+        "[Chat Fallback Proxy] 🚀 Java Backend responded successfully. Piping stream...",
+      );
+      return new Response(proxyRes.body, {
+        headers: {
+          "Content-Type":
+            proxyRes.headers.get("Content-Type") || "text/plain; charset=utf-8",
+        },
+      });
+    } else {
+      console.warn(
+        `[Chat Fallback Proxy] ⚠️ Java Backend returned status: ${proxyRes.status}, fallback to local Next.js inference.`,
+      );
+    }
+  } catch (error) {
+    console.warn(
+      `[Chat Fallback Proxy] ❌ Java Backend unavailable or timed out, fallback to local Next.js inference. Error:`,
+      error,
+    );
+  }
+  // ====== 代理失败，继续往下走，启用备选方案（本地直连 AI）======
+
   try {
     // 先把 body 消费掉，再并行验证用户身份
     const {
       messages,
       system,
       pageContext,
-      provider = "intern", // 默认使用书生模型
+      provider = "deepseek", // 默认使用deepseek模型
       apiKey,
       chatId,
     }: ChatRequest = await req.json();

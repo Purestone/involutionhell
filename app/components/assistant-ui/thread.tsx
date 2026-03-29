@@ -350,12 +350,12 @@ const Composer: FC<ComposerProps> = ({
       : provider === "gemini"
         ? geminiApiKey
         : "";
-  const hasActiveKey = provider === "intern" || activeKey.trim().length > 0;
+  const hasActiveKey = provider === "deepseek" || activeKey.trim().length > 0;
   const providerLabel =
     provider === "gemini"
       ? "Google Gemini"
-      : provider === "intern"
-        ? "Intern-AI"
+      : provider === "deepseek"
+        ? "Deepseek"
         : "OpenAI";
 
   const handleOpenSettings = useCallback(() => {

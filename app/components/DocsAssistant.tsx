@@ -365,7 +365,7 @@ interface AssistantErrorState {
   showSettingsCTA: boolean;
 }
 
-type AssistantProvider = "openai" | "gemini" | "intern";
+type AssistantProvider = "openai" | "gemini" | "deepseek";
 
 type AssistantErrorData = {
   error?: string;
@@ -392,8 +392,8 @@ function deriveAssistantError(
   const providerLabel =
     provider === "gemini"
       ? "Google Gemini"
-      : provider === "intern"
-        ? "Intern-AI"
+      : provider === "deepseek"
+        ? "Deepseek"
         : "OpenAI";
   const fallback: AssistantErrorState = {
     message:
@@ -441,7 +441,7 @@ function deriveAssistantError(
   // For intern provider, don't show settings CTA for API key related errors
   // 对于书生，不要显示 API 密钥相关的错误
   if (
-    provider !== "intern" &&
+    provider !== "deepseek" &&
     (statusCode === 400 ||
       statusCode === 401 ||
       statusCode === 403 ||
