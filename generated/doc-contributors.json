@@ -1,8 +1,8 @@
 {
   "repo": "InvolutionHell/involutionhell",
-  "generatedAt": "2026-04-01T03:55:19.330Z",
+  "generatedAt": "2026-04-01T04:11:03.355Z",
   "docsDir": "app/docs",
-  "totalDocs": 148,
+  "totalDocs": 149,
   "results": [
     {
       "docId": "ue27z7z95yzw3lhhfj7nit1c",
@@ -1684,6 +1684,23 @@
           "login": "Crokily",
           "avatarUrl": "https://avatars.githubusercontent.com/u/7187663?v=4",
           "htmlUrl": "https://github.com/Crokily"
+        }
+      ]
+    },
+    {
+      "docId": "l6eepr5ctjgrhdgupy3twr1t",
+      "path": "app/docs/CommunityShare/Amazing-AI-Tools/prompt-repetition-improves-non-reasoning-llms.md",
+      "contributorStats": {
+        "128119791": 1
+      },
+      "contributors": [
+        {
+          "githubId": "128119791",
+          "contributions": 1,
+          "lastContributedAt": "2026-03-05T01:19:27.000Z",
+          "login": "CeitherNSW",
+          "avatarUrl": "https://avatars.githubusercontent.com/u/128119791?v=4",
+          "htmlUrl": "https://github.com/CeitherNSW"
         }
       ]
     },
