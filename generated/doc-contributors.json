@@ -1,6 +1,6 @@
 {
   "repo": "InvolutionHell/involutionhell",
-  "generatedAt": "2026-03-09T17:47:42.725Z",
+  "generatedAt": "2026-04-01T03:55:19.330Z",
   "docsDir": "app/docs",
   "totalDocs": 148,
   "results": [
@@ -2072,13 +2072,13 @@
       "docId": "zuoplhoodv7tzfgku0pwzi6w",
       "path": "app/docs/CommunityShare/Leetcode/[1545]找出第 N 个二进制字符串中的第 K 位.md",
       "contributorStats": {
-        "114939201": 1
+        "114939201": 2
       },
       "contributors": [
         {
           "githubId": "114939201",
-          "contributions": 1,
-          "lastContributedAt": "2026-03-09T17:41:04.000Z",
+          "contributions": 2,
+          "lastContributedAt": "2026-03-09T17:47:55.000Z",
           "login": "longsizhuo",
           "avatarUrl": "https://avatars.githubusercontent.com/u/114939201?v=4",
           "htmlUrl": "https://github.com/longsizhuo"
@@ -2727,13 +2727,13 @@
       "docId": "aslw60tfyzxqga598pt4ociu",
       "path": "app/docs/CommunityShare/Leetcode/index.mdx",
       "contributorStats": {
-        "114939201": 1
+        "114939201": 2
       },
       "contributors": [
         {
           "githubId": "114939201",
-          "contributions": 1,
-          "lastContributedAt": "2026-03-09T17:41:04.000Z",
+          "contributions": 2,
+          "lastContributedAt": "2026-03-09T17:47:55.000Z",
           "login": "longsizhuo",
           "avatarUrl": "https://avatars.githubusercontent.com/u/114939201?v=4",
           "htmlUrl": "https://github.com/longsizhuo"
