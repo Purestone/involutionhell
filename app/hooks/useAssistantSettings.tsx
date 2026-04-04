@@ -10,7 +10,7 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 
-type Provider = "openai" | "gemini" | "deepseek";
+type Provider = "openai" | "gemini" | "intern";
 
 interface AssistantSettingsState {
   provider: Provider;
@@ -30,7 +30,7 @@ interface AssistantSettingsContextValue extends AssistantSettingsState {
 const SETTINGS_KEY = "assistant-settings-storage";
 
 const defaultSettings: AssistantSettingsState = {
-  provider: "deepseek",
+  provider: "intern",
   openaiApiKey: "",
   geminiApiKey: "",
   saveToLocalStorage: false,
@@ -52,8 +52,8 @@ const parseStoredSettings = (raw: string | null): AssistantSettingsState => {
     let provider =
       parsed.provider === "gemini"
         ? "gemini"
-        : parsed.provider === "deepseek"
-          ? "deepseek"
+        : parsed.provider === "intern"
+          ? "intern"
           : "openai";
 
     const openaiApiKey =
@@ -67,10 +67,10 @@ const parseStoredSettings = (raw: string | null): AssistantSettingsState => {
 
     // 如果用户之前默认在 openai/gemini 但现在没有对应的 API Key，则回退到免配置的 intern 模型
     if (provider === "openai" && !openaiApiKey) {
-      provider = "deepseek";
+      provider = "intern";
     }
     if (provider === "gemini" && !geminiApiKey) {
-      provider = "deepseek";
+      provider = "intern";
     }
 
     return {

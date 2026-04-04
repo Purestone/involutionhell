@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const {
       messages,
       pageContext,
-      provider = "deepseek",
+      provider = "intern",
       apiKey,
     }: SuggestionsRequest = await req.json();
 
@@ -38,17 +38,17 @@ export async function POST(req: Request) {
 
     // 模型选择策略：
     // - 若用户选了自己的 Provider（openai/gemini），用用户的模型
-    // - 否则（默认 deepseek）优先用 GLM-4-Flash（免费且快速），若 ZHIPU_API_KEY 未配置则回退到 deepseek
+    // - 否则（默认 intern）优先用 GLM-4-Flash（免费且快速），若 ZHIPU_API_KEY 未配置则回退到 intern
     let model;
-    if (provider !== "deepseek") {
+    if (provider !== "intern") {
       // 用户自选模型（openai / gemini）
       model = getModel(provider, apiKey);
     } else if (process.env.ZHIPU_API_KEY) {
       // 默认使用智谱 GLM-4-Flash（免费轻量）
       model = createGlmFlashModel();
     } else {
-      // 兜底：仍使用 deepseek
-      model = getModel("deepseek");
+      // 兜底：仍使用 intern
+      model = getModel("intern");
     }
 
     const isWelcomeRequest = messages.length === 0;
@@ -92,12 +92,12 @@ export async function POST(req: Request) {
       async (cPrompt: string, cModelId: string) => {
         // 由于 model 不能序列化传入，在缓存函数内侧由于无法动态构建，所以此处传递标识再创建
         const m =
-          cModelId === "deepseek"
-            ? getModel("deepseek")
+          cModelId === "intern"
+            ? getModel("intern")
             : cModelId === "glm"
               ? createGlmFlashModel()
               : // 无法传递用户动态 key，对于配置了 key 的情况不走此函数
-                getModel("deepseek");
+                getModel("intern");
 
         const { text } = await generateText({
           model: m,
@@ -115,7 +115,7 @@ export async function POST(req: Request) {
 
     let text = "";
     // 判断是否可以使用缓存（如果使用了自定义 apiKey，为了防止数据交叉，不采用公用缓存）
-    if (provider !== "deepseek" && !process.env.ZHIPU_API_KEY) {
+    if (provider !== "intern" && !process.env.ZHIPU_API_KEY) {
       const { text: directText } = await generateText({
         model,
         prompt,
@@ -124,11 +124,11 @@ export async function POST(req: Request) {
     } else {
       // 确定内部用于缓存匹配的模型标识
       const internalModelId =
-        provider === "deepseek"
+        provider === "intern"
           ? process.env.ZHIPU_API_KEY
             ? "glm"
-            : "deepseek"
-          : "deepseek";
+            : "intern"
+          : "intern";
       // 将缓存粒度关联到请求本身的内容上
       const suggestionKey = isWelcomeRequest
         ? `welcome-${pageContext?.slug || "default"}`

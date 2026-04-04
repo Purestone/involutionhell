@@ -34,7 +34,8 @@ export async function POST(req: Request) {
 
   // ====== 尝试优雅降级代理到 Java 后端 ======
   try {
-    const backendUrl = process.env.BACKEND_URL ?? "http://localhost:8080";
+    const backendUrl = process.env.BACKEND_URL;
+    if (!backendUrl) throw new Error("BACKEND_URL is not configured.");
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
 
@@ -81,7 +82,7 @@ export async function POST(req: Request) {
       messages,
       system,
       pageContext,
-      provider = "deepseek", // 默认使用deepseek模型
+      provider = "intern", // 默认使用书生模型
       apiKey,
       chatId,
     }: ChatRequest = await req.json();
