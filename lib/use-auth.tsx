@@ -78,7 +78,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // 2. 读取存储的 token，调用后端验证并获取用户信息
     const token = urlToken ?? getStoredToken();
     if (!token) {
-      setStatus("unauthenticated");
+      // 异步设置，避免在 effect 中同步调用 setState 触发级联渲染
+      Promise.resolve().then(() => setStatus("unauthenticated"));
       return;
     }
 
