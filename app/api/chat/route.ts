@@ -156,7 +156,7 @@ export async function POST(req: Request) {
     const result = streamText({
       model: model,
       system: systemMessage,
-      messages: convertToModelMessages(messages || []),
+      messages: await convertToModelMessages(messages || []),
       onFinish: async ({ text }) => {
         try {
           // 等待用户身份解析（与流式传输并行运行，此时大概率已完成）

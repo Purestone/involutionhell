@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 
-import { AssistantRuntimeProvider } from "@assistant-ui/react";
+import {
+  AssistantRuntimeProvider,
+  type AssistantRuntime,
+} from "@assistant-ui/react";
 import { useAISDKRuntime } from "@assistant-ui/react-ai-sdk";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
@@ -343,7 +346,8 @@ function DocsAssistantInner({ pageContext }: DocsAssistantProps) {
     clearChatError();
   }, [clearChatError]);
 
-  const runtime = useAISDKRuntime(chat);
+  // @assistant-ui/react-ai-sdk 与 @assistant-ui/react 内部 AssistantRuntime 类型因版本分叉而不兼容，运行时行为一致
+  const runtime = useAISDKRuntime(chat) as unknown as AssistantRuntime;
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
