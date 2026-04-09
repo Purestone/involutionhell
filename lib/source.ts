@@ -24,7 +24,6 @@ export const source = loader({
   source: docs.toFumadocsSource(),
   transformers: [
     ({ storage }) => {
-      let count = 0;
       for (const path of storage.getFiles()) {
         const file = storage.read(path);
         if (
@@ -37,7 +36,6 @@ export const source = loader({
 
           // 强制覆盖 Fumadocs-MDX 预生成的 slugs
           file.slugs = newSlugs;
-          count++;
         }
       }
     },
