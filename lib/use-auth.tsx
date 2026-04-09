@@ -57,20 +57,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>("loading");
 
   useEffect(() => {
-    // 1. 检查 URL 中是否携带 ?token=xxx（后端 OAuth 登录成功后跳回来时携带）
-    const params = new URLSearchParams(window.location.search);
-    const urlToken = params.get("token");
+    // 1. 检查 URL fragment 中是否携带 #token=xxx（后端 OAuth 登录成功后跳回来时携带）
+    // 使用 fragment 而非 query param：fragment 不会出现在服务器日志和 Referer 头中
+    const hashParams = new URLSearchParams(window.location.hash.slice(1));
+    const urlToken = hashParams.get("token");
 
     if (urlToken) {
       // 存入 localStorage
       localStorage.setItem("satoken", urlToken);
-      // 用 replaceState 清除 URL 中的 token 参数，避免刷新或分享时 token 泄露
-      params.delete("token");
-      const newSearch = params.toString();
+      // 用 replaceState 清除 URL 中的 fragment，避免刷新或分享时 token 泄露
+      hashParams.delete("token");
+      const newHash = hashParams.toString();
       const newUrl =
         window.location.pathname +
-        (newSearch ? "?" + newSearch : "") +
-        window.location.hash;
+        window.location.search +
+        (newHash ? "#" + newHash : "");
       window.history.replaceState(null, "", newUrl);
     }
 
