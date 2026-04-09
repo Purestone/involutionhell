@@ -36,8 +36,8 @@ interface UploadRequest {
  */
 export async function POST(request: NextRequest) {
   try {
-    // 从请求头读取 satoken，转发给后端验证
-    const token = request.headers.get("satoken");
+    // 从请求头读取 x-satoken（客户端侧统一约定），转发后端时改为 satoken
+    const token = request.headers.get("x-satoken");
     if (!token) {
       return NextResponse.json({ error: "未授权访问" }, { status: 401 });
     }

@@ -82,13 +82,13 @@ export function EditorPageClient({ user }: EditorPageClientProps) {
     file: File,
     articleSlug: string,
   ): Promise<{ blobUrl: string; publicUrl: string }> => {
-    // 1. 获取预签名 URL（带 satoken 请求头，供服务端验证身份）
+    // 1. 获取预签名 URL（带 x-satoken 请求头，供服务端验证身份）
     const token = localStorage.getItem("satoken") ?? "";
     const response = await fetch("/api/upload", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        satoken: token,
+        "x-satoken": token,
       },
       body: JSON.stringify({
         filename: file.name,

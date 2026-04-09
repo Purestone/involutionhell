@@ -40,17 +40,24 @@ export async function POST(req: Request) {
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
 
     // 原封不动把前端的参数丢给 Java
-    const proxyRes = await fetch(`${backendUrl}/openai/responses/stream`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-satoken": req.headers.get("x-satoken") || "",
-      },
-      body: await proxyReq.text(),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
+    let proxyRes: Response;
+    try {
+      proxyRes = await fetch(`${backendUrl}/openai/responses/stream`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 浏览器侧用 x-satoken 传递 token，转发给后端时改回后端期望的 satoken
+          ...(req.headers.get("x-satoken")
+            ? { satoken: req.headers.get("x-satoken")! }
+            : {}),
+        },
+        body: await proxyReq.text(),
+        signal: controller.signal,
+      });
+    } finally {
+      // 无论成功还是抛出（网络错误/超时中断），都清除定时器
+      clearTimeout(timeoutId);
+    }
 
     // 如果 Java 后端返回成功，则直接把它的流传回浏览器，提前结束
     if (proxyRes.ok && proxyRes.body) {
