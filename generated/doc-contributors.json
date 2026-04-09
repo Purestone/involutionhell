@@ -1,8 +1,8 @@
 {
   "repo": "InvolutionHell/involutionhell",
-  "generatedAt": "2026-03-09T17:47:42.725Z",
+  "generatedAt": "2026-04-09T17:09:54.691Z",
   "docsDir": "app/docs",
-  "totalDocs": 148,
+  "totalDocs": 149,
   "results": [
     {
       "docId": "ue27z7z95yzw3lhhfj7nit1c",
@@ -1688,6 +1688,41 @@
       ]
     },
     {
+      "docId": "l6eepr5ctjgrhdgupy3twr1t",
+      "path": "app/docs/CommunityShare/Amazing-AI-Tools/prompt-repetition-improves-non-reasoning-llms.md",
+      "contributorStats": {
+        "128119791": 1,
+        "138507318": 1,
+        "163523387": 1
+      },
+      "contributors": [
+        {
+          "githubId": "138507318",
+          "contributions": 1,
+          "lastContributedAt": "2026-04-09T16:29:54.000Z",
+          "login": "TinyAlmond",
+          "avatarUrl": "https://avatars.githubusercontent.com/u/138507318?v=4",
+          "htmlUrl": "https://github.com/TinyAlmond"
+        },
+        {
+          "githubId": "163523387",
+          "contributions": 1,
+          "lastContributedAt": "2026-04-01T04:11:16.000Z",
+          "login": "Mira190",
+          "avatarUrl": "https://avatars.githubusercontent.com/u/163523387?v=4",
+          "htmlUrl": "https://github.com/Mira190"
+        },
+        {
+          "githubId": "128119791",
+          "contributions": 1,
+          "lastContributedAt": "2026-03-05T01:19:27.000Z",
+          "login": "CeitherNSW",
+          "avatarUrl": "https://avatars.githubusercontent.com/u/128119791?v=4",
+          "htmlUrl": "https://github.com/CeitherNSW"
+        }
+      ]
+    },
+    {
       "docId": "gj4bn01un0s0841berfvwrn5",
       "path": "app/docs/CommunityShare/Geek/cloudflare-r2-sharex-free-image-hosting.mdx",
       "contributorStats": {
@@ -2072,13 +2107,13 @@
       "docId": "zuoplhoodv7tzfgku0pwzi6w",
       "path": "app/docs/CommunityShare/Leetcode/[1545]找出第 N 个二进制字符串中的第 K 位.md",
       "contributorStats": {
-        "114939201": 1
+        "114939201": 2
       },
       "contributors": [
         {
           "githubId": "114939201",
-          "contributions": 1,
-          "lastContributedAt": "2026-03-09T17:41:04.000Z",
+          "contributions": 2,
+          "lastContributedAt": "2026-03-09T17:47:55.000Z",
           "login": "longsizhuo",
           "avatarUrl": "https://avatars.githubusercontent.com/u/114939201?v=4",
           "htmlUrl": "https://github.com/longsizhuo"
@@ -2727,13 +2762,13 @@
       "docId": "aslw60tfyzxqga598pt4ociu",
       "path": "app/docs/CommunityShare/Leetcode/index.mdx",
       "contributorStats": {
-        "114939201": 1
+        "114939201": 2
       },
       "contributors": [
         {
           "githubId": "114939201",
-          "contributions": 1,
-          "lastContributedAt": "2026-03-09T17:41:04.000Z",
+          "contributions": 2,
+          "lastContributedAt": "2026-03-09T17:47:55.000Z",
           "login": "longsizhuo",
           "avatarUrl": "https://avatars.githubusercontent.com/u/114939201?v=4",
           "htmlUrl": "https://github.com/longsizhuo"
