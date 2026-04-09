@@ -19,8 +19,6 @@ function convertSlugToPinyin(text: string) {
     .join("-");
 }
 
-console.log(">>> [Source.ts] 正在加载路由重映射插件...");
-
 export const source = loader({
   baseUrl: "/docs",
   source: docs.toFumadocsSource(),
@@ -37,20 +35,11 @@ export const source = loader({
           const defaultSlugs = getSlugs(path);
           const newSlugs = defaultSlugs.map(convertSlugToPinyin);
 
-          if (count < 3) {
-            console.log(
-              `>>> [Transformer] 映射样例: ${path} -> ${newSlugs.join("/")}`,
-            );
-          }
-
           // 强制覆盖 Fumadocs-MDX 预生成的 slugs
           file.slugs = newSlugs;
           count++;
         }
       }
-      console.log(
-        `>>> [Transformer] 任务完成，共成功重映射 ${count} 条拼音路径。`,
-      );
     },
   ],
 });
