@@ -7,7 +7,6 @@ settings:
 overrides:
   '@types/react': 19.2.7
   '@types/react-dom': 19.2.3
-  '@assistant-ui/tap': 0.5.7
 
 importers:
 
@@ -361,7 +360,7 @@ packages:
     resolution: {integrity: sha512-UV8j/l3SbyRz51yHEh8wt6k6eV0cJ5wEaXYwi36hMq/+GwIZydzDmX0XHwFaHTB2Ev0nlrTW5RlF6/g2tVPgoQ==}
     peerDependencies:
       '@assistant-ui/store': ^0.2.6
-      '@assistant-ui/tap': 0.5.7
+      '@assistant-ui/tap': ^0.5.7
       '@types/react': 19.2.7
       assistant-cloud: ^0.1.25
       react: ^18 || ^19
@@ -411,7 +410,7 @@ packages:
   '@assistant-ui/store@0.2.6':
     resolution: {integrity: sha512-rpl+cWrJVimQzjh3plxhm5cgC/v918jffxHT6xEuanL1pPhxNjhHU90N3hH/pkALpkTdv7RH5kGVpIG+4bJj8w==}
     peerDependencies:
-      '@assistant-ui/tap': 0.5.7
+      '@assistant-ui/tap': ^0.5.6
       '@types/react': 19.2.7
       react: ^18 || ^19
     peerDependenciesMeta:
