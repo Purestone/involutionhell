@@ -1,22 +1,40 @@
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/use-auth";
 import { EditorPageClient } from "./EditorPageClient";
 
 /**
- * 编辑器页面 - Server Component
- * 验证用户登录状态，未登录则重定向到登录页
+ * 编辑器页面 - 客户端组件
+ * token 存在 localStorage，无法在服务端读取，因此改用客户端鉴权
  */
-export default async function EditorPage() {
-  const session = await auth();
+export default function EditorPage() {
+  const { user, status } = useAuth();
+  const router = useRouter();
 
-  // 如果用户未登录，重定向到登录页，并传递 callbackUrl
-  if (!session?.user) {
-    redirect("/login?callbackUrl=/editor");
+  useEffect(() => {
+    // 状态确认后，未登录则跳转到登录页
+    if (status === "unauthenticated") {
+      router.replace("/login?callbackUrl=/editor");
+    }
+  }, [status, router]);
+
+  // 加载中显示骨架占位
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="size-8 rounded-full bg-muted animate-pulse" />
+      </div>
+    );
   }
+
+  // 未登录时先不渲染内容（useEffect 会触发跳转）
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-background">
-      <EditorPageClient session={session} />
+      <EditorPageClient user={user} />
     </div>
   );
 }

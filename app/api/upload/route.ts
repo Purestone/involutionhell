@@ -1,5 +1,5 @@
-import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import type { UserView } from "@/lib/use-auth";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { sanitizeDocumentSlug, sanitizeResourceKey } from "@/lib/sanitizer";
@@ -36,12 +36,22 @@ interface UploadRequest {
  */
 export async function POST(request: NextRequest) {
   try {
-    // 验证用户身份
-    const session = await auth();
-
-    if (!session?.user?.id) {
+    // 从请求头读取 x-satoken（客户端侧统一约定），转发后端时改为 satoken
+    const token = request.headers.get("x-satoken");
+    if (!token) {
       return NextResponse.json({ error: "未授权访问" }, { status: 401 });
     }
+
+    // 调用后端 /auth/me 验证 token（服务端直连后端，走 BACKEND_URL 环境变量）
+    const backendUrl = process.env.BACKEND_URL ?? "http://localhost:8080";
+    const meRes = await fetch(`${backendUrl}/auth/me`, {
+      headers: { satoken: token },
+    });
+    if (!meRes.ok) {
+      return NextResponse.json({ error: "未授权访问" }, { status: 401 });
+    }
+    const meBody = (await meRes.json()) as { data: UserView };
+    const currentUser = meBody.data;
 
     // 验证环境变量
     if (
@@ -81,7 +91,7 @@ export async function POST(request: NextRequest) {
     // 生成唯一的对象键
     // 格式：users/{userId}/{article-slug}/{timestamp}-{filename}
     const timestamp = Date.now();
-    const userId = session.user.id;
+    const userId = String(currentUser.id);
     const sanitizedSlug = sanitizeDocumentSlug(articleSlug);
     const sanitizedFilename = sanitizeResourceKey(filename);
     const key = `users/${userId}/${sanitizedSlug}/${timestamp}-${sanitizedFilename}`;

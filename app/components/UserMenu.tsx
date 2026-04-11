@@ -1,6 +1,5 @@
 "use client";
 
-import { signOut } from "next-auth/react";
 import {
   Avatar,
   AvatarFallback,
@@ -14,9 +13,11 @@ interface UserMenuProps {
     image?: string | null;
   };
   provider?: string;
+  // 退出登录回调，由父组件传入（来自 useAuth().logout）
+  logout: () => Promise<void>;
 }
 
-export function UserMenu({ user, provider }: UserMenuProps) {
+export function UserMenu({ user, provider, logout }: UserMenuProps) {
   const initials = user.name?.[0] ?? user.email?.[0] ?? "?";
 
   return (
@@ -59,7 +60,7 @@ export function UserMenu({ user, provider }: UserMenuProps) {
         ) : null}
 
         <button
-          onClick={() => signOut()}
+          onClick={() => void logout()}
           className="w-full px-4 py-2 text-left text-sm text-foreground transition hover:bg-muted"
         >
           Sign out

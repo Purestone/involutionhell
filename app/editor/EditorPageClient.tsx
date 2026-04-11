@@ -10,7 +10,7 @@ import {
 import { Button } from "@/app/components/ui/button";
 import { useCallback, useRef, useState } from "react";
 import Link from "next/link";
-import type { Session } from "next-auth";
+import type { UserView } from "@/lib/use-auth";
 import { buildDocsNewUrl } from "@/lib/github";
 import {
   FILENAME_PATTERN,
@@ -19,7 +19,7 @@ import {
 } from "@/lib/submission";
 
 interface EditorPageClientProps {
-  session: Session;
+  user: UserView;
 }
 
 function buildFrontmatter({
@@ -62,7 +62,7 @@ function buildFrontmatter({
  * 编辑器页面客户端组件
  * 包含表单、编辑器和发布按钮
  */
-export function EditorPageClient({ session }: EditorPageClientProps) {
+export function EditorPageClient({ user }: EditorPageClientProps) {
   const [isPublishing, setIsPublishing] = useState(false);
   const [imageCount, setImageCount] = useState(0);
   const [destinationPath, setDestinationPath] = useState("");
@@ -82,11 +82,13 @@ export function EditorPageClient({ session }: EditorPageClientProps) {
     file: File,
     articleSlug: string,
   ): Promise<{ blobUrl: string; publicUrl: string }> => {
-    // 1. 获取预签名 URL
+    // 1. 获取预签名 URL（带 x-satoken 请求头，供服务端验证身份）
+    const token = localStorage.getItem("satoken") ?? "";
     const response = await fetch("/api/upload", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-satoken": token,
       },
       body: JSON.stringify({
         filename: file.name,
@@ -253,7 +255,7 @@ export function EditorPageClient({ session }: EditorPageClientProps) {
         <div>
           <h1 className="text-3xl font-bold">创作新文章</h1>
           <p className="text-muted-foreground mt-1">
-            欢迎，{session.user?.name || session.user?.email}
+            欢迎，{user.displayName || user.username}
           </p>
         </div>
         <Link href="/">

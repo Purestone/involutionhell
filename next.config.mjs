@@ -21,6 +21,23 @@ const withNextIntl = createNextIntlPlugin("./i18n.ts");
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
+  async rewrites() {
+    const backendUrl = process.env.BACKEND_URL ?? "http://localhost:8080";
+    return [
+      {
+        // GitHub OAuth 回调：GitHub → localhost:3000/api/auth/callback/github → 后端
+        // 路径与 GitHub OAuth App 注册的 callback URL 保持一致，无需改 GitHub App 设置
+        source: "/api/auth/callback/github",
+        destination: `${backendUrl}/api/auth/callback/github`,
+      },
+      {
+        // 认证 API（/auth/me, /auth/logout 等）走 Next.js 代理，避免浏览器跨域 CORS 问题
+        // 浏览器只见 localhost:3000，Next.js 服务端再转发给 localhost:8080
+        source: "/auth/:path*",
+        destination: `${backendUrl}/auth/:path*`,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

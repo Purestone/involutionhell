@@ -26,8 +26,65 @@ interface ChatRequest {
   chatId?: string;
 }
 
+import { resolveUserId } from "@/lib/server-auth";
+
 export async function POST(req: Request) {
+  // 1. 克隆请求，因为如果代理失败，后面的代码还需要读取 req.json()
+  const proxyReq = req.clone();
+
+  // ====== 尝试优雅降级代理到 Java 后端 ======
   try {
+    const backendUrl = process.env.BACKEND_URL;
+    if (!backendUrl) throw new Error("BACKEND_URL is not configured.");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
+
+    // 原封不动把前端的参数丢给 Java
+    let proxyRes: Response;
+    try {
+      proxyRes = await fetch(`${backendUrl}/openai/responses/stream`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // 浏览器侧用 x-satoken 传递 token，转发给后端时改回后端期望的 satoken
+          ...(req.headers.get("x-satoken")
+            ? { satoken: req.headers.get("x-satoken")! }
+            : {}),
+        },
+        body: await proxyReq.text(),
+        signal: controller.signal,
+      });
+    } finally {
+      // 无论成功还是抛出（网络错误/超时中断），都清除定时器
+      clearTimeout(timeoutId);
+    }
+
+    // 如果 Java 后端返回成功，则直接把它的流传回浏览器，提前结束
+    if (proxyRes.ok && proxyRes.body) {
+      console.log(
+        "[Chat Fallback Proxy] 🚀 Java Backend responded successfully. Piping stream...",
+      );
+      return new Response(proxyRes.body, {
+        headers: {
+          "Content-Type":
+            proxyRes.headers.get("Content-Type") || "text/plain; charset=utf-8",
+        },
+      });
+    } else {
+      console.warn(
+        `[Chat Fallback Proxy] ⚠️ Java Backend returned status: ${proxyRes.status}, fallback to local Next.js inference.`,
+      );
+    }
+  } catch (error) {
+    console.warn(
+      `[Chat Fallback Proxy] ❌ Java Backend unavailable or timed out, fallback to local Next.js inference. Error:`,
+      error,
+    );
+  }
+  // ====== 代理失败，继续往下走，启用备选方案（本地直连 AI）======
+
+  try {
+    // 先把 body 消费掉，再并行验证用户身份
     const {
       messages,
       system,
@@ -36,6 +93,9 @@ export async function POST(req: Request) {
       apiKey,
       chatId,
     }: ChatRequest = await req.json();
+
+    // 并行解析用户身份（不阻塞主流程，失败静默降级为匿名）
+    const userIdPromise = resolveUserId(req);
 
     // 对指定Provider验证key是否存在
     if (requiresApiKey(provider) && (!apiKey || apiKey.trim() === "")) {
@@ -90,22 +150,30 @@ export async function POST(req: Request) {
     // 根据Provider获取 AI 模型实例
     const model = getModel(provider, apiKey);
 
-    // 确保有 chatId (如果前端没传，就生成一个临时的，虽然这会导致每次请求都是新会话)
-    // 理想情况是前端应该维护 chatId
     const effectiveChatId = chatId || crypto.randomUUID();
 
     // 生成流式响应
     const result = streamText({
       model: model,
       system: systemMessage,
-      messages: convertToModelMessages(messages || []),
+      messages: await convertToModelMessages(messages || []),
       onFinish: async ({ text }) => {
         try {
-          // 1. 保存/更新会话
+          // 等待用户身份解析（与流式传输并行运行，此时大概率已完成）
+          const userId = await userIdPromise;
+
+          // 1. 保存/更新会话，绑定用户 ID
+          // update 也写入 userId：覆盖此前匿名创建的记录（用户登录后继续同一 chatId）
           await prisma.chat.upsert({
             where: { id: effectiveChatId },
-            update: { updatedAt: new Date() },
-            create: { id: effectiveChatId },
+            update: {
+              updatedAt: new Date(),
+              ...(userId != null && { userId }),
+            },
+            create: {
+              id: effectiveChatId,
+              ...(userId != null && { userId }),
+            },
           });
 
           // 2. 保存用户消息 (取最后一条)
