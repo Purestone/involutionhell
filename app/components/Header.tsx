@@ -10,10 +10,12 @@ import { LiveEditionLabel } from "./LiveEditionLabel";
 export function Header() {
   const now = new Date();
   const editionTimestampMs = now.getTime();
+  // 使用 UTC 时区格式化日期，保证服务端渲染结果与客户端一致
   const formattedDate = now.toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
+    timeZone: "Australia/Sydney",
   });
   return (
     <header className="fixed top-0 w-full z-50 bg-[var(--background)] border-b border-[var(--foreground)] py-2 transition-colors duration-300">
