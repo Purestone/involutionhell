@@ -19,9 +19,19 @@ function convertSlugToPinyin(text: string) {
     .join("-");
 }
 
+// fumadocs-mdx@11.x returns `files` as a lazy function,
+// but fumadocs-core@15.8.x buildContentStorage calls files.map() directly.
+// Eagerly resolve the files array to maintain compatibility.
+const _fumaSource = docs.toFumadocsSource();
+if (typeof _fumaSource.files === "function") {
+  (_fumaSource as { files: unknown }).files = (
+    _fumaSource.files as () => unknown[]
+  )();
+}
+
 export const source = loader({
   baseUrl: "/docs",
-  source: docs.toFumadocsSource(),
+  source: _fumaSource,
   transformers: [
     ({ storage }) => {
       for (const path of storage.getFiles()) {
