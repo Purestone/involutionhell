@@ -11,6 +11,7 @@ import { UmamiIdentity } from "@/app/components/UmamiIdentity";
 import { AuthProvider } from "@/lib/use-auth";
 // import { SearchWrapper } from "@/app/components/SearchWrapper";
 import { CustomSearchDialog } from "@/app/components/CustomSearchDialog";
+import { cookies } from "next/headers";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -126,6 +127,11 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // 读取 locale cookie，选对应语言的搜索索引分片。
+  // 分片目的：规避 Vercel 单页 ISR 19.07MB 硬上限（FALLBACK_BODY_TOO_LARGE）。
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("locale")?.value === "en" ? "en" : "zh";
+  const searchApi = `/search.${locale}.json`;
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
@@ -206,10 +212,13 @@ export default async function RootLayout({
         <ThemeProvider defaultTheme="dark" storageKey="ih-theme">
           <AuthProvider>
             <RootProvider
+              // 禁用 fumadocs 内置的 next-themes，避免与我们自己的 ThemeProvider（storageKey: ih-theme）
+              // 同时往 <html class> 写 light/dark 导致闪烁和状态不同步
+              theme={{ enabled: false }}
               search={{
                 SearchDialog: CustomSearchDialog,
                 // 使用静态索引，兼容 next export 与本地开发
-                options: { type: "static", api: "/search.json" },
+                options: { type: "static", api: searchApi },
               }}
             >
               <main id="main-content" className="relative z-10">
