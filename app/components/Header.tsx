@@ -2,27 +2,21 @@ import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import { Github as GithubIcon } from "./icons/Github";
-import { SignInButton } from "./SignInButton";
-import { auth } from "@/auth";
-import { UserMenu } from "./UserMenu";
+import { AuthNav } from "./AuthNav";
 import { BrandMark } from "./BrandMark";
 import { LiveEditionLabel } from "./LiveEditionLabel";
 
-export async function Header() {
-  const session = await auth();
-  const user = session?.user;
-  const provider =
-    session && "provider" in session
-      ? (session.provider as string | undefined)
-      : undefined;
+// 改为普通服务端组件，登录状态由客户端 AuthNav 处理
+export function Header() {
   const now = new Date();
   const editionTimestampMs = now.getTime();
+  // 使用 UTC 时区格式化日期，保证服务端渲染结果与客户端一致
   const formattedDate = now.toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
+    timeZone: "Australia/Sydney",
   });
-  console.log("session", session);
   return (
     <header className="fixed top-0 w-full z-50 bg-[var(--background)] border-b border-[var(--foreground)] py-2 transition-colors duration-300">
       <div className="container mx-auto px-6">
@@ -103,11 +97,8 @@ export async function Header() {
               </a>
             </Button>
             <ThemeToggle />
-            {user ? (
-              <UserMenu user={user} provider={provider} />
-            ) : (
-              <SignInButton />
-            )}
+            {/* AuthNav 是客户端组件，内部通过 useAuth() 自动处理登录/未登录状态 */}
+            <AuthNav />
           </div>
         </div>
       </div>

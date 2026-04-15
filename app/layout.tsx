@@ -8,7 +8,7 @@ import "katex/dist/katex.min.css";
 import { ThemeProvider } from "@/app/components/ThemeProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { UmamiIdentity } from "@/app/components/UmamiIdentity";
-import { SessionProvider } from "next-auth/react";
+import { AuthProvider } from "@/lib/use-auth";
 // import { SearchWrapper } from "@/app/components/SearchWrapper";
 import { CustomSearchDialog } from "@/app/components/CustomSearchDialog";
 
@@ -204,7 +204,7 @@ export default async function RootLayout({
       >
         <div className="site-bg site-bg--stars" aria-hidden />
         <ThemeProvider defaultTheme="dark" storageKey="ih-theme">
-          <SessionProvider>
+          <AuthProvider>
             <RootProvider
               search={{
                 SearchDialog: CustomSearchDialog,
@@ -217,7 +217,7 @@ export default async function RootLayout({
               </main>
               <UmamiIdentity />
             </RootProvider>
-          </SessionProvider>
+          </AuthProvider>
         </ThemeProvider>
         {/* 谷歌分析 */}
         <Script

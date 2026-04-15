@@ -27,16 +27,13 @@ export function ThemeProvider({
   storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
+  // 懒初始化：客户端直接从 localStorage 读取，服务端返回 defaultTheme。
+  // layout.tsx 中的内联脚本在 React 水合前已设置正确的 CSS class，首屏不会 flash。
   const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window === "undefined") {
-      return defaultTheme;
-    }
-
+    if (typeof window === "undefined") return defaultTheme;
     try {
-      const stored = localStorage.getItem(storageKey) as Theme | null;
-      return stored ?? defaultTheme;
+      return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
     } catch {
-      console.error("Error reading theme from localStorage");
       return defaultTheme;
     }
   });

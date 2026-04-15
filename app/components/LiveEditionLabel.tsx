@@ -34,8 +34,17 @@ export function LiveEditionLabel({ initialTimestamp }: LiveEditionLabelProps) {
     return () => clearInterval(intervalId);
   }, []);
 
-  const editionDay = currentDate.getDate();
-  const editionMonth = currentDate.toLocaleString("en-US", { month: "long" });
+  // 初次渲染（水合阶段）使用固定时区（悉尼），保证服务端/客户端一致，
+  // 避免时区差异导致 React error #418（hydration mismatch）。
+  // 挂载后也继续使用悉尼时区保持一致性。
+  const TIMEZONE = "Australia/Sydney";
+  const editionDay = Number(
+    currentDate.toLocaleString("en-US", { day: "numeric", timeZone: TIMEZONE }),
+  );
+  const editionMonth = currentDate.toLocaleString("en-US", {
+    month: "long",
+    timeZone: TIMEZONE,
+  });
 
   return (
     <>

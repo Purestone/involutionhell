@@ -154,10 +154,9 @@ const AttachmentUI: FC = () => {
         return "Document";
       case "file":
         return "File";
-      default: {
-        const _exhaustiveCheck: never = type;
-        throw new Error(`Unknown attachment type: ${_exhaustiveCheck}`);
-      }
+      default:
+        // 0.12.x 允许自定义 attachment type（string & {}），兜底返回 "File"
+        return "File";
     }
   });
 
