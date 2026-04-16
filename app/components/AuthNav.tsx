@@ -17,6 +17,8 @@ export function AuthNav() {
         name: user.displayName,
         email: user.email ?? null,
         image: user.avatarUrl ?? null,
+        // 透传 githubId，让 UserMenu 渲染"我的主页"入口
+        githubId: user.githubId ?? null,
       }}
       provider="github"
       logout={logout}

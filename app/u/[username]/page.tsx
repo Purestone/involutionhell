@@ -6,6 +6,8 @@ import leaderboard from "@/generated/site-leaderboard.json";
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import { ProfileCard } from "./ProfileCard";
+import { EditLinkIfOwner } from "./EditLinkIfOwner";
+import { ActivityHeatmap } from "./ActivityHeatmap";
 
 interface UserView {
   id: number;
@@ -44,28 +46,29 @@ interface Preferences {
   pinned_papers?: UserPaperItem[];
 }
 
+interface ProfileData {
+  user: UserView;
+  preferences: Preferences;
+}
+
 interface ProfileResponse {
   success: boolean;
-  data?: {
-    user: UserView;
-    preferences: Preferences;
-  };
+  data?: ProfileData;
   message?: string;
 }
 
 /**
- * SSR 获取用户主页数据。匿名请求，走 Next rewrite 到 Java 后端。
- * 失败或 404 返回 null，让页面走 notFound()。
+ * SSR 获取用户主页基础信息（账户 + preferences）。
+ * 贡献文档不走后端 DB，而是在组件里从 build-time 的 site-leaderboard.json 读取，
+ * 目的：每次访问 /u/{x} 省一次 Neon 查询（免费额度有限）。docs 本来就是 git-based，
+ * JSON 新鲜度和 DB 一致，都是 deploy 级。
  */
-async function fetchProfile(
-  username: string,
-): Promise<ProfileResponse["data"] | null> {
+async function fetchProfile(identifier: string): Promise<ProfileData | null> {
   const backendUrl = process.env.BACKEND_URL;
   if (!backendUrl) return null;
   try {
     const res = await fetch(
-      `${backendUrl}/api/user-center/profile/${encodeURIComponent(username)}`,
-      // 用户主页数据变化慢（preferences 手动编辑），缓 5 分钟已足够
+      `${backendUrl}/api/user-center/profile/${encodeURIComponent(identifier)}`,
       { next: { revalidate: 300 } },
     );
     if (!res.ok) return null;
@@ -78,25 +81,31 @@ async function fetchProfile(
 }
 
 /**
- * 在 leaderboard JSON 里按 name（GitHub login）匹配贡献文档列表。
- * leaderboard 脚本跑在 build 时，所以这里是静态数据。
+ * 从 leaderboard JSON 按 githubId 匹配贡献记录。
+ * 之前按 name 字符串匹配会踩坑（leaderboard.name = "longsizhuo"，user_accounts.username = "github_114939201"），
+ * 现在按 githubId 数字匹配直接对齐。
  */
-function findContributedDocs(username: string) {
+function findContributions(githubId: number | null | undefined) {
+  if (githubId == null)
+    return { docs: [], points: 0, commits: 0, dailyCounts: {} };
   type Row = {
+    id: string;
     name: string;
     points?: number;
     commits?: number;
-    contributedDocs?: Array<{ title: string; url: string }>;
+    avatarUrl?: string;
+    contributedDocs?: Array<{ id: string; title: string; url: string }>;
+    dailyCounts?: Record<string, number>;
   };
   const rows = leaderboard as Row[];
-  const match = rows.find(
-    (r) => r.name.toLowerCase() === username.toLowerCase(),
-  );
-  if (!match) return { docs: [], points: 0, commits: 0 };
+  const idStr = String(githubId);
+  const match = rows.find((r) => r.id === idStr);
+  if (!match) return { docs: [], points: 0, commits: 0, dailyCounts: {} };
   return {
     docs: match.contributedDocs ?? [],
     points: match.points ?? 0,
     commits: match.commits ?? 0,
+    dailyCounts: match.dailyCounts ?? {},
   };
 }
 
@@ -112,7 +121,7 @@ export async function generateMetadata({ params }: Param): Promise<Metadata> {
   return {
     title: `${displayName} (@${data.user.username})`,
     description:
-      data.preferences.bio ||
+      data.preferences?.bio ||
       `${displayName} 在 Involution Hell 的个人主页 — 项目、论文与文档贡献。`,
   };
 }
@@ -122,8 +131,11 @@ export default async function UserProfilePage({ params }: Param) {
   const data = await fetchProfile(username);
   if (!data) notFound();
 
-  const { docs, points, commits } = findContributedDocs(data.user.username);
-  const { preferences } = data;
+  const { user } = data;
+  const preferences = data.preferences ?? {};
+  const { docs, points, commits, dailyCounts } = findContributions(
+    user.githubId,
+  );
   const projects = preferences.projects ?? [];
   const papers = preferences.pinned_papers ?? [];
   const links = preferences.links ?? [];
@@ -133,52 +145,59 @@ export default async function UserProfilePage({ params }: Param) {
       <Header />
       <main className="pt-32 pb-16 bg-[var(--background)] min-h-screen">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          {/* Section header（和站内其他模块视觉对齐） */}
           <header className="border-t-4 border-[var(--foreground)] pt-6 mb-12">
             <div className="flex items-baseline justify-between gap-4 flex-wrap">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-500">
-                  User Dossier · Vol. 1 Issue {data.user.id}
+                  User Dossier · Vol. 1 Issue {user.id}
                 </div>
                 <h2 className="font-serif text-4xl md:text-5xl font-black uppercase mt-2 tracking-tight text-[var(--foreground)]">
-                  {data.user.displayName || data.user.username}
+                  {user.displayName || user.username}
                 </h2>
               </div>
-              <Link
-                href="/rank"
-                className="font-mono text-[11px] uppercase tracking-widest hover:text-[#CC0000] transition-colors flex items-center gap-1"
-              >
-                Full Rank →
-              </Link>
+              <div className="flex items-center gap-3">
+                {/* 编辑入口：只有本人登录状态下才显示；访问者判定由 EditProfileForm 内部做，
+                    这里不做服务端鉴权，因为 satoken 存 localStorage，SSR 拿不到用户 */}
+                <EditLinkIfOwner
+                  ownerGithubId={user.githubId ?? null}
+                  ownerUsername={user.username}
+                  identifier={username}
+                />
+                <Link
+                  href="/rank"
+                  className="font-mono text-[11px] uppercase tracking-widest hover:text-[#CC0000] transition-colors flex items-center gap-1"
+                >
+                  Full Rank →
+                </Link>
+              </div>
             </div>
           </header>
 
-          {/* Bento 12-col grid */}
           <div className="grid grid-cols-12 gap-8">
             {/* 左大块：Identity */}
             <section className="col-span-12 lg:col-span-5 border border-[var(--foreground)] p-8 lg:p-10 flex flex-col gap-6 self-start">
               <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
                 SEC. PROFILE · 001
               </span>
-              {data.user.avatarUrl ? (
+              {user.avatarUrl ? (
                 <Image
-                  src={data.user.avatarUrl}
-                  alt={data.user.username}
+                  src={user.avatarUrl}
+                  alt={user.username}
                   width={96}
                   height={96}
                   className="border-2 border-[var(--foreground)]"
                 />
               ) : (
                 <div className="w-24 h-24 border-2 border-[var(--foreground)] flex items-center justify-center font-serif text-3xl font-black">
-                  {data.user.username.charAt(0).toUpperCase()}
+                  {user.username.charAt(0).toUpperCase()}
                 </div>
               )}
               <div>
                 <h1 className="font-serif text-4xl font-black italic leading-none text-[var(--foreground)]">
-                  {data.user.displayName || data.user.username}
+                  {user.displayName || user.username}
                 </h1>
                 <p className="font-mono text-xs text-neutral-500 mt-1">
-                  @{data.user.username}
+                  @{user.username}
                 </p>
                 {preferences.tagline && (
                   <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
@@ -239,25 +258,18 @@ export default async function UserProfilePage({ params }: Param) {
                   href={p.url}
                 />
               ))}
-              {docs.length > 0 && (
+              {docs.slice(0, 8).map((doc, idx) => (
                 <ProfileCard
+                  key={`doc-${doc.id}`}
                   kind="DOC"
-                  index={1}
-                  title={`文档贡献 · ${docs.length} 篇`}
-                  meta={`最近 ${Math.min(docs.length, 5)} 篇`}
-                  summary={docs
-                    .slice(0, 3)
-                    .map((d) => d.title)
-                    .join(" · ")}
-                  detail={docs
-                    .slice(0, 5)
-                    .map((d) => d.title)
-                    .join("\n")}
-                  href="/rank"
-                  // DOC 卡占满一行（span-2），其他卡片 gridAutoFlow 自动填充
-                  spanFull
+                  index={idx + 1}
+                  title={doc.title}
+                  meta={`文档 · ${doc.id.slice(0, 8)}`}
+                  summary={doc.url}
+                  detail={`标题：${doc.title}\n路径：${doc.url}`}
+                  href={doc.url}
                 />
-              )}
+              ))}
               {projects.length === 0 &&
                 papers.length === 0 &&
                 docs.length === 0 && (
@@ -267,6 +279,13 @@ export default async function UserProfilePage({ params }: Param) {
                 )}
             </div>
           </div>
+
+          {/* 活跃度热力图：Bento 下方独立一行全宽，仅当有贡献数据时显示 */}
+          {Object.keys(dailyCounts).length > 0 && (
+            <div className="mt-12">
+              <ActivityHeatmap dailyCounts={dailyCounts} />
+            </div>
+          )}
         </div>
       </main>
       <Footer />
