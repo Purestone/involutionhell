@@ -113,42 +113,122 @@ interface ProfileResponse {
  * 让 Next error boundary 兜底，避免把"后端故障"伪装成"用户不存在"。
  */
 function warnFetchProfile(message: string, details?: Record<string, unknown>) {
-  if (process.env.NODE_ENV !== "production") {
-    console.warn(`[fetchProfile] ${message}`, details ?? {});
+  const isProduction = process.env.NODE_ENV === "production";
+  const status = typeof details?.status === "number" ? details.status : undefined;
+  const success = typeof details?.success === "boolean" ? details.success : undefined;
+  const isExpectedNotFound = status === 404 || success === false;
+
+  // 生产环境仅记录需要诊断的异常场景；404 / success=false 属于预期控制流，
+  // 否则像爬虫扫描随机 /u/* 会产生大量无意义 warn 日志。
+  if (isProduction && isExpectedNotFound) {
+    return;
   }
+
+  // 对异常/需诊断场景仍然打印：例如 403/5xx、网关异常、解析失败等，
+  // 便于在 Vercel runtime logs 中查看状态码、cf-ray、响应体片段等上下文。
+  console.warn(`[fetchProfile] ${message}`, details ?? {});
 }
 
+/**
+ * 带重试的 profile 抓取。
+ * 背景：Cloudflare 偶发会对 Vercel SSR 出口返回 403（疑似 Bot 挑战/Managed Challenge），
+ * 单次失败就 500 会让正常访问的用户直接看到 Next 默认 "Application error" 黑屏。
+ *
+ * 策略：
+ * - 404 / 200 直接返回（用户不存在或成功）
+ * - 其他非 2xx（403/5xx/网关异常）做最多 2 次重试，退避 300ms / 800ms
+ * - 每次失败都 console.warn，记录 status / cf-ray / 响应体前 300 字符，便于 Vercel 日志定位
+ * - 重试全败才抛，让 error.tsx 兜底（不再是裸露的 Application error 页）
+ *
+ * 重试走 cache: "no-store"，避免把上次的 403 命中 Next Data Cache 导致 5 分钟内
+ * 所有访问都拿到同一份错误。
+ */
 async function fetchProfile(identifier: string): Promise<ProfileData | null> {
   const backendUrl = process.env.BACKEND_URL;
   if (!backendUrl) {
     // 关键配置缺失不能静默 notFound，给个可见错误
     throw new Error("BACKEND_URL is not configured");
   }
-  const res = await fetch(
-    `${backendUrl}/api/user-center/profile/${encodeURIComponent(identifier)}`,
-    { next: { revalidate: 300 } },
-  );
-  // 404：用户确实不存在 → notFound
-  if (res.status === 404) {
-    warnFetchProfile("backend 404", { identifier });
-    return null;
-  }
-  // 其他非 2xx 都抛，进 Next error boundary
-  if (!res.ok) {
-    throw new Error(
-      `profile backend ${res.status} ${res.statusText} for ${identifier}`,
-    );
-  }
-  const json = (await res.json()) as ProfileResponse;
-  // 后端用 {success:false, message:"用户不存在"} 表示软 404
-  if (!json.success || !json.data) {
-    warnFetchProfile("backend success=false", {
+  const url = `${backendUrl}/api/user-center/profile/${encodeURIComponent(identifier)}`;
+  const attempts: Array<{ revalidate: number } | { noStore: true }> = [
+    { revalidate: 300 }, // 首次命中：走 Next Data Cache（5min ISR），命中快
+    { noStore: true }, // 第一次重试：绕过缓存
+    { noStore: true }, // 第二次重试：再绕一次，防瞬时抖动
+  ];
+
+  for (let i = 0; i < attempts.length; i++) {
+    const attempt = attempts[i];
+    const init: RequestInit & { next?: { revalidate: number } } =
+      "noStore" in attempt
+        ? { cache: "no-store" }
+        : { next: { revalidate: attempt.revalidate } };
+    // 显式设置 UA / Accept，降低被 Cloudflare 误判 bot 的概率
+    // （Node 原生 fetch 默认 UA 在某些 CF 规则下会被挑战）
+    init.headers = {
+      accept: "application/json",
+      "user-agent": "InvolutionHell-SSR/1.0 (+https://involutionhell.com)",
+    };
+
+    let res: Response;
+    try {
+      res = await fetch(url, init);
+    } catch (networkErr) {
+      warnFetchProfile("fetch network error", {
+        identifier,
+        attempt: i,
+        error: String(networkErr),
+      });
+      if (i === attempts.length - 1) throw networkErr;
+      await sleep(i === 0 ? 300 : 800);
+      continue;
+    }
+
+    // 404：用户确实不存在 → notFound（不重试）
+    if (res.status === 404) {
+      warnFetchProfile("backend 404", { identifier });
+      return null;
+    }
+    if (res.ok) {
+      const json = (await res.json()) as ProfileResponse;
+      // 后端用 {success:false, message:"用户不存在"} 表示软 404
+      if (!json.success || !json.data) {
+        warnFetchProfile("backend success=false", {
+          identifier,
+          message: json.message,
+        });
+        return null;
+      }
+      return json.data;
+    }
+
+    // 非 2xx：记录诊断信息，准备重试或最终抛错
+    const bodySnippet = await res
+      .text()
+      .then((t) => t.slice(0, 300))
+      .catch(() => "<read body failed>");
+    warnFetchProfile("backend non-2xx", {
       identifier,
-      message: json.message,
+      attempt: i,
+      status: res.status,
+      statusText: res.statusText,
+      cfRay: res.headers.get("cf-ray"),
+      cfMitigated: res.headers.get("cf-mitigated"),
+      contentType: res.headers.get("content-type"),
+      bodySnippet,
     });
-    return null;
+    if (i === attempts.length - 1) {
+      throw new Error(
+        `profile backend ${res.status} ${res.statusText} for ${identifier} (cf-ray=${res.headers.get("cf-ray") ?? "none"})`,
+      );
+    }
+    await sleep(i === 0 ? 300 : 800);
   }
-  return json.data;
+  // 理论上不会走到：上面循环要么 return，要么 throw
+  throw new Error("profile fetch exhausted without resolution");
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 /**
