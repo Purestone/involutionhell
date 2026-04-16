@@ -1,12 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import {
-  Inter,
-  JetBrains_Mono,
-  Playfair_Display,
-  Lora,
-} from "next/font/google";
 import { RootProvider } from "fumadocs-ui/provider";
 import Script from "next/script";
 import "./globals.css";
@@ -30,42 +24,6 @@ const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
-});
-
-/*
- * 四套 Google Fonts 改走 next/font/google 自托管。
- * 收益：build 时下载到 .next/static/ 不走 Google CDN，首屏省一次第三方 CSS 往返，
- * LCP 下降 200-500ms。自动 font-display: swap + preload + 子集化。
- *
- * 权重参考原来 <link> CSS URL 里的 weight/style 参数保持一致，避免 fallback 到默认 400。
- * display: "swap" — FOUT 代替 FOIT，保证文字立刻可读（避免不可见的 UX 断层）。
- * variable 名和 globals.css 里的 --font-* 对齐。
- */
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-inter",
-  display: "swap",
-});
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-jb-mono",
-  display: "swap",
-});
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "900"],
-  style: ["normal", "italic"],
-  variable: "--font-playfair",
-  display: "swap",
-});
-const lora = Lora({
-  subsets: ["latin"],
-  weight: ["400", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-lora",
-  display: "swap",
 });
 
 const SITE_URL =
@@ -182,10 +140,16 @@ export default async function RootLayout({
   return (
     <html lang={htmlLang} suppressHydrationWarning>
       <head>
-        {/*
-          Google Fonts 的 <link> preconnect + stylesheet 已全部改走 next/font/google 自托管，
-          不再走第三方 CDN（避免阻塞首屏 LCP、也不给 Google 收集 IP）。
-        */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
+        />
         {/* 主题脚本：避免首屏闪烁 */}
         <script
           dangerouslySetInnerHTML={{
@@ -274,7 +238,7 @@ export default async function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} ${lora.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="site-bg site-bg--stars" aria-hidden />
         {/*
