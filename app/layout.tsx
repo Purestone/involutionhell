@@ -12,6 +12,7 @@ import { AuthProvider } from "@/lib/use-auth";
 // import { SearchWrapper } from "@/app/components/SearchWrapper";
 import { CustomSearchDialog } from "@/app/components/CustomSearchDialog";
 import { cookies } from "next/headers";
+import { LocaleProvider } from "@/lib/i18n/client";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -209,25 +210,32 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="site-bg site-bg--stars" aria-hidden />
-        <ThemeProvider defaultTheme="dark" storageKey="ih-theme">
-          <AuthProvider>
-            <RootProvider
-              // 禁用 fumadocs 内置的 next-themes，避免与我们自己的 ThemeProvider（storageKey: ih-theme）
-              // 同时往 <html class> 写 light/dark 导致闪烁和状态不同步
-              theme={{ enabled: false }}
-              search={{
-                SearchDialog: CustomSearchDialog,
-                // 使用静态索引，兼容 next export 与本地开发
-                options: { type: "static", api: searchApi },
-              }}
-            >
-              <main id="main-content" className="relative z-10">
-                {children}
-              </main>
-              <UmamiIdentity />
-            </RootProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        {/*
+          LocaleProvider 把服务端读出的 locale 注入客户端 Context，
+          客户端组件通过 useT() 拿到翻译函数，保持 SSR/CSR 一致，
+          不在客户端重新读 cookie 避免水合抖动。
+        */}
+        <LocaleProvider locale={locale}>
+          <ThemeProvider defaultTheme="dark" storageKey="ih-theme">
+            <AuthProvider>
+              <RootProvider
+                // 禁用 fumadocs 内置的 next-themes，避免与我们自己的 ThemeProvider（storageKey: ih-theme）
+                // 同时往 <html class> 写 light/dark 导致闪烁和状态不同步
+                theme={{ enabled: false }}
+                search={{
+                  SearchDialog: CustomSearchDialog,
+                  // 使用静态索引，兼容 next export 与本地开发
+                  options: { type: "static", api: searchApi },
+                }}
+              >
+                <main id="main-content" className="relative z-10">
+                  {children}
+                </main>
+                <UmamiIdentity />
+              </RootProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </LocaleProvider>
         {/* 谷歌分析 */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-ED4GVN8YVW"

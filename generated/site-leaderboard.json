@@ -801,7 +801,53 @@
         "title": "2335. The shortest total time to be filled with a cup One question daily",
         "url": "/docs/CommunityShare/Leetcode/2335. 装满杯子需要的最短总时长_translated"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-26": 82,
+      "2025-10-26": 2,
+      "2025-10-25": 7,
+      "2025-10-08": 29,
+      "2025-10-27": 3,
+      "2025-12-05": 11,
+      "2025-11-09": 7,
+      "2025-12-04": 3,
+      "2025-12-13": 2,
+      "2026-03-09": 4,
+      "2026-04-11": 6,
+      "2025-11-14": 2,
+      "2025-12-07": 15,
+      "2025-12-11": 2,
+      "2025-12-10": 2,
+      "2025-11-23": 2,
+      "2025-12-09": 2,
+      "2025-11-24": 2,
+      "2025-12-17": 2,
+      "2025-11-12": 2,
+      "2025-12-03": 2,
+      "2025-11-13": 2,
+      "2025-11-25": 2,
+      "2025-11-20": 2,
+      "2025-11-15": 2,
+      "2025-12-06": 3,
+      "2025-12-12": 2,
+      "2025-12-18": 2,
+      "2026-01-10": 3,
+      "2025-11-11": 2,
+      "2025-11-10": 2,
+      "2025-11-17": 2,
+      "2025-11-19": 2,
+      "2025-12-14": 2,
+      "2025-12-16": 2,
+      "2025-11-27": 2,
+      "2025-11-22": 2,
+      "2025-11-26": 2,
+      "2025-11-21": 2,
+      "2025-12-01": 2,
+      "2025-12-08": 2,
+      "2025-11-16": 2,
+      "2025-11-18": 2,
+      "2025-11-29": 2
+    }
   },
   {
     "id": "163523387",
@@ -1170,7 +1216,29 @@
         "title": "Prompt Repetition Improves Non-Reasoning LLMs",
         "url": "/docs/CommunityShare/Amazing-AI-Tools/prompt-repetition-improves-non-reasoning-llms.zh"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-17": 16,
+      "2025-09-13": 59,
+      "2025-09-19": 6,
+      "2025-09-14": 6,
+      "2025-09-18": 2,
+      "2025-09-24": 1,
+      "2025-10-15": 3,
+      "2025-09-23": 1,
+      "2025-09-22": 1,
+      "2025-09-27": 5,
+      "2025-10-17": 7,
+      "2025-10-18": 3,
+      "2025-10-11": 3,
+      "2025-10-03": 2,
+      "2025-10-25": 6,
+      "2025-10-10": 1,
+      "2025-11-01": 2,
+      "2025-09-28": 2,
+      "2025-10-26": 2,
+      "2026-04-01": 1
+    }
   },
   {
     "id": "7187663",
@@ -1254,7 +1322,15 @@
         "title": "1234. Replace the sub -string to get a balanced string One question daily",
         "url": "/docs/CommunityShare/Leetcode/1234. 替换子串得到平衡字符串_translated"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-12": 6,
+      "2025-10-08": 3,
+      "2025-10-03": 4,
+      "2025-09-17": 2,
+      "2025-09-30": 1,
+      "2025-11-16": 3
+    }
   },
   {
     "id": "73457237",
@@ -1313,7 +1389,12 @@
         "title": "求职活动回放站",
         "url": "/docs/jobs/event-keynote/event-takeway"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-20": 6,
+      "2025-09-18": 6,
+      "2026-02-08": 1
+    }
   },
   {
     "id": "188854497",
@@ -1367,7 +1448,13 @@
         "title": "王树森推荐系统学习笔记_排序",
         "url": "/docs/ai/recommender-systems/wangshusen_recommend_note_rank"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-22": 2,
+      "2025-09-27": 5,
+      "2025-10-10": 2,
+      "2025-10-09": 1
+    }
   },
   {
     "id": "100033202",
@@ -1416,7 +1503,11 @@
         "title": "手写线程池",
         "url": "/docs/computer-science/cpp_backend/Handwritten_pool_components/1_Handwritten_threadpool"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-30": 7,
+      "2025-09-27": 1
+    }
   },
   {
     "id": "166212872",
@@ -1445,7 +1536,13 @@
         "title": "RAG",
         "url": "/docs/CommunityShare/RAG/rag"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-10-02": 1,
+      "2025-10-01": 2,
+      "2025-10-03": 1,
+      "2025-09-19": 2
+    }
   },
   {
     "id": "206296353",
@@ -1459,7 +1556,10 @@
         "title": "PPO",
         "url": "/docs/CommunityShare/Personal-Study-Notes/Reinforcement-Learning/ppo"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-10-03": 4
+    }
   },
   {
     "id": "59130571",
@@ -1478,7 +1578,11 @@
         "title": "如何部署你自己的Github图床-PictureCDN",
         "url": "/docs/CommunityShare/Geek/picturecdn"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-19": 1,
+      "2025-09-27": 2
+    }
   },
   {
     "id": "84211946",
@@ -1492,7 +1596,10 @@
         "title": "Recommended Books on Mathematics and Data Science",
         "url": "/docs/ai/ai-math-basics/math_books"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-10-06": 3
+    }
   },
   {
     "id": "104760545",
@@ -1511,7 +1618,10 @@
         "title": "frontend",
         "url": "/docs/computer-science/frontend"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-19": 2
+    }
   },
   {
     "id": "123258594",
@@ -1525,7 +1635,10 @@
         "title": "Introduction of Multi-agents system(In any task you want)",
         "url": "/docs/ai/Introduction-of-Multi-agents-system/introduction_of_multi-agents_system"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-29": 2
+    }
   },
   {
     "id": "150361711",
@@ -1544,7 +1657,10 @@
         "title": "多模态强化学习项目（MVP 目标）",
         "url": "/docs/all-projects/multimodal-rl"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-10-17": 2
+    }
   },
   {
     "id": "194795025",
@@ -1563,7 +1679,11 @@
         "title": "使用 Cloudflare R2 + ShareX 搭建个人/团队专属“永久”图床",
         "url": "/docs/CommunityShare/Geek/cloudflare-r2-sharex-free-image-hosting"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-21": 1,
+      "2025-09-27": 1
+    }
   },
   {
     "id": "76551253",
@@ -1577,7 +1697,10 @@
         "title": "Theory of MoE",
         "url": "/docs/ai/MoE/moe-update"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-10-06": 1
+    }
   },
   {
     "id": "88451018",
@@ -1591,7 +1714,10 @@
         "title": "Git入门操作指南-程序员必会的git小技巧",
         "url": "/docs/CommunityShare/Geek/git101"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-10-15": 1
+    }
   },
   {
     "id": "90535573",
@@ -1605,7 +1731,10 @@
         "title": "程序员学生时期求职与实习经验分享",
         "url": "/docs/jobs/interview-prep/preparations-to-get-an-offer-as-a-student"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-29": 1
+    }
   },
   {
     "id": "95595902",
@@ -1619,7 +1748,10 @@
         "title": "程序员 Burnout 自救指南",
         "url": "/docs/CommunityShare/MentalHealth/burnout-guide"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-09-26": 1
+    }
   },
   {
     "id": "128119791",
@@ -1633,7 +1765,10 @@
         "title": "Prompt Repetition Improves Non-Reasoning LLMs",
         "url": "/docs/CommunityShare/Amazing-AI-Tools/prompt-repetition-improves-non-reasoning-llms.zh"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2026-03-05": 1
+    }
   },
   {
     "id": "138507318",
@@ -1647,7 +1782,10 @@
         "title": "Prompt Repetition Improves Non-Reasoning LLMs",
         "url": "/docs/CommunityShare/Amazing-AI-Tools/prompt-repetition-improves-non-reasoning-llms.zh"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2026-04-09": 1
+    }
   },
   {
     "id": "147322547",
@@ -1661,6 +1799,9 @@
         "title": "程序员 Burnout 自救指南",
         "url": "/docs/CommunityShare/MentalHealth/burnout-guide"
       }
-    ]
+    ],
+    "dailyCounts": {
+      "2025-10-14": 1
+    }
   }
 ]

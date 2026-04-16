@@ -102,17 +102,27 @@ export function ContributorRow({
                     Contributions Dossier
                   </Dialog.Description>
 
-                  {/* GitHub 个人主页跳转链接，带有 Umami 点击事件追踪埋点 */}
-                  <a
-                    href={`https://github.com/${user.name}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-[var(--foreground)]/70 hover:text-[#CC0000] transition-colors w-max"
-                    data-umami-event="click_github_profile"
-                    data-umami-event-user={user.name}
-                  >
-                    GITHUB PROFILE <ExternalLink className="w-3 h-3" />
-                  </a>
+                  {/* 本站个人主页 + GitHub 主页两个入口 */}
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <Link
+                      href={`/u/${user.id}`}
+                      className="inline-flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-[var(--foreground)] hover:text-[#CC0000] transition-colors w-max font-bold"
+                      data-umami-event="click_site_profile"
+                      data-umami-event-user={user.name}
+                    >
+                      VIEW DOSSIER →
+                    </Link>
+                    <a
+                      href={`https://github.com/${user.name}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-[var(--foreground)]/70 hover:text-[#CC0000] transition-colors w-max"
+                      data-umami-event="click_github_profile"
+                      data-umami-event-user={user.name}
+                    >
+                      GITHUB <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
                 </div>
 
                 {/* 贡献统计数据展示 */}

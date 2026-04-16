@@ -139,3 +139,17 @@ model AnalyticsEvent {
   @@index([eventType])
   @@index([userId])
 }
+
+/// 用户关注关系：follower_id 关注了 followee_id。
+/// 两个字段都对应 user_accounts.id（BigInt/Long），和 analytics/chat 保持一致。
+/// 不建外键约束：user_accounts 由 Java 侧 SaToken 管理，Prisma 只负责 schema 声明，
+/// 避免 cross-ownership 的删除级联踩坑。
+model user_follows {
+  follower_id BigInt
+  followee_id BigInt
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@id([follower_id, followee_id])
+  @@index([followee_id])
+  @@index([follower_id])
+}

@@ -12,6 +12,8 @@ interface UserMenuProps {
     name?: string | null;
     email?: string | null;
     image?: string | null;
+    /** GitHub 数字 ID，用于拼个人主页 URL /u/{githubId} */
+    githubId?: number | null;
   };
   provider?: string;
   // 退出登录回调，由父组件传入（来自 useAuth().logout）
@@ -57,6 +59,17 @@ export function UserMenu({ user, provider, logout }: UserMenuProps) {
             </p>
           ) : null}
         </div>
+
+        {/* 个人主页入口：只有拿到 githubId 的登录用户才显示，避免老账号 githubId 为 null 时跳 404 */}
+        {user.githubId != null && (
+          <Link
+            href={`/u/${user.githubId}`}
+            className="block px-4 py-2 text-sm text-neutral-900 dark:text-neutral-100 transition hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            data-umami-event="user_menu_profile_click"
+          >
+            我的主页
+          </Link>
+        )}
 
         {/* 设置入口：登录用户均可见，指向 /settings 偏好页 */}
         <Link
