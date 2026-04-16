@@ -113,9 +113,19 @@ interface ProfileResponse {
  * 让 Next error boundary 兜底，避免把"后端故障"伪装成"用户不存在"。
  */
 function warnFetchProfile(message: string, details?: Record<string, unknown>) {
-  // 生产环境也打印：在 Vercel runtime logs 排查偶发 403/5xx 需要看到上下文
-  // （原先只在开发输出，导致线上 Cloudflare 拦截时只看到 Next 抛出的 Error 行，
-  //  缺少 res 状态/cf-ray/响应体片段，排查成本高）
+  const isProduction = process.env.NODE_ENV === "production";
+  const status = typeof details?.status === "number" ? details.status : undefined;
+  const success = typeof details?.success === "boolean" ? details.success : undefined;
+  const isExpectedNotFound = status === 404 || success === false;
+
+  // 生产环境仅记录需要诊断的异常场景；404 / success=false 属于预期控制流，
+  // 否则像爬虫扫描随机 /u/* 会产生大量无意义 warn 日志。
+  if (isProduction && isExpectedNotFound) {
+    return;
+  }
+
+  // 对异常/需诊断场景仍然打印：例如 403/5xx、网关异常、解析失败等，
+  // 便于在 Vercel runtime logs 中查看状态码、cf-ray、响应体片段等上下文。
   console.warn(`[fetchProfile] ${message}`, details ?? {});
 }
 
