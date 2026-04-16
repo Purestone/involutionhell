@@ -392,29 +392,15 @@ export default async function UserProfilePage({ params }: Param) {
                   href={sanitizeExternalUrl(p.url) ?? undefined}
                 />
               ))}
-              {docs.slice(0, 8).map((doc, idx) => (
-                <ProfileCard
-                  key={`doc-${doc.id}`}
-                  kind="DOC"
-                  index={idx + 1}
-                  title={doc.title}
-                  meta={`文档 · ${doc.id.slice(0, 8)}`}
-                  summary={doc.url}
-                  detail={`标题：${doc.title}\n路径：${doc.url}`}
-                  href={doc.url}
-                />
-              ))}
-              {projects.length === 0 &&
-                papers.length === 0 &&
-                docs.length === 0 && (
-                  <div className="col-span-full border border-dashed border-[var(--foreground)] p-10 text-center text-neutral-500 font-mono text-sm">
-                    该用户还没有填写 projects / papers，也没有文档贡献记录。
-                  </div>
-                )}
+              {projects.length === 0 && papers.length === 0 && (
+                <div className="col-span-full border border-dashed border-[var(--foreground)] p-10 text-center text-neutral-500 font-mono text-sm">
+                  该用户还没有填写 projects / papers。
+                </div>
+              )}
             </div>
           </div>
 
-          {/* 活跃度热力图：Bento 下方独立一行全宽，仅当有贡献数据时显示 */}
+          {/* 活跃度热力图：提到 Bento 之后立即显示，让数据可视化先于冗长的列表 */}
           {Object.keys(dailyCounts).length > 0 && (
             <div className="mt-12">
               <ActivityHeatmap dailyCounts={dailyCounts} />
@@ -425,10 +411,77 @@ export default async function UserProfilePage({ params }: Param) {
           <div className="mt-12">
             <GithubRepos identifier={username} />
           </div>
+
+          {/* 文档贡献列表：放最底部，紧凑列表形式（每行 ~48px），避免 docs 多的用户把页面顶得很长。
+              超过 10 条时用 <details> 折叠，默认只显示前 10 */}
+          {docs.length > 0 && (
+            <section className="mt-12 border border-[var(--foreground)] p-6 lg:p-8 flex flex-col gap-4">
+              <div className="flex items-baseline justify-between gap-3 flex-wrap border-b border-[var(--foreground)] pb-3">
+                <div>
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
+                    SEC. DOCS · 007
+                  </div>
+                  <h3 className="font-serif text-xl font-black uppercase mt-1 text-[var(--foreground)]">
+                    贡献过的文档
+                  </h3>
+                </div>
+                <div className="font-mono text-[10px] text-neutral-500">
+                  {docs.length} 篇 · 合计 {commits.toLocaleString()} commits
+                </div>
+              </div>
+              <ol className="flex flex-col">
+                {docs.slice(0, 10).map((doc, idx) => (
+                  <DocRow key={doc.id} idx={idx + 1} doc={doc} />
+                ))}
+              </ol>
+              {docs.length > 10 && (
+                <details className="flex flex-col">
+                  <summary className="font-mono text-[10px] uppercase tracking-widest text-[#CC0000] cursor-pointer hover:underline py-2">
+                    展开剩余 {docs.length - 10} 篇 ↓
+                  </summary>
+                  <ol className="flex flex-col mt-2">
+                    {docs.slice(10).map((doc, idx) => (
+                      <DocRow key={doc.id} idx={idx + 11} doc={doc} />
+                    ))}
+                  </ol>
+                </details>
+              )}
+            </section>
+          )}
         </div>
       </main>
       <Footer />
     </>
+  );
+}
+
+/** 紧凑单行文档条目 */
+function DocRow({
+  idx,
+  doc,
+}: {
+  idx: number;
+  doc: { id: string; title: string; url: string };
+}) {
+  const safe = sanitizeExternalUrl(doc.url);
+  return (
+    <li className="flex items-baseline gap-3 border-t border-[var(--foreground)]/20 first:border-t-0 py-2 group">
+      <span className="font-mono text-[10px] text-neutral-400 w-6 shrink-0">
+        {String(idx).padStart(2, "0")}
+      </span>
+      {safe ? (
+        <Link
+          href={safe}
+          className="flex-1 font-serif text-sm text-[var(--foreground)] truncate group-hover:text-[#CC0000] transition-colors"
+        >
+          {doc.title}
+        </Link>
+      ) : (
+        <span className="flex-1 font-serif text-sm text-neutral-400 truncate">
+          {doc.title}
+        </span>
+      )}
+    </li>
   );
 }
 
