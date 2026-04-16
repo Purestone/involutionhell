@@ -51,6 +51,12 @@ const config = {
         source: "/oauth/:path*",
         destination: `${backendUrl}/oauth/:path*`,
       },
+      {
+        // 文档 commit 历史代理到 Java（带 Caffeine 10min 缓存 + GITHUB_TOKEN），
+        // 原 Next API Route 已删除，避免 Vercel Fluid CPU 被拉取 GitHub API 的请求吃掉
+        source: "/api/docs/history",
+        destination: `${backendUrl}/api/docs/history`,
+      },
     ];
   },
   images: {
