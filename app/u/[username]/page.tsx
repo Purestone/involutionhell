@@ -102,22 +102,74 @@ interface ProfileResponse {
 
 /**
  * SSR 获取用户主页基础信息（账户 + preferences）。
+ * 服务端使用 BACKEND_URL 直连 Java 后端（不走 next.config.mjs rewrites，那是给浏览器用的）。
  * 贡献文档不走后端 DB，而是在组件里从 build-time 的 site-leaderboard.json 读取，
  * 目的：每次访问 /u/{x} 省一次 Neon 查询（免费额度有限）。docs 本来就是 git-based，
  * JSON 新鲜度和 DB 一致，都是 deploy 级。
+ *
+ * 错误策略：只有后端明确返回 404 或 success=false 才 return null（走 notFound()）。
+ * 其他失败（500 / 网关异常 / JSON 解析错 / BACKEND_URL 缺失）一律抛错，
+ * 让 Next error boundary 兜底，避免把"后端故障"伪装成"用户不存在"。
  */
+function warnFetchProfile(message: string, details?: Record<string, unknown>) {
+  if (process.env.NODE_ENV !== "production") {
+    console.warn(`[fetchProfile] ${message}`, details ?? {});
+  }
+}
+
 async function fetchProfile(identifier: string): Promise<ProfileData | null> {
   const backendUrl = process.env.BACKEND_URL;
-  if (!backendUrl) return null;
-  try {
-    const res = await fetch(
-      `${backendUrl}/api/user-center/profile/${encodeURIComponent(identifier)}`,
-      { next: { revalidate: 300 } },
+  if (!backendUrl) {
+    // 关键配置缺失不能静默 notFound，给个可见错误
+    throw new Error("BACKEND_URL is not configured");
+  }
+  const res = await fetch(
+    `${backendUrl}/api/user-center/profile/${encodeURIComponent(identifier)}`,
+    { next: { revalidate: 300 } },
+  );
+  // 404：用户确实不存在 → notFound
+  if (res.status === 404) {
+    warnFetchProfile("backend 404", { identifier });
+    return null;
+  }
+  // 其他非 2xx 都抛，进 Next error boundary
+  if (!res.ok) {
+    throw new Error(
+      `profile backend ${res.status} ${res.statusText} for ${identifier}`,
     );
-    if (!res.ok) return null;
-    const json = (await res.json()) as ProfileResponse;
-    if (!json.success || !json.data) return null;
-    return json.data;
+  }
+  const json = (await res.json()) as ProfileResponse;
+  // 后端用 {success:false, message:"用户不存在"} 表示软 404
+  if (!json.success || !json.data) {
+    warnFetchProfile("backend success=false", {
+      identifier,
+      message: json.message,
+    });
+    return null;
+  }
+  return json.data;
+}
+
+/**
+ * URL scheme 白名单：仅允许 http(s)/mailto，拦截 javascript: / data: 等向量。
+ * 任何 preferences 里的 URL 在渲染前必须过这里。
+ */
+function sanitizeExternalUrl(raw: string | undefined | null): string | null {
+  if (!raw || typeof raw !== "string") return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  try {
+    // 允许相对路径（以 / 开头），直接放行
+    if (trimmed.startsWith("/") && !trimmed.startsWith("//")) return trimmed;
+    const u = new URL(trimmed);
+    if (
+      u.protocol === "http:" ||
+      u.protocol === "https:" ||
+      u.protocol === "mailto:"
+    ) {
+      return u.toString();
+    }
+    return null;
   } catch {
     return null;
   }
@@ -283,17 +335,32 @@ export default async function UserProfilePage({ params }: Param) {
               <FollowButton identifier={username} targetUserId={user.id} />
               {links.length > 0 && (
                 <div className="border-t border-[var(--foreground)] pt-4 flex flex-wrap gap-2">
-                  {links.slice(0, 5).map((link) => (
-                    <a
-                      key={link.url}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-mono text-[10px] uppercase tracking-widest px-2 py-1 border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  ))}
+                  {links.slice(0, 5).map((link, idx) => {
+                    // 过滤 javascript: / data: 等危险 scheme，不合法直接渲染成不可点击的纯文本
+                    const safe = sanitizeExternalUrl(link.url);
+                    if (!safe) {
+                      return (
+                        <span
+                          key={`${link.label}-${idx}`}
+                          className="font-mono text-[10px] uppercase tracking-widest px-2 py-1 border border-dashed border-neutral-400 text-neutral-400"
+                          title="链接协议不安全，已禁用"
+                        >
+                          {link.label}
+                        </span>
+                      );
+                    }
+                    return (
+                      <a
+                        key={safe}
+                        href={safe}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-[10px] uppercase tracking-widest px-2 py-1 border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    );
+                  })}
                 </div>
               )}
             </section>
@@ -309,7 +376,7 @@ export default async function UserProfilePage({ params }: Param) {
                   meta={p.tags?.join(" · ")}
                   summary={p.description}
                   detail={p.description}
-                  href={p.url}
+                  href={sanitizeExternalUrl(p.url) ?? undefined}
                 />
               ))}
               {papers.map((p, idx) => (
@@ -322,7 +389,7 @@ export default async function UserProfilePage({ params }: Param) {
                   meta={[p.authors, p.year].filter(Boolean).join(", ")}
                   summary={p.abstract}
                   detail={p.abstract}
-                  href={p.url}
+                  href={sanitizeExternalUrl(p.url) ?? undefined}
                 />
               ))}
               {docs.slice(0, 8).map((doc, idx) => (

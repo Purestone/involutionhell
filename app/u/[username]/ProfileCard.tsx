@@ -3,6 +3,31 @@
 import { useState } from "react";
 import Link from "next/link";
 
+/**
+ * URL scheme 白名单：仅允许 http(s)/mailto 和相对路径（/ 开头）。
+ * 防备 preferences 里注入 javascript: / data: 等导致的 XSS。
+ * 上游 page.tsx 已做一次过滤，这里二次防御以免组件被复用到未过滤的地方。
+ */
+function safeHref(raw: string | undefined | null): string | null {
+  if (!raw || typeof raw !== "string") return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  try {
+    if (trimmed.startsWith("/") && !trimmed.startsWith("//")) return trimmed;
+    const u = new URL(trimmed);
+    if (
+      u.protocol === "http:" ||
+      u.protocol === "https:" ||
+      u.protocol === "mailto:"
+    ) {
+      return u.toString();
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 interface ProfileCardProps {
   kind: "PROJ" | "PAPER" | "DOC";
   index: number;
@@ -41,15 +66,41 @@ export function ProfileCard({
     DOC: "Docs",
   }[kind];
 
+  // desktop 走 hover（CSS 驱动，见下面的 group-hover 样式），mobile 走 tap toggle；
+  // 这里用 `@media (hover: none)` 探测"不支持 hover 的设备"（触屏），只有这种设备才在 click 时翻转 state。
+  // 避免桌面端点击导致"离开 hover 后仍保持展开"的幽灵状态。
+  const toggleIfTouchDevice = () => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia?.("(hover: none)").matches) {
+      setExpanded((v) => !v);
+    }
+  };
+
+  const hasDetail = Boolean(detail);
+
   return (
     <article
-      // onClick 提供 mobile tap toggle；desktop 的 hover 通过 group-hover 样式实现
-      onClick={() => setExpanded((v) => !v)}
+      onClick={hasDetail ? toggleIfTouchDevice : undefined}
+      onKeyDown={
+        hasDetail
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setExpanded((v) => !v);
+              }
+            }
+          : undefined
+      }
+      role={hasDetail ? "button" : undefined}
+      tabIndex={hasDetail ? 0 : undefined}
+      aria-expanded={hasDetail ? expanded : undefined}
       className={[
         "group relative border border-[var(--foreground)] bg-[var(--background)]",
-        "p-6 flex flex-col gap-3 min-h-[180px] cursor-pointer",
+        "p-6 flex flex-col gap-3 min-h-[180px]",
+        hasDetail ? "cursor-pointer" : "",
         "transition-shadow duration-200 ease-out",
         "hover:shadow-[6px_6px_0_var(--foreground)]",
+        "focus-visible:outline-none focus-visible:shadow-[6px_6px_0_var(--foreground)] focus-visible:ring-2 focus-visible:ring-[#CC0000]",
         spanFull ? "sm:col-span-2" : "",
       ].join(" ")}
     >
@@ -96,12 +147,16 @@ export function ProfileCard({
         </div>
       )}
 
-      {href && (
+      {safeHref(href) && (
         <div className="mt-auto pt-3">
           <Link
-            href={href}
-            target={href.startsWith("http") ? "_blank" : undefined}
-            rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+            href={safeHref(href)!}
+            target={safeHref(href)!.startsWith("http") ? "_blank" : undefined}
+            rel={
+              safeHref(href)!.startsWith("http")
+                ? "noopener noreferrer"
+                : undefined
+            }
             onClick={(e) => e.stopPropagation()}
             className="font-mono text-[10px] uppercase tracking-widest text-[#CC0000] hover:underline"
           >
