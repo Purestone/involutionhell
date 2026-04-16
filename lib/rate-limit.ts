@@ -22,9 +22,33 @@ let cachedDailyLimiter: Ratelimit | null = null;
 // 避免生产环境每请求刷爆 serverless 日志（Copilot CR #3）
 let hasWarnedMissingUpstash = false;
 
+/**
+ * 挑第一个非空 env var 返回；本地开发 + Vercel 不同集成版本的命名差异靠它兜住。
+ */
+function firstEnv(...names: string[]): string | undefined {
+  for (const n of names) {
+    const v = process.env[n];
+    if (v && v.trim()) return v;
+  }
+  return undefined;
+}
+
 function getRedis(): Redis | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  // Upstash 的 env 名字在不同集成路径下会长得不一样：
+  //   - 手动从 Upstash 控制台复制       → UPSTASH_REDIS_REST_URL / _TOKEN
+  //   - Vercel 集成、无自定义 prefix    → KV_REST_API_URL / KV_REST_API_TOKEN
+  //   - Vercel 集成、prefix=UPSTASH_... → UPSTASH_REDIS_REST_KV_REST_API_URL ...
+  // 按上面优先级依次查找，读到谁用谁，免得跟集成命名斗智斗勇。
+  const url = firstEnv(
+    "UPSTASH_REDIS_REST_URL",
+    "UPSTASH_REDIS_REST_KV_REST_API_URL",
+    "KV_REST_API_URL",
+  );
+  const token = firstEnv(
+    "UPSTASH_REDIS_REST_TOKEN",
+    "UPSTASH_REDIS_REST_KV_REST_API_TOKEN",
+    "KV_REST_API_TOKEN",
+  );
   if (!url || !token) return null;
   return new Redis({ url, token });
 }
