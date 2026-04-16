@@ -14,7 +14,7 @@ interface Param {
  */
 export default async function EditProfilePage({ params }: Param) {
   const { username } = await params;
-  const t = await getTranslations("edit");
+  const t = await getTranslations("profile.edit");
   return (
     <>
       <Header />

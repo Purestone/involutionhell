@@ -60,7 +60,7 @@ export function ProfileCard({
   spanFull,
 }: ProfileCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const t = useTranslations("card");
+  const t = useTranslations("profile.card");
 
   const kindLabel = {
     PROJ: t("kind.project"),

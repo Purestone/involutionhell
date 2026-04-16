@@ -8,7 +8,7 @@ import { ThumbsUp, ThumbsDown } from "lucide-react";
 
 export function PageFeedback() {
   const pathname = usePathname();
-  const t = useTranslations("pageFeedback");
+  const t = useTranslations("feedback");
   const [voted, setVoted] = useState<"helpful" | "not_helpful" | null>(null);
 
   const handleVote = (vote: "helpful" | "not_helpful") => {

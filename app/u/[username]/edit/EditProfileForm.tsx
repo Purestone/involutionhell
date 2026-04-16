@@ -105,7 +105,7 @@ interface Props {
 export function EditProfileForm({ targetIdentifier }: Props) {
   const { user, status } = useAuth();
   const router = useRouter();
-  const t = useTranslations("edit");
+  const t = useTranslations("profile.edit");
 
   const [prefs, setPrefs] = useState<Preferences>(EMPTY_PREFS);
   const [loading, setLoading] = useState(true);
@@ -316,7 +316,7 @@ export function EditProfileForm({ targetIdentifier }: Props) {
                 type="text"
                 value={item.title}
                 onChange={(e) => update({ ...item, title: e.target.value })}
-                placeholder={t("sec3.title.placeholder")}
+                placeholder={t("sec3.titleField.placeholder")}
                 className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-serif text-sm font-bold"
               />
               <textarea
@@ -388,7 +388,7 @@ export function EditProfileForm({ targetIdentifier }: Props) {
                 type="text"
                 value={item.title}
                 onChange={(e) => update({ ...item, title: e.target.value })}
-                placeholder={t("sec4.title.placeholder")}
+                placeholder={t("sec4.titleField.placeholder")}
                 className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-serif text-sm font-bold"
               />
               <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-2">

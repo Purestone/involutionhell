@@ -56,7 +56,7 @@ function fmtDate(iso: string): string {
 export async function GithubRepos({ identifier }: Props) {
   const repos = await fetchRepos(identifier);
   if (repos.length === 0) return null;
-  const t = await getTranslations("repos");
+  const t = await getTranslations("profile.repos");
 
   return (
     <section className="border border-[var(--foreground)] p-6 lg:p-8 flex flex-col gap-4">

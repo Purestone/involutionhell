@@ -38,7 +38,7 @@ function readToken(): string | null {
  */
 export function FollowButton({ identifier, targetUserId }: Props) {
   const { user, status } = useAuth();
-  const t = useTranslations("follow");
+  const t = useTranslations("profile.follow");
   const [followerCount, setFollowerCount] = useState<number | null>(null);
   const [followingCount, setFollowingCount] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);

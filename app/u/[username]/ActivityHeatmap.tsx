@@ -32,7 +32,7 @@ function formatDay(d: Date): string {
 }
 
 export async function ActivityHeatmap({ dailyCounts }: Props) {
-  const t = await getTranslations("activity");
+  const t = await getTranslations("profile.activity");
   // 以今天为右边界，往前 52 周；按周对齐：从上上周日起（GitHub 图的起点）
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);

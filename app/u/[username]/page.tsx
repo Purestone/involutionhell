@@ -230,7 +230,7 @@ export default async function UserProfilePage({ params }: Param) {
   if (!data) notFound();
 
   const t = await getTranslations("profile");
-  const tDocs = await getTranslations("docs");
+  const tDocs = await getTranslations("profile.docs");
   const { user } = data;
   const preferences = data.preferences ?? {};
   const { docs, points, commits, dailyCounts } = findContributions(
