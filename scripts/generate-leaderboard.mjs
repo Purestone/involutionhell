@@ -11,8 +11,55 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
 import dotenv from "dotenv";
 dotenv.config({ path: [".env.local", ".env"] });
+
+/**
+ * 从仓库 git log 反推 GitHub id → login 映射，优先走 noreply 邮箱（GitHub 默认启用 privacy）。
+ * 格式：
+ *   1234567+alice@users.noreply.github.com   → id=1234567, login=alice
+ *   alice@users.noreply.github.com           → login=alice（老格式，没 id，只能 name 回填）
+ *
+ * 这样 build 时不用调 100 次 GitHub API 就能拿到绝大多数贡献者的 login，
+ * 只有用真实邮箱提交的（少数）才回退到 GitHub API。
+ */
+function buildLoginMapFromGitLog() {
+  const byId = {}; // github_id → login
+  const byLogin = {}; // login → login（用于老格式邮箱的兜底，至少保住 name 字段）
+  try {
+    // --all 覆盖所有 ref；--no-merges 去掉 merge commit 噪音；%ae 邮箱；%an 展示名
+    const out = execSync("git log --all --no-merges --format='%ae%x09%an'", {
+      encoding: "utf8",
+      maxBuffer: 50 * 1024 * 1024,
+    });
+    for (const line of out.split("\n")) {
+      if (!line) continue;
+      const [email, name] = line.split("\t");
+      if (!email) continue;
+      // 先匹配带 id 的 noreply： "1234567+alice@users.noreply.github.com"
+      const newStyle = email.match(
+        /^(\d+)\+([^@\s]+)@users\.noreply\.github\.com$/,
+      );
+      if (newStyle) {
+        byId[newStyle[1]] = newStyle[2];
+        byLogin[newStyle[2]] = newStyle[2];
+        continue;
+      }
+      // 老式 noreply： "alice@users.noreply.github.com"（没 id，只能靠 login 反查）
+      const oldStyle = email.match(/^([^@\s]+)@users\.noreply\.github\.com$/);
+      if (oldStyle) {
+        byLogin[oldStyle[1]] = oldStyle[1];
+      }
+    }
+  } catch (e) {
+    console.warn(
+      "[generate-leaderboard] git log 解析 login 失败（是否不在仓库内？），退回到纯 GitHub API 模式：",
+      e instanceof Error ? e.message : e,
+    );
+  }
+  return { byId, byLogin };
+}
 
 // 兼容 Prisma client 引入方式
 import * as PrismaModule from "../generated/prisma/client.ts";
@@ -139,10 +186,20 @@ async function main() {
         grouped[gid] = {
           contributions: 0,
           docs: new Set(),
+          // 按日分桶的贡献次数，用于前端渲染活跃度热力图（GitHub 风格 365 格）
+          dailyCounts: {},
         };
       }
       grouped[gid].contributions += record.contributions;
       grouped[gid].docs.add(record.doc_id);
+      // last_contributed_at 是 timestamptz，只要精度到日即可
+      const day = record.last_contributed_at
+        ? new Date(record.last_contributed_at).toISOString().slice(0, 10)
+        : null;
+      if (day) {
+        grouped[gid].dailyCounts[day] =
+          (grouped[gid].dailyCounts[day] || 0) + record.contributions;
+      }
     }
 
     // 格式化输出榜单
@@ -173,67 +230,85 @@ async function main() {
           commits: data.contributions,
           avatarUrl: `https://avatars.githubusercontent.com/u/${githubId}`,
           contributedDocs: contributedDocsInfo,
+          dailyCounts: data.dailyCounts,
         };
       })
       .sort((a, b) => b.points - a.points);
 
-    // 为前排用户附带一下 Github API 拉取详细昵称信息，由于只是少数人（例如前100），可以接受构建时拉取。
-    console.log(
-      `[generate-leaderboard] 已聚合 ${leaderboard.length} 名用户，正在通过 GitHub API 获取前 100 名的详细信息... | Aggregated ${leaderboard.length} users. Annotating top 100 with Github API...`,
-    );
-
-    // 读取 GITHUB_TOKEN（由 workflow env 注入，见 .github/workflows/sync-uuid.yml）。
-    // 匿名调用 GitHub API 限流 60/hour，带 token 后 5000/hour。没有 token 依然能跑，
-    // 只是前 100 基本全部 403，fallback 回 "GitHub User <id>"。
-    const ghToken = process.env.GITHUB_TOKEN || process.env.GH_PAT || "";
-    if (!ghToken) {
-      console.warn(
-        "[generate-leaderboard] 未检测到 GITHUB_TOKEN/GH_PAT（GitHub token），名字获取会因限流失败，榜单只会展示 id 占位符",
-      );
-    }
-
-    // 我们在此取前 100 名抓取 Github Name 防止 Rate Limit
-    const topUsers = leaderboard.slice(0, 100);
-    let successCount = 0;
-    let failureCount = 0;
-    for (let user of topUsers) {
-      try {
-        const headers = {
-          "User-Agent": "involutionhell-leaderboard-script",
-          Accept: "application/vnd.github+json",
-        };
-        if (ghToken) headers.Authorization = `Bearer ${ghToken}`;
-        const ghRes = await fetch(`https://api.github.com/user/${user.id}`, {
-          headers,
-        });
-        if (ghRes.ok) {
-          const data = await ghRes.json();
-          user.name = data.login || data.name || user.name;
-          successCount++;
-        } else {
-          failureCount++;
-          // 首次失败时打印详情帮助定位（限流 / token 过期 / 被 revoke）
-          if (failureCount === 1) {
-            console.warn(
-              `[generate-leaderboard] GitHub API 返回 ${ghRes.status}，后续失败将静默计数。示例响应：`,
-              await ghRes.text().then((t) => t.slice(0, 200)),
-            );
-          }
-        }
-      } catch (err) {
-        failureCount++;
-        // 首次网络/DNS/SSL 等异常打印一次错误消息，便于排查；后续静默计数
-        if (failureCount === 1) {
-          console.warn(
-            "[generate-leaderboard] GitHub API 请求异常，后续失败将静默计数。示例错误：",
-            err instanceof Error ? err.message : err,
-          );
-        }
+    // Step 1: 先从本地 git log 的 noreply 邮箱反推 id→login，覆盖绝大多数贡献者。
+    // 这个是纯本地操作，不打 GitHub API，快且免额度。
+    const { byId: loginByGitId } = buildLoginMapFromGitLog();
+    let offlineHits = 0;
+    for (const user of leaderboard) {
+      const login = loginByGitId[user.id];
+      if (login) {
+        user.name = login;
+        offlineHits++;
       }
     }
     console.log(
-      `[generate-leaderboard] GitHub 名字获取完成：成功 ${successCount} / 失败 ${failureCount}`,
+      `[generate-leaderboard] git log 离线匹配 login：${offlineHits}/${leaderboard.length} 条直接拿到，节省同等数量的 GitHub API 调用`,
     );
+
+    // Step 2: 仍然是 "GitHub User <id>" 占位符的前 100 名才打 GitHub API 兜底
+    const ghToken = process.env.GITHUB_TOKEN || process.env.GH_PAT || "";
+    const topUsers = leaderboard
+      .slice(0, 100)
+      .filter((u) => u.name === `GitHub User ${u.id}`);
+
+    if (topUsers.length === 0) {
+      console.log(
+        "[generate-leaderboard] 前 100 名 login 全部命中本地缓存，跳过 GitHub API",
+      );
+    } else {
+      if (!ghToken) {
+        console.warn(
+          `[generate-leaderboard] 还有 ${topUsers.length} 名用户需要走 GitHub API，但未检测到 GITHUB_TOKEN/GH_PAT，限流 60/hour`,
+        );
+      } else {
+        console.log(
+          `[generate-leaderboard] 剩余 ${topUsers.length} 名用户走 GitHub API 兜底 login`,
+        );
+      }
+      let successCount = 0;
+      let failureCount = 0;
+      for (const user of topUsers) {
+        try {
+          const headers = {
+            "User-Agent": "involutionhell-leaderboard-script",
+            Accept: "application/vnd.github+json",
+          };
+          if (ghToken) headers.Authorization = `Bearer ${ghToken}`;
+          const ghRes = await fetch(`https://api.github.com/user/${user.id}`, {
+            headers,
+          });
+          if (ghRes.ok) {
+            const data = await ghRes.json();
+            user.name = data.login || data.name || user.name;
+            successCount++;
+          } else {
+            failureCount++;
+            if (failureCount === 1) {
+              console.warn(
+                `[generate-leaderboard] GitHub API 返回 ${ghRes.status}，后续失败将静默计数。示例响应：`,
+                await ghRes.text().then((t) => t.slice(0, 200)),
+              );
+            }
+          }
+        } catch (err) {
+          failureCount++;
+          if (failureCount === 1) {
+            console.warn(
+              "[generate-leaderboard] GitHub API 请求异常，后续失败将静默计数。示例错误：",
+              err instanceof Error ? err.message : err,
+            );
+          }
+        }
+      }
+      console.log(
+        `[generate-leaderboard] GitHub API 兜底完成：成功 ${successCount} / 失败 ${failureCount}`,
+      );
+    }
 
     await ensureParentDir(outputAbs);
 
