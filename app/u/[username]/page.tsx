@@ -9,6 +9,7 @@ import { ProfileCard } from "./ProfileCard";
 import { EditLinkIfOwner } from "./EditLinkIfOwner";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { FollowButton } from "./FollowButton";
+import { GithubRepos } from "./GithubRepos";
 
 interface UserView {
   id: number;
@@ -289,6 +290,11 @@ export default async function UserProfilePage({ params }: Param) {
               <ActivityHeatmap dailyCounts={dailyCounts} />
             </div>
           )}
+
+          {/* GitHub 公开 repos：server component 内部 fetch，零数据时自动返回 null */}
+          <div className="mt-12">
+            <GithubRepos identifier={username} />
+          </div>
         </div>
       </main>
       <Footer />
