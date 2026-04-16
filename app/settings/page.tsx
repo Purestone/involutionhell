@@ -1,9 +1,18 @@
 // 用户偏好设置页（Server Component）
 // 登录态由客户端 SettingsForm 内部的 useAuth 处理：token 存在 localStorage，服务端无法读取，
 // 所以这里不做服务端鉴权，仅负责渲染页面壳。未登录 → 客户端 router.replace 到 /login?redirect=/settings。
+import type { Metadata } from "next";
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import { SettingsForm } from "./SettingsForm";
+
+// SEO: 设置页仅登录用户相关，不参与搜索索引
+export const metadata: Metadata = {
+  title: "Settings",
+  description: "Customize theme, language, and AI assistant preferences.",
+  alternates: { canonical: "/settings" },
+  robots: { index: false, follow: true },
+};
 
 export default function SettingsPage() {
   return (

@@ -1,5 +1,14 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { SignInButton } from "@/app/components/SignInButton";
+
+// SEO: 登录页不参与 index（搜索引擎不需要收录登录入口）
+export const metadata: Metadata = {
+  title: "Sign In",
+  description: "Sign in to Involution Hell with GitHub.",
+  alternates: { canonical: "/login" },
+  robots: { index: false, follow: true },
+};
 
 export default async function LoginPage() {
   const t = await getTranslations("login");

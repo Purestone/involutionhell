@@ -67,15 +67,16 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   robots: {
+    // nocache 会抑制 rich snippet / cached page，对 SEO 反而不利；移除
     index: true,
     follow: true,
-    nocache: true,
     googleBot: {
       index: true,
       follow: true,
-      "max-image-preview": "standard",
-      "max-snippet": 160,
-      "max-video-preview": 0,
+      // 允许摘要长度，不要限制过短（160 char → -1 让 Google 自行判断）
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
     },
   },
   formatDetection: {
@@ -186,6 +187,33 @@ export default async function RootLayout({
           as="image"
           type="image/png"
           fetchPriority="high"
+        />
+        {/*
+          WebSite + SearchAction 结构化数据：Google 搜索结果下方可能直接显示站内搜索框
+          （Sitelinks Search Box）。target 指向我们的搜索页带 query 参数；
+          search-input 占位符必须叫 "search_term_string"（Google 硬约定）。
+        */}
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Involution Hell",
+              alternateName: ["内卷地狱"],
+              url: SITE_URL,
+              inLanguage: ["zh-CN", "en-US"],
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate: `${SITE_URL}/docs?q={search_term_string}`,
+                },
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
         />
         {/* 结构化数据：英文主名 + 中文 alternateName */}
         <script
