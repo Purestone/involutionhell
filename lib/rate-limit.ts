@@ -8,8 +8,8 @@
  * 但生产必须配齐 UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN。
  *
  * 使用：
- *   const { success, reset } = await limitChat(req);
- *   if (!success) return rateLimitResponse(reset);
+ *   const result = await limitChat(req);
+ *   if (!result.success) return rateLimitResponse(result);
  */
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
@@ -18,6 +18,9 @@ import { Redis } from "@upstash/redis";
 let cachedChatLimiter: Ratelimit | null = null;
 let cachedChatImageLimiter: Ratelimit | null = null;
 let cachedDailyLimiter: Ratelimit | null = null;
+// Upstash env 缺失的 warn 只在模块生命周期内打一次，
+// 避免生产环境每请求刷爆 serverless 日志（Copilot CR #3）
+let hasWarnedMissingUpstash = false;
 
 function getRedis(): Redis | null {
   const url = process.env.UPSTASH_REDIS_REST_URL;
@@ -70,13 +73,28 @@ function getDailyLimiter(): Ratelimit | null {
 
 /**
  * 从 request headers 里提取客户端 IP。
- * Vercel 上优先 x-forwarded-for；本地开发回退到 x-real-ip 或 "anonymous"。
+ *
+ * 防伪造（Copilot CR #2）：
+ * - 优先读 `x-real-ip`：Vercel/多数 CDN 只写由自己验证过的真实客户端 IP，
+ *   不会把客户端伪造的值透传进来，最可信。
+ * - 没有 `x-real-ip` 时才降级到 `x-forwarded-for`；但不能取 XFF 的 **第一个**，
+ *   因为那是客户端可以随便伪造的值；应该取 **最后一个非空项**，也就是最内层
+ *   可信代理看到的实际来源地址。
+ * - 都没有（本地 dev）时用固定字符串，所有请求共享一个额度桶，避免本地爆测。
  */
 function getClientIp(req: Request): string {
-  const xff = req.headers.get("x-forwarded-for");
-  if (xff) return xff.split(",")[0].trim();
   const xri = req.headers.get("x-real-ip");
-  if (xri) return xri.trim();
+  if (xri && xri.trim()) return xri.trim();
+
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) {
+    const parts = xff
+      .split(",")
+      .map((ip) => ip.trim())
+      .filter(Boolean);
+    if (parts.length > 0) return parts[parts.length - 1];
+  }
+
   return "anonymous";
 }
 
@@ -102,12 +120,16 @@ export async function limitChat(
   const minuteLimiter = hasImage ? getChatImageLimiter() : getChatLimiter();
   const dayLimiter = getDailyLimiter();
 
-  // Upstash 未配置：本地开发或生产漏配。不阻塞请求，但打 warn 提示运维。
+  // Upstash 未配置：本地开发或生产漏配。不阻塞请求，只打一次 warn 提示运维。
+  // 不再按 NODE_ENV 区分（dev 也提示，免得开发期"没限流却不知道"），
+  // 用 module 级 flag 避免每请求刷爆日志（Copilot CR #3）。
   if (!minuteLimiter || !dayLimiter) {
-    if (process.env.NODE_ENV === "production") {
+    if (!hasWarnedMissingUpstash) {
+      hasWarnedMissingUpstash = true;
       console.warn(
         "[rate-limit] UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN 未配置，" +
-          "生产环境聊天接口无限流保护，请尽快在 Vercel Env 中补齐。",
+          "聊天接口暂无限流保护（本实例生命周期内不会再次提示）。" +
+          "生产环境请在 Vercel Env 中补齐。",
       );
     }
     return {

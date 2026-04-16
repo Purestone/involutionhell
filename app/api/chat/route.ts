@@ -33,7 +33,17 @@ export async function POST(req: Request) {
   // 0. Rate limit：免费模型 GLM-4.6V-Flash 并发极低（≈ 5），
   //    单用户开几个 tab 就能打爆。per-IP 滑动窗口限流先挡一层。
   //    （L2 防护；如果 Upstash env 漏配会自动降级为放行+warn）
-  const rl = await limitChat(req, false);
+  //
+  //    预读 body 判断是否带图（hasImage=true 会触发更严的 5 req/60s 窗口）。
+  //    为此多克一次请求，后续 proxyReq/req.json() 仍可独立读（Copilot CR #4）。
+  let hasImage = false;
+  try {
+    const body = (await req.clone().json()) as Partial<ChatRequest>;
+    hasImage = messagesHaveImage(body.messages);
+  } catch {
+    // body 不是合法 JSON：按无图处理，继续让下游的 req.json() 去报真正的错
+  }
+  const rl = await limitChat(req, hasImage);
   if (!rl.success) return rateLimitResponse(rl);
 
   // 1. 克隆请求，因为如果代理失败，后面的代码还需要读取 req.json()
@@ -261,6 +271,30 @@ export async function POST(req: Request) {
   }
 }
 
+/**
+ * 判断一组 UIMessage 里是否含图片 part。支持 AI SDK v5 的多种图片表达：
+ * `type === "image"` / `type === "image_url"` / `type === "file"` 且 mediaType 起头 image。
+ * 任何异常结构都当作无图，宁可放过也不误杀。
+ */
+function messagesHaveImage(messages: unknown): boolean {
+  if (!Array.isArray(messages)) return false;
+  return messages.some((msg) => {
+    if (!msg || typeof msg !== "object") return false;
+    const parts = (msg as { parts?: unknown }).parts;
+    if (!Array.isArray(parts)) return false;
+    return parts.some((part) => {
+      if (!part || typeof part !== "object") return false;
+      const type = (part as { type?: unknown }).type;
+      if (type === "image" || type === "image_url") return true;
+      if (type === "file") {
+        const mediaType = (part as { mediaType?: unknown }).mediaType;
+        return typeof mediaType === "string" && mediaType.startsWith("image/");
+      }
+      return false;
+    });
+  });
+}
+
 interface MappedUpstreamError {
   status: number;
   code: "rate_limited" | "quota_exhausted" | "upstream_auth" | "upstream_down";
@@ -269,19 +303,33 @@ interface MappedUpstreamError {
 
 function mapUpstreamError(err: unknown): MappedUpstreamError | null {
   if (!err) return null;
-  const raw =
-    err instanceof Error
-      ? `${err.message} ${(err as Error & { stack?: string }).stack ?? ""}`
-      : typeof err === "string"
-        ? err
-        : JSON.stringify(err);
 
-  // GLM/OpenAI-compatible 的错误通常把 HTTP status 和业务码都塞在 message 里
+  // 仅使用 message / response payload，**不要拼 stack** —— stack 里带行号
+  // 形如 `:429:` / `:1302:` 会误匹配业务码正则（Copilot CR #5）。
+  // JSON.stringify 对循环引用会抛错，用 try/catch 兜底（Copilot CR #6）。
+  let raw: string;
+  if (err instanceof Error) {
+    raw = err.message;
+  } else if (typeof err === "string") {
+    raw = err;
+  } else {
+    try {
+      raw = JSON.stringify(err);
+    } catch {
+      raw = String(err);
+    }
+  }
+
+  // 业务码正则：全部用 `[^\s]{0,N}?` 代替 `.*`，限死回溯深度避免 ReDoS
+  // （CodeQL polynomial regex 告警）。关键词语义够短，10~20 字符窗口足够。
   const hasStatus429 = /\b429\b|rate[-_ ]?limit|too many requests/i.test(raw);
   const has1302 = /\b1302\b|并发超额|速率限制|控制请求频率/.test(raw);
-  const has1113 = /\b1113\b|余额不足|额度.*耗尽|quota.*exhaust/i.test(raw);
+  const has1113 =
+    /\b1113\b|余额不足|额度[^\s]{0,10}?耗尽|quota[^\s]{0,10}?exhaust/i.test(
+      raw,
+    );
   const hasAuth =
-    /\b1001\b|\b1002\b|\b1003\b|\b401\b|unauthorized|invalid.*api.*key/i.test(
+    /\b1001\b|\b1002\b|\b1003\b|\b401\b|unauthorized|invalid[^\s]{0,10}?api[^\s]{0,10}?key/i.test(
       raw,
     );
 
