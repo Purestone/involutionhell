@@ -20,6 +20,7 @@
 
 import type { MetadataRoute } from "next";
 import { source } from "@/lib/source";
+import leaderboard from "@/generated/site-leaderboard.json";
 
 /**
  * 从环境变量中读取的站点根 URL。
@@ -102,12 +103,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 1, // 首页是最高优先级
   };
 
-  // 4. 合并与处理
+  // 4. /rank 排行榜页（静态路由）
+  const rankEntry: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/rank`,
+    changeFrequency: "daily", // 贡献排行榜每天都可能变
+    priority: 0.7,
+  };
+
+  // 5. 个人主页 /u/[githubId] — 从 build-time leaderboard JSON 枚举所有贡献者。
+  // 非贡献者 / 新注册用户的 profile 不入 sitemap（search crawler 进去也是空白，浪费 crawl budget）。
+  type LeaderboardRow = { id?: string };
+  const profileEntries: MetadataRoute.Sitemap = (
+    leaderboard as LeaderboardRow[]
+  )
+    .filter((r) => typeof r.id === "string" && /^\d+$/.test(r.id))
+    .map((r) => ({
+      url: `${SITE_URL}/u/${r.id}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.5,
+    }));
+
+  // 6. 合并与处理
   const unique = new Map(docsEntries.map((e) => [e.url, e]));
 
-  // 返回合并后的数组：首页 + (去重后的文档页)
+  // 返回合并后的数组：首页 + /rank + 贡献者 profiles + (去重后的文档页)
   return [
     homeEntry,
+    rankEntry,
+    ...profileEntries,
     ...[...unique.values()].sort((a, b) => a.url.localeCompare(b.url)),
   ];
 }

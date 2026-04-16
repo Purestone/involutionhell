@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import { ContributorRow } from "@/app/components/rank/ContributorRow";
@@ -5,6 +6,21 @@ import { RankTabs } from "@/app/components/rank/RankTabs";
 import { Suspense } from "react";
 
 import leaderboardData from "@/generated/site-leaderboard.json";
+
+// SEO: rank 页用 canonical + 稳定 title/description，避免 tab/window 参数造成重复索引
+export const metadata: Metadata = {
+  title: "贡献者排行榜 / Contributors Rank",
+  description:
+    "Involution Hell 社区贡献者排行榜 — 按文档 commits 实时统计。谁在写、谁在维护、本周最热文档。Realtime contributor leaderboard of the Involution Hell community.",
+  alternates: { canonical: "/rank" },
+  openGraph: {
+    title: "Contributors Rank · Involution Hell",
+    description:
+      "Realtime contributor leaderboard & hottest docs in the Involution Hell community.",
+    url: "/rank",
+    type: "website",
+  },
+};
 
 import { MAINTAINERS } from "@/lib/admins";
 

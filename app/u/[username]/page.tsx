@@ -114,8 +114,10 @@ interface ProfileResponse {
  */
 function warnFetchProfile(message: string, details?: Record<string, unknown>) {
   const isProduction = process.env.NODE_ENV === "production";
-  const status = typeof details?.status === "number" ? details.status : undefined;
-  const success = typeof details?.success === "boolean" ? details.success : undefined;
+  const status =
+    typeof details?.status === "number" ? details.status : undefined;
+  const success =
+    typeof details?.success === "boolean" ? details.success : undefined;
   const isExpectedNotFound = status === 404 || success === false;
 
   // 生产环境仅记录需要诊断的异常场景；404 / success=false 属于预期控制流，
@@ -294,13 +296,32 @@ interface Param {
 export async function generateMetadata({ params }: Param): Promise<Metadata> {
   const { username } = await params;
   const data = await fetchProfile(username);
-  if (!data) return { title: `@${username}` };
+  if (!data) return { title: `@${username}`, robots: { index: false } };
   const displayName = data.user.displayName || data.user.username;
+  const description =
+    data.preferences?.bio ||
+    `${displayName} on Involution Hell — projects, papers, and docs contributions.`;
+  // 用 githubId 作为 canonical URL，避免 /u/github_114939201 和 /u/114939201 两个入口重复索引
+  const canonicalId = data.user.githubId ?? data.user.username;
+  const canonical = `/u/${canonicalId}`;
+  const title = `${displayName} (@${data.user.username})`;
   return {
-    title: `${displayName} (@${data.user.username})`,
-    description:
-      data.preferences?.bio ||
-      `${displayName} 在 Involution Hell 的个人主页 — 项目、论文与文档贡献。`,
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      type: "profile",
+      title,
+      description,
+      url: canonical,
+      images: data.user.avatarUrl ? [{ url: data.user.avatarUrl }] : undefined,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      images: data.user.avatarUrl ? [data.user.avatarUrl] : undefined,
+    },
   };
 }
 
@@ -339,8 +360,34 @@ export default async function UserProfilePage({ params }: Param) {
     };
   });
 
+  // Person JSON-LD：让搜索引擎识别这是一个"个人档案"而不是普通页面，有机会走 knowledge panel
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://involutionhell.com";
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: user.displayName || user.username,
+    alternateName: user.username,
+    url: `${siteUrl}/u/${user.githubId ?? user.username}`,
+    ...(user.avatarUrl ? { image: user.avatarUrl } : {}),
+    ...(preferences.bio ? { description: preferences.bio } : {}),
+    ...(user.githubId
+      ? { sameAs: [`https://github.com/${user.githubId}`] }
+      : {}),
+    memberOf: {
+      "@type": "Organization",
+      name: "Involution Hell",
+      url: siteUrl,
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
       <Header />
       <main className="pt-32 pb-16 bg-[var(--background)] min-h-screen">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">

@@ -93,8 +93,59 @@ export default async function DocPage({ params }: Param) {
     getDocContributorsByDocId(docIdFromPage);
   const Mdx = page.data.body;
 
+  // SEO 结构化数据
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://involutionhell.com";
+  const slugPath = (slug ?? []).join("/");
+  const docUrl = slugPath ? `${siteUrl}/docs/${slugPath}` : `${siteUrl}/docs`;
+
+  // TechArticle: 让 docs 在 Google 搜索结果上更可能展示为技术文章卡片
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: page.data.title,
+    description: page.data.description,
+    url: docUrl,
+    inLanguage: locale === "en" ? "en-US" : "zh-CN",
+    publisher: {
+      "@type": "Organization",
+      name: "Involution Hell",
+      url: siteUrl,
+    },
+  };
+
+  // BreadcrumbList: 按 slug 层级生成面包屑（Google 搜索结果里的那种层级链接）
+  const breadcrumbItems = [
+    { name: "Involution Hell", url: siteUrl },
+    { name: "Docs", url: `${siteUrl}/docs` },
+    ...(slug ?? []).map((seg, idx) => ({
+      name: decodeURIComponent(seg),
+      url: `${siteUrl}/docs/${slug!.slice(0, idx + 1).join("/")}`,
+    })),
+  ];
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbItems.map((item, idx) => ({
+      "@type": "ListItem",
+      position: idx + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <DocsPage toc={page.data.toc}>
         <DocsBody>
           <div className="mb-6 flex flex-col gap-3 border-b border-border pb-6 md:mb-8 md:flex-row md:items-start md:justify-between">
@@ -144,8 +195,35 @@ export async function generateMetadata({ params }: Param): Promise<Metadata> {
     notFound();
   }
 
+  // 规范化 slug → canonical 路径。用户访问 /docs/ai/rl（原文）或 /docs/ai/rl.en（翻译版）
+  // 都统一指向原始 slug，避免两个 URL 竞争同一份内容的 PageRank。
+  const slugPath = (slug ?? []).join("/");
+  const canonical = slugPath ? `/docs/${slugPath}` : "/docs";
+
+  // hreflang：告诉搜索引擎该文档有哪些语言版本。
+  // 翻译版文件命名是 `<slug>.en.mdx` / `<slug>.zh.mdx`，URL 靠 cookie 切换，
+  // 两种语言走同一 canonical URL，因此 hreflang 都指向自己。
+  const languages: Record<string, string> = {
+    "zh-CN": canonical,
+    "en-US": canonical,
+    "x-default": canonical,
+  };
+
   return {
     title: page.data.title,
     description: page.data.description,
+    alternates: { canonical, languages },
+    openGraph: {
+      type: "article",
+      title: page.data.title,
+      description: page.data.description,
+      url: canonical,
+      locale: locale === "en" ? "en_US" : "zh_CN",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: page.data.title,
+      description: page.data.description,
+    },
   };
 }
