@@ -43,7 +43,7 @@ export default function ProfileError({
         </h1>
         <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
           服务端在拉取这个用户的资料时遇到了一次瞬时错误（可能是上游 CDN
-          拦截或后端抖动）。 通常重试一次就能恢复。
+          拦截或后端抖动）。通常重试一次就能恢复。
         </p>
         {error.digest ? (
           <p className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
