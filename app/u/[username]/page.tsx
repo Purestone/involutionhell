@@ -393,8 +393,12 @@ export default async function UserProfilePage({ params }: Param) {
                 />
               ))}
               {projects.length === 0 && papers.length === 0 && (
-                <div className="col-span-full border border-dashed border-[var(--foreground)] p-10 text-center text-neutral-500 font-mono text-sm">
-                  该用户还没有填写 projects / papers。
+                <div className="col-span-full border border-dashed border-[var(--foreground)] p-10 text-center text-neutral-500 font-sans text-sm leading-relaxed">
+                  Ta 还没填个人项目和最近在读的论文。
+                  <br />
+                  <span className="text-xs text-neutral-400">
+                    （下方仍会显示 GitHub 公开 repos 和文档贡献记录）
+                  </span>
                 </div>
               )}
             </div>
