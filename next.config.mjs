@@ -106,11 +106,6 @@ const config = {
         hostname: "placehold.co",
         pathname: "/**",
       },
-      {
-        protocol: "https",
-        hostname: "mirrors.creativecommons.org",
-        pathname: "/**",
-      },
     ],
     /**
      * CRITICAL: 禁用 Next.js 图片优化

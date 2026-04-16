@@ -33,30 +33,35 @@ export function LicenseNotice({ className }: LicenseNoticeProps) {
       >
         CC BY-NC-SA 4.0
       </a>
+      {/*
+        CC 图标改为本地托管（public/cc-icons/）。
+        原来走 mirrors.creativecommons.org 外链，每个图标 ~960ms（国内延迟 + 可能被墙），
+        4 个图标就是近 4s 额外网络开销。每个 SVG ~1KB，本地走站内 CDN 毫秒级返回。
+      */}
       <span className="flex items-center gap-0.5 opacity-50">
         <Image
-          src="https://mirrors.creativecommons.org/presskit/icons/cc.svg"
+          src="/cc-icons/cc.svg"
           alt="CC"
           width={10}
           height={10}
           loading="lazy"
         />
         <Image
-          src="https://mirrors.creativecommons.org/presskit/icons/by.svg"
+          src="/cc-icons/by.svg"
           alt="BY"
           width={10}
           height={10}
           loading="lazy"
         />
         <Image
-          src="https://mirrors.creativecommons.org/presskit/icons/nc.svg"
+          src="/cc-icons/nc.svg"
           alt="NC"
           width={10}
           height={10}
           loading="lazy"
         />
         <Image
-          src="https://mirrors.creativecommons.org/presskit/icons/sa.svg"
+          src="/cc-icons/sa.svg"
           alt="SA"
           width={10}
           height={10}
