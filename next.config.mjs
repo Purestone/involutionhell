@@ -1,6 +1,7 @@
 ﻿// next.config.mjs
 import { createMDX } from "fumadocs-mdx/next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { withSentryConfig } from "@sentry/nextjs";
 
 /**
  * IMPORTANT: remarkImage 配置已移至 source.config.ts 统一管理
@@ -131,4 +132,26 @@ const config = {
   },
 };
 
-export default withNextIntl(withMDX(config));
+const finalConfig = withNextIntl(withMDX(config));
+
+// Sentry 包裹：webpack 插件需要看到最终的 Next 配置才能上传 source map。
+// silent: !CI 让本地构建不刷日志，只在 Vercel CI 构建时打印。
+// widenClientFileUpload 扩大 source map 扫描范围，保证前端错误堆栈能解出来。
+// disableLogger 树摇掉 Sentry 自带 logger，减小 bundle 体积。
+//
+// 守门条件：只有在存在 SENTRY_AUTH_TOKEN 时才启用 withSentryConfig。
+// 贡献者 clone 仓库后没配 Sentry env 也能直接 `pnpm build` / `pnpm dev`，
+// 不会因为 webpack 插件缺凭据而构建失败。生产 Vercel 那边 env 齐全，正常上报。
+const enableSentry = Boolean(process.env.SENTRY_AUTH_TOKEN);
+
+export default enableSentry
+  ? withSentryConfig(finalConfig, {
+      org: process.env.SENTRY_ORG || "involutionhell",
+      project: process.env.SENTRY_PROJECT || "sentry-bole-notebook",
+      silent: !process.env.CI,
+      widenClientFileUpload: true,
+      disableLogger: true,
+      // 不启用 tunnelRoute：需要加 /monitoring rewrite，和现有 rewrites 交互
+      // 复杂；广告屏蔽对 docs 站影响小，后续真需要再打开。
+    })
+  : finalConfig;
