@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -51,6 +52,7 @@ Write your content here.
 
 export function Contribute() {
   const router = useRouter();
+  const t = useTranslations("contribute");
   const [open, setOpen] = useState(false);
   const [tree, setTree] = useState<DirNode[]>([]);
   const [loading, setLoading] = useState(false);
@@ -71,18 +73,17 @@ export function Contribute() {
     if (!normalizedArticleFile) {
       return {
         isFileNameValid: false,
-        fileNameError: "请填写文件名。",
+        fileNameError: t("dialog.filenameError.empty"),
       };
     }
     if (!FILENAME_PATTERN.test(normalizedArticleFile)) {
       return {
         isFileNameValid: false,
-        fileNameError:
-          "文件名仅支持字母、数字、连字符或下划线，并需以字母或数字开头。",
+        fileNameError: t("dialog.filenameError.invalid"),
       };
     }
     return { isFileNameValid: true, fileNameError: "" };
-  }, [normalizedArticleFile]);
+  }, [normalizedArticleFile, t]);
 
   useEffect(() => {
     let mounted = true;
@@ -179,7 +180,7 @@ export function Contribute() {
           >
             <span className="relative z-10 flex items-center gap-4">
               <Sparkles className="h-6 w-6" />
-              <span>Submit Contribution / 投稿 </span>
+              <span>{t("button")}</span>
             </span>
           </Button>
         </DialogTrigger>
@@ -188,25 +189,24 @@ export function Contribute() {
           href="https://github.com/InvolutionHell/involutionhell?tab=contributing-ov-file#%E6%8A%95%E7%A8%BF%E6%8C%87%E5%8D%97"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="查看投稿指南"
-          title="查看投稿指南"
+          aria-label={t("guideAriaLabel")}
+          title={t("guideAriaLabel")}
           className="absolute top-0 right-0 flex h-10 w-10 translate-x-1/2 -translate-y-1/2 items-center justify-center border border-[var(--foreground)] bg-[var(--background)] text-[var(--foreground)] font-mono hover:bg-[#CC0000] hover:text-white transition-colors z-20"
         >
           <span className="text-sm font-bold">?</span>
-          <span className="sr-only">查看投稿指南</span>
+          <span className="sr-only">{t("guideAriaLabel")}</span>
         </a>
       </div>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>我要投稿</DialogTitle>
-          <DialogDescription>
-            选择栏目（单选、可搜索；一级仅用于展开），或在一级下新建二级子栏目，然后跳转到
-            GitHub 新建文章。
-          </DialogDescription>
+          <DialogTitle>{t("dialog.title")}</DialogTitle>
+          <DialogDescription>{t("dialog.description")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">选择栏目</label>
+          <label className="text-sm font-medium">
+            {t("dialog.selectLabel")}
+          </label>
           <TreeSelect
             className="w-full"
             treeData={options as DataNode[]}
@@ -231,7 +231,7 @@ export function Contribute() {
             getPopupContainer={(trigger) =>
               trigger?.parentElement ?? document.body
             }
-            placeholder="请选择（可搜索）"
+            placeholder={t("dialog.selectPlaceholder")}
             allowClear
             treeLine
           />
@@ -239,29 +239,34 @@ export function Contribute() {
 
         {selectedKey.endsWith(CREATE_SUBDIR_SUFFIX) && (
           <div className="space-y-1">
-            <label className="text-sm font-medium">新建二级子栏目名称</label>
+            <label className="text-sm font-medium">
+              {t("dialog.subdirLabel")}
+            </label>
             <Input
               placeholder="e.g. foundation-models"
               value={newSub}
               onChange={(e) => setNewSub(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              将创建路径：{selectedKey.split("/")[0]} /{" "}
-              {sanitizedSubdir || "<未填写>"}
+              {t("dialog.subdirPathPrefix")}
+              {selectedKey.split("/")[0]} /{" "}
+              {sanitizedSubdir || t("dialog.subdirEmpty")}
             </p>
           </div>
         )}
 
         <div className="grid gap-2">
           <label className="text-sm font-medium">
-            文章标题（front-matter）
+            {t("dialog.articleTitleLabel")}
           </label>
           <Input
             placeholder="e.g. A Gentle Intro to Transformers"
             value={articleTitle}
             onChange={(e) => setArticleTitle(e.target.value)}
           />
-          <label className="text-sm font-medium">文件名（必填）</label>
+          <label className="text-sm font-medium">
+            {t("dialog.filenameLabel")}
+          </label>
           <Input
             placeholder="e.g. intro-to-transformers"
             value={articleFile}
@@ -278,11 +283,13 @@ export function Contribute() {
 
         <DialogFooter className="flex items-center justify-between">
           <div className="text-xs text-muted-foreground">
-            路径预览：
-            <code className="font-mono">{finalDirPath || "(未选择)"}</code>
+            {t("dialog.pathPreview")}
+            <code className="font-mono">
+              {finalDirPath || t("dialog.pathEmpty")}
+            </code>
           </div>
           <Button onClick={handleOpenGithub} disabled={!canProceed}>
-            继续在 GitHub 新建页面 <ExternalLink className="ml-2 h-4 w-4" />
+            {t("dialog.submit")} <ExternalLink className="ml-2 h-4 w-4" />
           </Button>
         </DialogFooter>
       </DialogContent>

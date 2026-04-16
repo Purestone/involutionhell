@@ -1,0 +1,403 @@
+{
+  "header": {
+    "nav": {
+      "docs": "文档",
+      "rank": "排行榜",
+      "community": "社区",
+      "contact": "联系"
+    }
+  },
+  "hero": {
+    "mission": "一个由开发者自发组织、免费开放的学习社区。降低门槛，避免无意义内卷，专注真实进步与乐趣。我们相信知识不应成为枷锁，而应是通往自由的阶梯。",
+    "cta": {
+      "access": "访问文章",
+      "guideAriaLabel": "查看投稿指南"
+    },
+    "archivesLabel": "归档分类",
+    "join": {
+      "title": "Join the Resistance",
+      "body": "Connect with thousands of developers who are reclaiming their passion for technology."
+    },
+    "categories": {
+      "ai": {
+        "title": "AI",
+        "desc": "基础数学、LLM、训练与推理、评测、数据集等"
+      },
+      "cs": {
+        "title": "Computer Science",
+        "desc": "数据结构、算法与基础计算机科学知识"
+      },
+      "jobs": {
+        "title": "笔试面经",
+        "desc": "可以给我一份工作吗？我什么都可以做！"
+      },
+      "community": {
+        "title": "群友分享",
+        "desc": "群友写的捏"
+      }
+    }
+  },
+  "footer": {
+    "brand": "一个由开发者自发组织的、完全免费且开放的学习社区。我们相信通过集体协作与开放共享，可以打破技术垄断，创造一个更公平的学习环境。",
+    "a11y": {
+      "github": "访问 GitHub",
+      "discord": "加入 Discord 社区"
+    }
+  },
+  "notFound": {
+    "heading": "页面未找到",
+    "body": "您寻找的页面可能已被移除、更名或暂时无法访问。",
+    "cta": "返回首页"
+  },
+  "login": {
+    "heading": "登录",
+    "subheading": "请登录以访问受保护的页面"
+  },
+  "settings": {
+    "theme": {
+      "label": "主题",
+      "light": "浅色",
+      "dark": "深色",
+      "system": "跟随系统"
+    },
+    "language": {
+      "label": "语言"
+    },
+    "ai": {
+      "label": "AI 默认提供商",
+      "intern": "书生（InternLM）"
+    },
+    "save": "保存设置",
+    "saving": "保存中...",
+    "toast": {
+      "tokenMissing": "登录态丢失，请重新登录",
+      "tokenMissingSave": "登录态丢失，请重新登录后再保存",
+      "loadError": "无法加载偏好设置，已显示默认值",
+      "saveSuccess": "偏好设置已保存",
+      "saveFail": "保存失败，请稍后重试",
+      "fetchFail": "获取偏好失败"
+    }
+  },
+  "signIn": {
+    "button": "登录"
+  },
+  "assistant": {
+    "welcome": {
+      "greeting": "你好！",
+      "prompt": "今天有什么可以帮你的吗？"
+    },
+    "suggestions": {
+      "label": "建议提问",
+      "thinking": "正在思考后续问题...",
+      "defaults": {
+        "summarize": {
+          "title": "总结本文",
+          "label": "内容要点",
+          "action": "请帮我总结一下当前页面的主要内容和要点"
+        },
+        "llm": {
+          "title": "什么是基座大模型",
+          "label": "概念解释",
+          "action": "什么是基座大模型？请详细解释一下"
+        },
+        "concept": {
+          "title": "解释技术概念",
+          "label": "深入理解",
+          "action": "请解释一下这个页面中提到的核心技术概念"
+        },
+        "learning": {
+          "title": "学习建议",
+          "label": "如何入门",
+          "action": "基于当前内容，你能给出一些学习建议和入门路径吗？"
+        }
+      }
+    },
+    "settings": {
+      "title": "AI 助手设置",
+      "provider": {
+        "label": "AI Provider"
+      },
+      "apiKey": {
+        "save": "保存 API Key 到本地存储",
+        "warning": {
+          "title": "安全提示",
+          "plaintext": "API Key 将以明文形式存储在浏览器的 localStorage 中",
+          "access": "任何能访问此浏览器的人都可能获取您的 API Key",
+          "shared": "请勿在公用电脑或共享设备上勾选此选项",
+          "rotate": "建议定期更换 API Key 以提高安全性"
+        }
+      },
+      "intern": {
+        "notice": "感谢上海AILab的书生大模型对本项目的算力支持，Intern-AI 模型已预配置，无需提供 API Key。"
+      }
+    }
+  },
+  "editor": {
+    "pageTitle": "文章编辑器",
+    "heading": "编辑器"
+  },
+  "contribute": {
+    "button": "投稿",
+    "dialog": {
+      "title": "我要投稿",
+      "description": "选择栏目（单选、可搜索；一级仅用于展开），或在一级下新建二级子栏目，然后跳转到 GitHub 新建文章。",
+      "selectLabel": "选择栏目",
+      "selectPlaceholder": "请选择（可搜索）",
+      "subdirLabel": "新建二级子栏目名称",
+      "subdirPathPrefix": "将创建路径：",
+      "subdirEmpty": "<未填写>",
+      "articleTitleLabel": "文章标题（front-matter）",
+      "filenameLabel": "文件名（必填）",
+      "filenameError": {
+        "empty": "请填写文件名。",
+        "invalid": "文件名仅支持字母、数字、连字符或下划线，并需以字母或数字开头。"
+      },
+      "pathPreview": "路径预览：",
+      "pathEmpty": "(未选择)",
+      "submit": "继续在 GitHub 新建页面"
+    },
+    "guideAriaLabel": "查看投稿指南"
+  },
+  "search": {
+    "placeholder": "搜索文档...",
+    "noResults": "未找到相关文档"
+  },
+  "feedback": {
+    "question": "这篇文章有帮助吗？",
+    "thanks": "感谢您的反馈！"
+  },
+  "hotDocs": {
+    "subtitle": "本周最热",
+    "more": "更多",
+    "empty": "暂无数据"
+  },
+  "floatWindow": {
+    "minimize": "Minimize",
+    "close": "Close",
+    "breaking": "Breaking",
+    "latest": "Latest",
+    "watchReplay": "Watch Replay",
+    "readMore": "Read More"
+  },
+  "ticker": {
+    "eventActive": "Event Active",
+    "archivesAvailable": "Archives Available"
+  },
+  "contributors": {
+    "heading": "贡献者"
+  },
+  "profile": {
+    "dossier": "User Dossier",
+    "volumeIssue": "Vol. 1 Issue {id}",
+    "fullRank": "总排行榜 →",
+    "editProfile": "编辑主页 →",
+    "sec": {
+      "profile": "SEC. PROFILE · 001"
+    },
+    "stats": {
+      "docs": "文档贡献",
+      "commits": "累计 Commits",
+      "points": "积分"
+    },
+    "empty": {
+      "title": "还没填个人项目和最近在读的论文",
+      "subtitle": "下方仍会显示 GitHub repos 和文档贡献"
+    },
+    "follow": {
+      "followers": "粉丝",
+      "following": "关注",
+      "signInToFollow": "登录后关注",
+      "follow": "+ 关注",
+      "unfollow": "已关注"
+    },
+    "activity": {
+      "sec": "SEC. ACTIVITY · 005",
+      "heading": "活跃度 · 最近 52 周",
+      "stats": "{days} 天有贡献 · 合计 {commits} commits",
+      "legend": {
+        "less": "少",
+        "more": "多"
+      },
+      "weekday": {
+        "mon": "周一",
+        "thu": "周四",
+        "sat": "周六"
+      },
+      "month": {
+        "1": "1月",
+        "2": "2月",
+        "3": "3月",
+        "4": "4月",
+        "5": "5月",
+        "6": "6月",
+        "7": "7月",
+        "8": "8月",
+        "9": "9月",
+        "10": "10月",
+        "11": "11月",
+        "12": "12月"
+      }
+    },
+    "repos": {
+      "sec": "SEC. REPOS · 006",
+      "heading": "GitHub 仓库",
+      "subtitle": "公开仓库 · 按 stars + 更新时间排序",
+      "count": "{n} 个项目"
+    },
+    "docs": {
+      "sec": "SEC. DOCS · 007",
+      "heading": "贡献过的文档",
+      "count": "{n} 篇 · 合计 {commits} commits",
+      "showMore": "展开剩余 {n} 篇 ↓"
+    },
+    "card": {
+      "kind": {
+        "project": "项目",
+        "paper": "论文",
+        "doc": "文档"
+      },
+      "view": "查看 →"
+    },
+    "edit": {
+      "pageTitle": "编辑个人主页",
+      "pageHeader": "Edit · User Dossier",
+      "loading": "正在加载...",
+      "auth": {
+        "required": "需要登录后才能编辑个人主页。",
+        "signIn": "Sign In →",
+        "notYours": "这不是你的主页（URL 标识 {id}），只有本人可以编辑。",
+        "goMine": "去我的主页 →"
+      },
+      "intro": {
+        "label": "About this page",
+        "body": "这里填的内容会显示在你的个人主页 /u/{id} 上，让别人知道你是谁、做什么、在读什么。全部字段都是可选，填哪个显示哪个；不填主页就只显示 GitHub 基础信息 + 贡献统计。"
+      },
+      "cta": {
+        "save": "保存 →",
+        "saving": "保存中...",
+        "cancel": "取消"
+      },
+      "status": {
+        "saved": "已保存，返回主页..."
+      },
+      "error": {
+        "noToken": "未检测到登录 token，请重新登录",
+        "http": "保存失败：HTTP {status}",
+        "unknown": "保存出错"
+      },
+      "section": {
+        "add": "+ 新增",
+        "remove": "删除此项"
+      },
+      "sec1": {
+        "title": "SEC. 01 · IDENTITY",
+        "heading": "关于你自己",
+        "description": "一句小标题 + 一段自我介绍，会显示在主页左侧大块最上方。相当于你在站内的名片。",
+        "tagline": {
+          "label": "一句话标签（tagline，80 字以内）",
+          "placeholder": "比如：LLM Safety 方向 · UNSW 在读 / 全栈搞着玩 / 找暑期实习中"
+        },
+        "bio": {
+          "label": "自我介绍（bio，80-200 字较合适）",
+          "placeholder": "你是谁、在做什么、感兴趣的方向。举例：我是 xxx，读研在做 LLM 对齐，平时写写文档和小工具。想认识做 RLHF / 评估 / infra 的朋友。"
+        }
+      },
+      "sec2": {
+        "title": "SEC. 02 · LINKS",
+        "heading": "外部链接",
+        "description": "想让大家跟你联系 / 了解你的其他地方。最多 5 条，会显示在主页左侧大块底部，以小按钮形式展示。",
+        "label": {
+          "placeholder": "按钮上显示的字，如 Blog / Twitter / 知乎"
+        },
+        "url": {
+          "placeholder": "https://your-blog.com"
+        }
+      },
+      "sec3": {
+        "title": "SEC. 03 · PROJECTS",
+        "heading": "你自己的项目",
+        "description": "想展示的个人项目 / 玩具 / 开源作品。GitHub 公开 repos 会自动出现在主页底部，这里填 GitHub 里没有或想单独强调的。最多 8 条。",
+        "titleField": {
+          "placeholder": "项目名，如 involutionhell.com"
+        },
+        "desc": {
+          "placeholder": "一两句说明做了什么、解决什么问题。hover 时会展开显示"
+        },
+        "url": {
+          "placeholder": "项目链接（GitHub repo / 产品首页）"
+        },
+        "tags": {
+          "placeholder": "技术栈标签，逗号分隔。例如 TypeScript, Next.js, LLM"
+        }
+      },
+      "sec4": {
+        "title": "SEC. 04 · PAPERS",
+        "heading": "最近在读 / 推荐的论文",
+        "description": "你最近读到觉得值得分享的论文（学术 / 技术博客都行）。可以填 Zotero itemKey 自动补齐信息，也可以手动填标题作者年份。不是必填，没有就留空。",
+        "itemKey": {
+          "placeholder": "Zotero itemKey（可选，填了会自动拉元信息；不填就手填下面字段）"
+        },
+        "titleField": {
+          "placeholder": "论文标题"
+        },
+        "authors": {
+          "placeholder": "作者（Alice, Bob）"
+        },
+        "year": {
+          "placeholder": "年份"
+        },
+        "url": {
+          "placeholder": "链接"
+        },
+        "abstract": {
+          "placeholder": "摘要或一句话评价"
+        }
+      }
+    }
+  },
+  "userMenu": {
+    "profile": "我的主页",
+    "settings": "设置",
+    "switchGithub": "切换 GitHub 账号（将在新标签页登出 GitHub）",
+    "signOut": "Sign out"
+  },
+  "docHistory": {
+    "heading": "最近更新",
+    "empty": "暂无更新记录",
+    "loadError": "无法加载历史",
+    "timeAgo": {
+      "justNow": "刚刚",
+      "minutesAgo": "{n} 分钟前",
+      "hoursAgo": "{n} 小时前",
+      "daysAgo": "{n} 天前",
+      "monthsAgo": "{n} 个月前",
+      "yearsAgo": "{n} 年前"
+    }
+  },
+  "docShare": {
+    "ariaLabel": "复制页面链接",
+    "copy": "复制链接",
+    "copied": "已复制"
+  },
+  "editorMetadata": {
+    "heading": "文章信息",
+    "title": {
+      "label": "标题",
+      "placeholder": "输入文章标题..."
+    },
+    "description": {
+      "label": "描述",
+      "placeholder": "简短描述文章内容..."
+    },
+    "tags": {
+      "label": "标签",
+      "hint": "逗号分隔",
+      "placeholder": "算法, 系统设计, React"
+    },
+    "filename": {
+      "label": "文件名",
+      "placeholder": "my-article",
+      "hint": "自动添加 .md 后缀"
+    }
+  }
+}

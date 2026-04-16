@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 interface TopDocDto {
   path: string;
@@ -7,10 +8,6 @@ interface TopDocDto {
 }
 
 async function fetchTopDocs(): Promise<TopDocDto[]> {
-  // 直连 Java 后端 /analytics/top-docs（GA4 数据 + Caffeine 缓存），
-  // Next 不再做聚合，把 CPU 留给后端。
-  // BACKEND_URL 不设置时不做任何硬编码 fallback：不同开发者端口不一致（8080/8081/其他），
-  // 生产环境必须显式配置，本地未配也直接 no-op 返回空，而不是假装连 8081。
   const backendUrl = process.env.BACKEND_URL;
   if (!backendUrl) {
     if (process.env.NODE_ENV !== "production") {
@@ -27,7 +24,6 @@ async function fetchTopDocs(): Promise<TopDocDto[]> {
     );
     if (!res.ok) return [];
     const json = await res.json();
-    // 后端 ApiResponse<List<TopDocDto>> 结构：{ success, data: [...] }
     return Array.isArray(json?.data) ? json.data : [];
   } catch {
     return [];
@@ -36,6 +32,7 @@ async function fetchTopDocs(): Promise<TopDocDto[]> {
 
 export async function HotDocsPreview() {
   const docs = await fetchTopDocs();
+  const t = await getTranslations("hotDocs");
 
   return (
     <div className="border border-[var(--foreground)] p-6 bg-[var(--background)]">
@@ -45,7 +42,7 @@ export async function HotDocsPreview() {
             Hot This Week
           </div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
-            本周最热
+            {t("subtitle")}
           </div>
         </div>
         <Link
@@ -63,7 +60,7 @@ export async function HotDocsPreview() {
       </div>
 
       {docs.length === 0 ? (
-        <p className="font-mono text-xs text-neutral-400">暂无数据</p>
+        <p className="font-mono text-xs text-neutral-400">{t("empty")}</p>
       ) : (
         <ol className="flex flex-col gap-4">
           {docs.map((doc, idx) => (

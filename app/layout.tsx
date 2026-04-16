@@ -12,7 +12,8 @@ import { AuthProvider } from "@/lib/use-auth";
 // import { SearchWrapper } from "@/app/components/SearchWrapper";
 import { CustomSearchDialog } from "@/app/components/CustomSearchDialog";
 import { cookies } from "next/headers";
-import { LocaleProvider } from "@/lib/i18n/client";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -133,8 +134,10 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const locale = cookieStore.get("locale")?.value === "en" ? "en" : "zh";
   const searchApi = `/search.${locale}.json`;
+  const messages = await getMessages();
+  const htmlLang = locale === "en" ? "en" : "zh-CN";
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang={htmlLang} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -211,11 +214,11 @@ export default async function RootLayout({
       >
         <div className="site-bg site-bg--stars" aria-hidden />
         {/*
-          LocaleProvider 把服务端读出的 locale 注入客户端 Context，
-          客户端组件通过 useT() 拿到翻译函数，保持 SSR/CSR 一致，
+          NextIntlClientProvider 把服务端选定的 locale 和完整 messages 传给客户端，
+          客户端组件通过 useTranslations('ns') 拿到翻译函数，保持 SSR/CSR 一致，
           不在客户端重新读 cookie 避免水合抖动。
         */}
-        <LocaleProvider locale={locale}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider defaultTheme="dark" storageKey="ih-theme">
             <AuthProvider>
               <RootProvider
@@ -235,7 +238,7 @@ export default async function RootLayout({
               </RootProvider>
             </AuthProvider>
           </ThemeProvider>
-        </LocaleProvider>
+        </NextIntlClientProvider>
         {/* 谷歌分析 */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-ED4GVN8YVW"

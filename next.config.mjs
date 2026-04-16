@@ -16,7 +16,7 @@ const withMDX = createMDX({
   configPath: "source.config.ts",
   // mdxOptions 留空，让 source.config.ts 统一管理所有 remark/rehype 插件
 });
-const withNextIntl = createNextIntlPlugin("./i18n.ts");
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 /** @type {import('next').NextConfig} */
 const config = {

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import ZoteroFeedLazy from "@/app/components/ZoteroFeedLazy";
 import { Contribute } from "@/app/components/Contribute";
 import Image from "next/image";
@@ -9,26 +10,28 @@ import { HotDocsPreview } from "@/app/components/HotDocsPreview";
 import leaderboardData from "@/generated/site-leaderboard.json";
 import { MAINTAINERS } from "@/lib/admins";
 
-export function Hero() {
+export async function Hero() {
+  const t = await getTranslations("hero");
+
   const categories: { title: string; desc: string; href: string }[] = [
     {
-      title: "AI",
-      desc: "基础数学、LLM、训练与推理、评测、数据集等",
+      title: t("categories.ai.title"),
+      desc: t("categories.ai.desc"),
       href: "/docs/ai",
     },
     {
-      title: "Computer Science",
-      desc: "数据结构、算法与基础计算机科学知识",
+      title: t("categories.cs.title"),
+      desc: t("categories.cs.desc"),
       href: "/docs/computer-science",
     },
     {
-      title: "笔试面经",
-      desc: "可以给我一份工作吗？我什么都可以做！",
+      title: t("categories.jobs.title"),
+      desc: t("categories.jobs.desc"),
       href: "/docs/jobs/interview-prep/bq",
     },
     {
-      title: "群友分享",
-      desc: "群友写的捏",
+      title: t("categories.community.title"),
+      desc: t("categories.community.desc"),
       href: "/docs/CommunityShare",
     },
   ];
@@ -54,7 +57,7 @@ export function Hero() {
 
             <div className="max-w-2xl">
               <p className="text-xl md:text-2xl font-body leading-relaxed text-justify drop-cap text-[var(--foreground)]">
-                一个由开发者自发组织、免费开放的学习社区。降低门槛，避免无意义内卷，专注真实进步与乐趣。我们相信知识不应成为枷锁，而应是通往自由的阶梯。
+                {t("mission")}
               </p>
 
               <div className="mt-12">
@@ -79,21 +82,19 @@ export function Hero() {
             </div>
 
             <div className="border border-[var(--foreground)] p-6 bg-[var(--foreground)] text-[var(--background)]">
-              <h3 className="font-serif text-2xl mb-4">Join the Resistance</h3>
+              <h3 className="font-serif text-2xl mb-4">{t("join.title")}</h3>
               <p className="font-body text-sm mb-6 opacity-80">
-                Connect with thousands of developers who are reclaiming their
-                passion for technology.
+                {t("join.body")}
               </p>
               <Link
                 href="/docs/ai"
                 className="block w-full"
-                // Umami 埋点: Hero CTA 按钮点击
                 data-umami-event="navigation_click"
                 data-umami-event-region="hero_cta"
                 data-umami-event-label="Access Articles"
               >
                 <button className="w-full py-3 border border-[var(--background)] font-sans text-xs uppercase tracking-widest hover:bg-[var(--background)] hover:text-[var(--foreground)] transition-all cursor-pointer">
-                  Access Articles / 访问文章
+                  {t("cta.access")}
                 </button>
               </Link>
             </div>
@@ -103,7 +104,7 @@ export function Hero() {
         {/* Top-level directories - Grid with shared borders */}
         <div className="mt-16 border-t-4 border-[var(--foreground)] transition-colors duration-300">
           <div className="py-4 font-mono text-xs uppercase tracking-widest border-b border-[var(--foreground)] text-[var(--foreground)]">
-            Classified Archives / 归档分类
+            {t("archivesLabel")}
           </div>
           <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
             {categories.map((c, idx) => (
@@ -118,7 +119,6 @@ export function Hero() {
                 <Link
                   href={c.href}
                   className="p-8 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors h-full flex flex-col hard-shadow-hover"
-                  // Umami 埋点: 首页分类卡片点击
                   data-umami-event="navigation_click"
                   data-umami-event-region="home_categories"
                   data-umami-event-label={c.title}

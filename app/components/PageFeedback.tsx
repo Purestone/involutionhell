@@ -2,18 +2,19 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/app/components/ui/button";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 
 export function PageFeedback() {
   const pathname = usePathname();
+  const t = useTranslations("feedback");
   const [voted, setVoted] = useState<"helpful" | "not_helpful" | null>(null);
 
   const handleVote = (vote: "helpful" | "not_helpful") => {
     if (voted) return;
 
     if (window.umami) {
-      // Umami 埋点: 记录用户是否有帮助的投票
       window.umami.track("feedback_submit", {
         page: pathname,
         vote,
@@ -25,7 +26,7 @@ export function PageFeedback() {
   if (voted) {
     return (
       <div className="flex items-center gap-2 text-sm text-neutral-500 mt-8 py-4 border-t border-[var(--foreground)] font-serif italic">
-        <span>Thanks for your feedback! / 感谢您的反馈！</span>
+        <span>{t("thanks")}</span>
       </div>
     );
   }
@@ -33,7 +34,7 @@ export function PageFeedback() {
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 py-4 border-t border-[var(--foreground)] mt-8">
       <span className="text-sm font-medium text-[var(--foreground)] font-serif">
-        Was this page helpful? / 这篇文章有帮助吗？
+        {t("question")}
       </span>
       <div className="flex gap-2">
         <Button

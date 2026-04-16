@@ -2,9 +2,9 @@
 
 import { useEffect, useReducer } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import type { HistoryItem } from "@/app/types/docs-history";
 
-// author 缺失时用 1x1 透明占位图，避免 <Image> 收到空 src 报错
 const FALLBACK_AVATAR =
   "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><rect width='24' height='24' fill='%23e5e7eb'/></svg>";
 
@@ -12,9 +12,6 @@ interface DocHistoryPanelProps {
   path: string;
 }
 
-// 将 items / error / loading 合并成一个 discriminated union，
-// 避免 effect 里多次同步 setState 触发 react-hooks/set-state-in-effect
-// 同时天然保证三种状态互斥（不会同时出现"错误提示 + 旧列表"）
 type State =
   | { status: "loading" }
   | { status: "ok"; items: HistoryItem[] }
@@ -31,22 +28,6 @@ function reducer(_: State, action: Action): State {
   return { status: "error", message: action.message };
 }
 
-// 将 ISO 日期转为相对时间描述（中文）
-function relativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const minutes = Math.floor(diff / 60_000);
-  if (minutes < 1) return "刚刚";
-  if (minutes < 60) return `${minutes} 分钟前`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} 小时前`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days} 天前`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months} 个月前`;
-  return `${Math.floor(months / 12)} 年前`;
-}
-
-// 骨架屏占位行
 function SkeletonRow() {
   return (
     <div className="flex items-center gap-3 py-2.5 animate-pulse">
@@ -61,10 +42,23 @@ function SkeletonRow() {
 
 export function DocHistoryPanel({ path }: DocHistoryPanelProps) {
   const [state, dispatch] = useReducer(reducer, { status: "loading" });
+  const t = useTranslations("docHistory");
+
+  function relativeTime(dateStr: string): string {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const minutes = Math.floor(diff / 60_000);
+    if (minutes < 1) return t("timeAgo.justNow");
+    if (minutes < 60) return t("timeAgo.minutesAgo", { n: minutes });
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return t("timeAgo.hoursAgo", { n: hours });
+    const days = Math.floor(hours / 24);
+    if (days < 30) return t("timeAgo.daysAgo", { n: days });
+    const months = Math.floor(days / 30);
+    if (months < 12) return t("timeAgo.monthsAgo", { n: months });
+    return t("timeAgo.yearsAgo", { n: Math.floor(months / 12) });
+  }
 
   useEffect(() => {
-    // 用 dispatch 而不是多次 setState，规避 react-hooks/set-state-in-effect lint；
-    // path 变化时立刻回到 loading，避免"错误提示 + 旧列表"并存
     dispatch({ type: "fetch" });
     let cancelled = false;
     fetch(`/api/docs/history?path=${encodeURIComponent(path)}`)
@@ -76,28 +70,27 @@ export function DocHistoryPanel({ path }: DocHistoryPanelProps) {
         } else {
           dispatch({
             type: "error",
-            message: json.error ?? "无法加载历史",
+            message: json.error ?? t("loadError"),
           });
         }
       })
       .catch(() => {
         if (!cancelled) {
-          dispatch({ type: "error", message: "无法加载历史" });
+          dispatch({ type: "error", message: t("loadError") });
         }
       });
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path]);
 
   return (
     <div className="font-serif">
-      {/* 报纸风格标题 */}
       <h2 className="text-xs font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-3 border-b border-neutral-200 dark:border-neutral-700 pb-2">
-        最近更新
+        {t("heading")}
       </h2>
 
-      {/* 加载中 */}
       {state.status === "loading" && (
         <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
           <SkeletonRow />
@@ -106,21 +99,18 @@ export function DocHistoryPanel({ path }: DocHistoryPanelProps) {
         </div>
       )}
 
-      {/* 错误 */}
       {state.status === "error" && (
         <p className="text-xs font-mono text-neutral-400 dark:text-neutral-500 py-2">
           {state.message}
         </p>
       )}
 
-      {/* 空结果 */}
       {state.status === "ok" && state.items.length === 0 && (
         <p className="text-xs font-mono text-neutral-400 dark:text-neutral-500 py-2">
-          暂无更新记录
+          {t("empty")}
         </p>
       )}
 
-      {/* 历史列表 */}
       {state.status === "ok" && state.items.length > 0 && (
         <ol className="divide-y divide-neutral-100 dark:divide-neutral-800">
           {state.items.map((item) => (
@@ -131,7 +121,6 @@ export function DocHistoryPanel({ path }: DocHistoryPanelProps) {
                 rel="noopener noreferrer"
                 className="flex items-start gap-3 py-2.5 group hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors px-1 -mx-1"
               >
-                {/* 头像 */}
                 <Image
                   src={item.avatarUrl || FALLBACK_AVATAR}
                   alt={item.authorLogin}
@@ -142,11 +131,9 @@ export function DocHistoryPanel({ path }: DocHistoryPanelProps) {
                 />
 
                 <div className="flex-1 min-w-0">
-                  {/* commit message，截断超长内容 */}
                   <p className="text-sm leading-snug text-neutral-800 dark:text-neutral-200 truncate group-hover:text-[#CC0000] transition-colors">
                     {item.message}
                   </p>
-                  {/* 作者 + 时间，monospace 风格 */}
                   <p className="text-[11px] font-mono text-neutral-400 dark:text-neutral-500 mt-0.5">
                     {item.authorName}
                     <span className="mx-1 opacity-40">·</span>
