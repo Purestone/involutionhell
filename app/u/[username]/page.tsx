@@ -8,6 +8,7 @@ import { Footer } from "@/app/components/Footer";
 import { ProfileCard } from "./ProfileCard";
 import { EditLinkIfOwner } from "./EditLinkIfOwner";
 import { ActivityHeatmap } from "./ActivityHeatmap";
+import { FollowButton } from "./FollowButton";
 
 interface UserView {
   id: number;
@@ -215,6 +216,8 @@ export default async function UserProfilePage({ params }: Param) {
                 <Stat label="累计 Commits" value={commits} />
                 <Stat label="积分" value={points} />
               </div>
+              {/* 关注按钮 + 粉丝/关注数，客户端动态拉 */}
+              <FollowButton identifier={username} targetUserId={user.id} />
               {links.length > 0 && (
                 <div className="border-t border-[var(--foreground)] pt-4 flex flex-wrap gap-2">
                   {links.slice(0, 5).map((link) => (
