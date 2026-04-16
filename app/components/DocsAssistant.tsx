@@ -465,11 +465,15 @@ function deriveAssistantError(
         ? message
         : `The ${providerLabel} API key looks incorrect. Update it in settings and try again.`;
   } else if (statusCode === 429) {
+    // 优先用服务端返回的中文友好提示（rate_limited / quota_exhausted），
+    // 只在服务端没给消息时才兜底到默认英文文案
     friendlyMessage =
-      "The provider is rate limiting requests. Please wait and try again.";
+      message && message.length > 0 ? message : "请求太频繁，请稍等片刻再试。";
   } else if (statusCode && statusCode >= 500) {
     friendlyMessage =
-      "The AI provider is currently unavailable. Please try again soon.";
+      message && message.length > 0
+        ? message
+        : "AI 服务暂时不可用，请稍后再试。";
   }
 
   return {

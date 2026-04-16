@@ -47,6 +47,8 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@types/mdx": "^2.0.13",
     "@types/pg": "^8.16.0",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.37.0",
     "@vercel/speed-insights": "^1.2.0",
     "ai": "^6.0.148",
     "antd": "^5.27.4",

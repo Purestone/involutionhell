@@ -3,6 +3,7 @@ import { streamText, UIMessage, convertToModelMessages } from "ai";
 import { getModel, requiresApiKey, type AIProvider } from "@/lib/ai/models";
 import { buildSystemMessage } from "@/lib/ai/prompt";
 import { source } from "@/lib/source";
+import { limitChat, rateLimitResponse } from "@/lib/rate-limit";
 import fs from "fs/promises";
 import path from "path";
 
@@ -29,6 +30,12 @@ interface ChatRequest {
 import { resolveUserId } from "@/lib/server-auth";
 
 export async function POST(req: Request) {
+  // 0. Rate limit：免费模型 GLM-4.6V-Flash 并发极低（≈ 5），
+  //    单用户开几个 tab 就能打爆。per-IP 滑动窗口限流先挡一层。
+  //    （L2 防护；如果 Upstash env 漏配会自动降级为放行+warn）
+  const rl = await limitChat(req, false);
+  if (!rl.success) return rateLimitResponse(rl);
+
   // 1. 克隆请求，因为如果代理失败，后面的代码还需要读取 req.json()
   const proxyReq = req.clone();
 
@@ -234,11 +241,74 @@ export async function POST(req: Request) {
       return Response.json({ error: error.message }, { status: 400 });
     }
 
+    // 识别上游（智谱 GLM）限流/欠费/鉴权错误，给出结构化 code 让前端友好提示。
+    // 智谱业务码参考：
+    //   1302 - 接口请求并发超额（与 HTTP 429 对应）
+    //   1113 - 账户余额不足 / 免费额度耗尽
+    //   1001/1002/1003 - 鉴权失败
+    const mapped = mapUpstreamError(error);
+    if (mapped) {
+      return Response.json(
+        { error: mapped.message, code: mapped.code },
+        { status: mapped.status },
+      );
+    }
+
     return Response.json(
       { error: "Failed to process chat request" },
       { status: 500 },
     );
   }
+}
+
+interface MappedUpstreamError {
+  status: number;
+  code: "rate_limited" | "quota_exhausted" | "upstream_auth" | "upstream_down";
+  message: string;
+}
+
+function mapUpstreamError(err: unknown): MappedUpstreamError | null {
+  if (!err) return null;
+  const raw =
+    err instanceof Error
+      ? `${err.message} ${(err as Error & { stack?: string }).stack ?? ""}`
+      : typeof err === "string"
+        ? err
+        : JSON.stringify(err);
+
+  // GLM/OpenAI-compatible 的错误通常把 HTTP status 和业务码都塞在 message 里
+  const hasStatus429 = /\b429\b|rate[-_ ]?limit|too many requests/i.test(raw);
+  const has1302 = /\b1302\b|并发超额|速率限制|控制请求频率/.test(raw);
+  const has1113 = /\b1113\b|余额不足|额度.*耗尽|quota.*exhaust/i.test(raw);
+  const hasAuth =
+    /\b1001\b|\b1002\b|\b1003\b|\b401\b|unauthorized|invalid.*api.*key/i.test(
+      raw,
+    );
+
+  if (has1302 || hasStatus429) {
+    return {
+      status: 429,
+      code: "rate_limited",
+      message: "AI 服务被挤爆了，排队中，请 30 秒后再试。(上游并发限流)",
+    };
+  }
+  if (has1113) {
+    return {
+      status: 503,
+      code: "quota_exhausted",
+      message:
+        "免费模型今日额度已用完，请明天再来，或在设置里切到你自己的 OpenAI/Gemini。",
+    };
+  }
+  if (hasAuth) {
+    return {
+      status: 502,
+      code: "upstream_auth",
+      message:
+        "AI 服务密钥配置异常，站点管理员已收到通知。请稍后重试或切换到自有 API Key。",
+    };
+  }
+  return null;
 }
 
 // 提取纯文本内容，过滤掉 MDX 语法

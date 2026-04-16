@@ -395,6 +395,8 @@ const Composer: FC<ComposerProps> = ({
           autoFocus
           aria-label="Message input"
           disabled={!hasActiveKey}
+          // 单条消息硬上限 4000 字符：防 token bomb，保护免费模型额度
+          maxLength={4000}
         />
         <ComposerAction
           canSend={hasActiveKey}
