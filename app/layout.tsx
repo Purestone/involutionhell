@@ -135,8 +135,9 @@ export default async function RootLayout({
   const locale = cookieStore.get("locale")?.value === "en" ? "en" : "zh";
   const searchApi = `/search.${locale}.json`;
   const messages = await getMessages();
+  const htmlLang = locale === "en" ? "en" : "zh-CN";
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang={htmlLang} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -213,8 +214,8 @@ export default async function RootLayout({
       >
         <div className="site-bg site-bg--stars" aria-hidden />
         {/*
-          LocaleProvider 把服务端读出的 locale 注入客户端 Context，
-          客户端组件通过 useT() 拿到翻译函数，保持 SSR/CSR 一致，
+          NextIntlClientProvider 把服务端选定的 locale 和完整 messages 传给客户端，
+          客户端组件通过 useTranslations('ns') 拿到翻译函数，保持 SSR/CSR 一致，
           不在客户端重新读 cookie 避免水合抖动。
         */}
         <NextIntlClientProvider locale={locale} messages={messages}>

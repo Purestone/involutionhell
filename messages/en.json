@@ -155,7 +155,8 @@
       "pathPreview": "Path preview: ",
       "pathEmpty": "(none selected)",
       "submit": "Continue on GitHub"
-    }
+    },
+    "guideAriaLabel": "Contribution Guide"
   },
   "search": {
     "placeholder": "Search docs...",

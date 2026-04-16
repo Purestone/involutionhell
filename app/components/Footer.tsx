@@ -20,36 +20,36 @@ export async function Footer() {
               textClassName="font-serif font-black text-2xl uppercase italic text-[var(--foreground)]"
             />
             <p className="font-body text-neutral-600 dark:text-neutral-400 mb-8 max-w-md text-justify leading-relaxed">
-              {t("tagline")}
+              {t("brand")}
             </p>
             <div className="flex space-x-2">
               <a
                 href="https://github.com/involutionhell"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={t("github.ariaLabel")}
-                title={t("github.ariaLabel")}
+                aria-label={t("a11y.github")}
+                title={t("a11y.github")}
                 data-umami-event="social_click"
                 data-umami-event-platform="github"
                 data-umami-event-location="footer"
                 className="w-12 h-12 flex items-center justify-center border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all text-[var(--foreground)]"
               >
                 <Github className="h-5 w-5" />
-                <span className="sr-only">{t("github.srOnly")}</span>
+                <span className="sr-only">{t("a11y.github")}</span>
               </a>
               <a
                 href="https://discord.com/invite/6CGP73ZWbD"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={t("discord.ariaLabel")}
-                title={t("discord.ariaLabel")}
+                aria-label={t("a11y.discord")}
+                title={t("a11y.discord")}
                 data-umami-event="social_click"
                 data-umami-event-platform="discord"
                 data-umami-event-location="footer"
                 className="w-12 h-12 flex items-center justify-center border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all text-[var(--foreground)]"
               >
                 <MessageCircle className="h-5 w-5" />
-                <span className="sr-only">{t("discord.srOnly")}</span>
+                <span className="sr-only">{t("a11y.discord")}</span>
               </a>
             </div>
           </div>

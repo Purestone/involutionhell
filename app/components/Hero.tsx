@@ -57,7 +57,7 @@ export async function Hero() {
 
             <div className="max-w-2xl">
               <p className="text-xl md:text-2xl font-body leading-relaxed text-justify drop-cap text-[var(--foreground)]">
-                {t("tagline")}
+                {t("mission")}
               </p>
 
               <div className="mt-12">
@@ -94,7 +94,7 @@ export async function Hero() {
                 data-umami-event-label="Access Articles"
               >
                 <button className="w-full py-3 border border-[var(--background)] font-sans text-xs uppercase tracking-widest hover:bg-[var(--background)] hover:text-[var(--foreground)] transition-all cursor-pointer">
-                  {t("cta")}
+                  {t("cta.access")}
                 </button>
               </Link>
             </div>

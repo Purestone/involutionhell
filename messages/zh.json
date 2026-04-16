@@ -155,7 +155,8 @@
       "pathPreview": "路径预览：",
       "pathEmpty": "(未选择)",
       "submit": "继续在 GitHub 新建页面"
-    }
+    },
+    "guideAriaLabel": "查看投稿指南"
   },
   "search": {
     "placeholder": "搜索文档...",
