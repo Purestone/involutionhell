@@ -10,6 +10,7 @@ import { EditLinkIfOwner } from "./EditLinkIfOwner";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { FollowButton } from "./FollowButton";
 import { GithubRepos } from "./GithubRepos";
+import { getServerT } from "@/lib/i18n/server";
 
 interface UserView {
   id: number;
@@ -228,6 +229,7 @@ export default async function UserProfilePage({ params }: Param) {
   const data = await fetchProfile(username);
   if (!data) notFound();
 
+  const t = await getServerT();
   const { user } = data;
   const preferences = data.preferences ?? {};
   const { docs, points, commits, dailyCounts } = findContributions(
@@ -265,7 +267,8 @@ export default async function UserProfilePage({ params }: Param) {
             <div className="flex items-baseline justify-between gap-4 flex-wrap">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-500">
-                  User Dossier · Vol. 1 Issue {user.id}
+                  {t("profile.dossier")} ·{" "}
+                  {t("profile.volumeIssue", { id: user.id })}
                 </div>
                 <h2 className="font-serif text-4xl md:text-5xl font-black uppercase mt-2 tracking-tight text-[var(--foreground)]">
                   {user.displayName || user.username}
@@ -283,7 +286,7 @@ export default async function UserProfilePage({ params }: Param) {
                   href="/rank"
                   className="font-mono text-[11px] uppercase tracking-widest hover:text-[#CC0000] transition-colors flex items-center gap-1"
                 >
-                  Full Rank →
+                  {t("profile.fullRank")}
                 </Link>
               </div>
             </div>
@@ -293,7 +296,7 @@ export default async function UserProfilePage({ params }: Param) {
             {/* 左大块：Identity */}
             <section className="col-span-12 lg:col-span-5 border border-[var(--foreground)] p-8 lg:p-10 flex flex-col gap-6 self-start">
               <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
-                SEC. PROFILE · 001
+                {t("profile.sec.profile")}
               </span>
               {user.avatarUrl ? (
                 <Image
@@ -327,9 +330,9 @@ export default async function UserProfilePage({ params }: Param) {
                 </p>
               )}
               <div className="border-t border-[var(--foreground)] pt-4 grid grid-cols-3 gap-4">
-                <Stat label="文档贡献" value={docs.length} />
-                <Stat label="累计 Commits" value={commits} />
-                <Stat label="积分" value={points} />
+                <Stat label={t("profile.stats.docs")} value={docs.length} />
+                <Stat label={t("profile.stats.commits")} value={commits} />
+                <Stat label={t("profile.stats.points")} value={points} />
               </div>
               {/* 关注按钮 + 粉丝/关注数，客户端动态拉 */}
               <FollowButton identifier={username} targetUserId={user.id} />
@@ -394,10 +397,10 @@ export default async function UserProfilePage({ params }: Param) {
               ))}
               {projects.length === 0 && papers.length === 0 && (
                 <div className="col-span-full border border-dashed border-[var(--foreground)] p-10 text-center text-neutral-500 font-sans text-sm leading-relaxed">
-                  Ta 还没填个人项目和最近在读的论文。
+                  {t("profile.empty.title")}
                   <br />
                   <span className="text-xs text-neutral-400">
-                    （下方仍会显示 GitHub 公开 repos 和文档贡献记录）
+                    {t("profile.empty.subtitle")}
                   </span>
                 </div>
               )}
@@ -423,14 +426,17 @@ export default async function UserProfilePage({ params }: Param) {
               <div className="flex items-baseline justify-between gap-3 flex-wrap border-b border-[var(--foreground)] pb-3">
                 <div>
                   <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
-                    SEC. DOCS · 007
+                    {t("docs.sec")}
                   </div>
                   <h3 className="font-serif text-xl font-black uppercase mt-1 text-[var(--foreground)]">
-                    贡献过的文档
+                    {t("docs.heading")}
                   </h3>
                 </div>
                 <div className="font-mono text-[10px] text-neutral-500">
-                  {docs.length} 篇 · 合计 {commits.toLocaleString()} commits
+                  {t("docs.count", {
+                    n: docs.length,
+                    commits: commits.toLocaleString(),
+                  })}
                 </div>
               </div>
               <ol className="flex flex-col">
@@ -441,7 +447,7 @@ export default async function UserProfilePage({ params }: Param) {
               {docs.length > 10 && (
                 <details className="flex flex-col">
                   <summary className="font-mono text-[10px] uppercase tracking-widest text-[#CC0000] cursor-pointer hover:underline py-2">
-                    展开剩余 {docs.length - 10} 篇 ↓
+                    {t("docs.showMore", { n: docs.length - 10 })}
                   </summary>
                   <ol className="flex flex-col mt-2">
                     {docs.slice(10).map((doc, idx) => (

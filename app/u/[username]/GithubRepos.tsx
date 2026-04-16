@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getServerT } from "@/lib/i18n/server";
 
 interface GithubRepo {
   name: string;
@@ -55,20 +56,24 @@ function fmtDate(iso: string): string {
 export async function GithubRepos({ identifier }: Props) {
   const repos = await fetchRepos(identifier);
   if (repos.length === 0) return null;
+  const t = await getServerT();
 
   return (
     <section className="border border-[var(--foreground)] p-6 lg:p-8 flex flex-col gap-4">
       <div className="flex items-baseline justify-between gap-3 flex-wrap border-b border-[var(--foreground)] pb-3">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
-            SEC. REPOS · 006
+            {t("repos.sec")}
           </div>
           <h3 className="font-serif text-xl font-black uppercase mt-1 text-[var(--foreground)]">
-            GitHub Repositories
+            {t("repos.heading")}
           </h3>
+          <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 mt-1">
+            {t("repos.subtitle")}
+          </div>
         </div>
         <div className="font-mono text-[10px] text-neutral-500">
-          {repos.length} 个项目 · 公开 · 按 stars + 更新时间排序
+          {t("repos.count", { n: repos.length })}
         </div>
       </div>
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -1,3 +1,6 @@
+import { getServerT } from "@/lib/i18n/server";
+import type { MessageKey } from "@/lib/i18n/messages";
+
 /**
  * 活跃度热力图 — GitHub 贡献图风格。
  * 数据源：leaderboard JSON 里的 dailyCounts（build-time 生成，零运行时 DB 查询）。
@@ -29,7 +32,8 @@ function formatDay(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-export function ActivityHeatmap({ dailyCounts }: Props) {
+export async function ActivityHeatmap({ dailyCounts }: Props) {
+  const t = await getServerT();
   // 以今天为右边界，往前 52 周；按周对齐：从上上周日起（GitHub 图的起点）
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
@@ -70,7 +74,9 @@ export function ActivityHeatmap({ dailyCounts }: Props) {
     const d = new Date(first.day);
     const m = d.getUTCMonth();
     if (m !== lastMonth) {
-      monthLabels.push({ col: w, label: `${m + 1}月` });
+      // locale 驱动月份：zh 显示 "1月 2月 ..."，en 显示 "Jan Feb ..."
+      const key = `activity.month.${m + 1}` as MessageKey;
+      monthLabels.push({ col: w, label: t(key) });
       lastMonth = m;
     }
   }
@@ -80,15 +86,17 @@ export function ActivityHeatmap({ dailyCounts }: Props) {
       <div className="flex items-baseline justify-between gap-3 flex-wrap">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
-            SEC. ACTIVITY · 005
+            {t("activity.sec")}
           </div>
           <h3 className="font-serif text-xl font-black uppercase mt-1 text-[var(--foreground)]">
-            活跃度 · 最近 52 周
+            {t("activity.heading")}
           </h3>
         </div>
         <div className="font-mono text-[11px] text-neutral-500">
-          {activeDays.toLocaleString()} 天有贡献 · 合计 {total.toLocaleString()}{" "}
-          commits
+          {t("activity.stats", {
+            days: activeDays.toLocaleString(),
+            commits: total.toLocaleString(),
+          })}
         </div>
       </div>
 
@@ -112,11 +120,11 @@ export function ActivityHeatmap({ dailyCounts }: Props) {
         {/* 周几刻度（周一 / 周四） */}
         <div className="flex flex-col justify-between font-mono text-[9px] text-neutral-500 py-0.5">
           <span></span>
-          <span>周一</span>
+          <span>{t("activity.weekday.mon")}</span>
           <span></span>
-          <span>周四</span>
+          <span>{t("activity.weekday.thu")}</span>
           <span></span>
-          <span>周六</span>
+          <span>{t("activity.weekday.sat")}</span>
           <span></span>
         </div>
 
@@ -158,13 +166,13 @@ export function ActivityHeatmap({ dailyCounts }: Props) {
 
       {/* 图例 */}
       <div className="flex items-center gap-2 font-mono text-[9px] text-neutral-500 self-end">
-        <span>Less</span>
+        <span>{t("activity.legend.less")}</span>
         <span className="w-3 h-3 border border-[var(--foreground)]/30 bg-[var(--background)]" />
         <span className="w-3 h-3 border border-[var(--foreground)]/30 bg-[#CC0000]/20" />
         <span className="w-3 h-3 border border-[var(--foreground)]/30 bg-[#CC0000]/40" />
         <span className="w-3 h-3 border border-[var(--foreground)]/30 bg-[#CC0000]/70" />
         <span className="w-3 h-3 border border-[var(--foreground)]/30 bg-[#CC0000]" />
-        <span>More</span>
+        <span>{t("activity.legend.more")}</span>
       </div>
     </section>
   );

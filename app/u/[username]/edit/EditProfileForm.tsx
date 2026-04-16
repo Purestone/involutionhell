@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/use-auth";
+import { useT } from "@/lib/i18n/client";
 
 interface LinkItem {
   label: string;
@@ -104,6 +105,7 @@ interface Props {
 export function EditProfileForm({ targetIdentifier }: Props) {
   const { user, status } = useAuth();
   const router = useRouter();
+  const t = useT();
 
   const [prefs, setPrefs] = useState<Preferences>(EMPTY_PREFS);
   const [loading, setLoading] = useState(true);
@@ -146,7 +148,7 @@ export function EditProfileForm({ targetIdentifier }: Props) {
     setSaving(true);
     const token = readToken();
     if (!token) {
-      setMessage("未检测到登录 token，请重新登录");
+      setMessage(t("edit.error.noToken"));
       setSaving(false);
       return;
     }
@@ -169,9 +171,9 @@ export function EditProfileForm({ targetIdentifier }: Props) {
         body: JSON.stringify(body),
       });
       if (!res.ok) {
-        setMessage(`保存失败：HTTP ${res.status}`);
+        setMessage(t("edit.error.http", { status: res.status }));
       } else {
-        setMessage("已保存，返回主页...");
+        setMessage(t("edit.status.saved"));
         setTimeout(() => {
           // 跳回自己的个人主页，用 githubId 作为 canonical URL
           const id = user?.githubId ?? user?.username;
@@ -179,25 +181,27 @@ export function EditProfileForm({ targetIdentifier }: Props) {
         }, 600);
       }
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "保存出错");
+      setMessage(err instanceof Error ? err.message : t("edit.error.unknown"));
     } finally {
       setSaving(false);
     }
   }
 
   if (status === "loading" || loading) {
-    return <p className="font-mono text-sm text-neutral-500">正在加载...</p>;
+    return (
+      <p className="font-mono text-sm text-neutral-500">{t("edit.loading")}</p>
+    );
   }
 
   if (status === "unauthenticated") {
     return (
       <div className="border border-[var(--foreground)] p-8">
-        <p className="font-mono text-sm mb-4">需要登录后才能编辑个人主页。</p>
+        <p className="font-mono text-sm mb-4">{t("edit.auth.required")}</p>
         <Link
           href="/login"
           className="inline-block font-mono text-xs uppercase tracking-widest px-4 py-2 border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
         >
-          Sign In →
+          {t("edit.auth.signIn")}
         </Link>
       </div>
     );
@@ -207,14 +211,13 @@ export function EditProfileForm({ targetIdentifier }: Props) {
     return (
       <div className="border border-[var(--foreground)] p-8">
         <p className="font-mono text-sm">
-          这不是你的主页（URL 标识 <code>{targetIdentifier}</code>），
-          只有本人可以编辑。
+          {t("edit.auth.notYours", { id: targetIdentifier })}
         </p>
         <Link
           href={`/u/${user?.githubId ?? user?.username}`}
           className="mt-4 inline-block font-mono text-xs uppercase tracking-widest hover:text-[#CC0000]"
         >
-          去我的主页 →
+          {t("edit.auth.goMine")}
         </Link>
       </div>
     );
@@ -225,42 +228,38 @@ export function EditProfileForm({ targetIdentifier }: Props) {
       {/* 编辑页顶部总说明：告诉用户这个页面都干什么 */}
       <div className="border border-[var(--foreground)] bg-[var(--background)] p-6 text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
         <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 mb-2">
-          About this page
+          {t("edit.intro.label")}
         </div>
         <p>
-          这里填的内容会显示在你的个人主页{" "}
-          <code className="font-mono text-[#CC0000]">
-            /u/{user?.githubId ?? user?.username ?? "你"}
-          </code>{" "}
-          上，让别人知道你是谁、做什么、在读什么。全部字段都是
-          <strong> 可选</strong>，填哪个显示哪个；不填主页就只显示 GitHub
-          基础信息 + 贡献统计。
+          {t("edit.intro.body", {
+            id: String(user?.githubId ?? user?.username ?? "-"),
+          })}
         </p>
       </div>
 
       {/* Section 1: 基础 */}
       <Section
-        title="SEC. 01 · IDENTITY"
-        heading="关于你自己"
-        description="一句小标题 + 一段自我介绍，会显示在主页左侧大块最上方。相当于你在站内的名片。"
+        title={t("edit.sec1.title")}
+        heading={t("edit.sec1.heading")}
+        description={t("edit.sec1.description")}
       >
-        <Field label="一句话标签（tagline，80 字以内）">
+        <Field label={t("edit.sec1.tagline.label")}>
           <input
             type="text"
             value={prefs.tagline}
             onChange={(e) => setPrefs({ ...prefs, tagline: e.target.value })}
             maxLength={80}
-            placeholder="比如：LLM Safety 方向 · UNSW 在读 / 全栈搞着玩 / 找暑期实习中"
+            placeholder={t("edit.sec1.tagline.placeholder")}
             className="w-full border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-mono text-sm"
           />
         </Field>
-        <Field label="自我介绍（bio，80-200 字较合适）">
+        <Field label={t("edit.sec1.bio.label")}>
           <textarea
             value={prefs.bio}
             onChange={(e) => setPrefs({ ...prefs, bio: e.target.value })}
             rows={4}
             maxLength={500}
-            placeholder="你是谁、在做什么、感兴趣的方向。举例：我是 xxx，读研在做 LLM 对齐，平时写写文档和小工具。想认识做 RLHF / 评估 / infra 的朋友。"
+            placeholder={t("edit.sec1.bio.placeholder")}
             className="w-full border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-serif text-sm leading-relaxed resize-y"
           />
         </Field>
@@ -268,29 +267,31 @@ export function EditProfileForm({ targetIdentifier }: Props) {
 
       {/* Section 2: Links */}
       <Section
-        title="SEC. 02 · LINKS"
-        heading="外部链接"
-        description="想让大家跟你联系 / 了解你的其他地方。最多 5 条，会显示在主页左侧大块底部，以小按钮形式展示。"
+        title={t("edit.sec2.title")}
+        heading={t("edit.sec2.heading")}
+        description={t("edit.sec2.description")}
       >
         <RepeatableList
           items={prefs.links}
           onChange={(items) => setPrefs({ ...prefs, links: items })}
           empty={{ label: "", url: "" }}
           maxItems={5}
+          addLabel={t("edit.section.add")}
+          removeLabel={t("edit.section.remove")}
           render={(item, idx, update) => (
             <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-3">
               <input
                 type="text"
                 value={item.label}
                 onChange={(e) => update({ ...item, label: e.target.value })}
-                placeholder="按钮上显示的字，如 Blog / Twitter / 知乎"
+                placeholder={t("edit.sec2.label.placeholder")}
                 className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-mono text-xs uppercase"
               />
               <input
                 type="url"
                 value={item.url}
                 onChange={(e) => update({ ...item, url: e.target.value })}
-                placeholder="https://your-blog.com"
+                placeholder={t("edit.sec2.url.placeholder")}
                 className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-mono text-xs"
               />
             </div>
@@ -300,22 +301,24 @@ export function EditProfileForm({ targetIdentifier }: Props) {
 
       {/* Section 3: Projects */}
       <Section
-        title="SEC. 03 · PROJECTS"
-        heading="你自己的项目"
-        description="想展示的个人项目 / 玩具 / 开源作品。GitHub 公开 repos 会自动出现在主页底部，这里填 GitHub 里没有或想单独强调的。最多 8 条。"
+        title={t("edit.sec3.title")}
+        heading={t("edit.sec3.heading")}
+        description={t("edit.sec3.description")}
       >
         <RepeatableList
           items={prefs.projects}
           onChange={(items) => setPrefs({ ...prefs, projects: items })}
           empty={{ title: "", description: "", url: "", tags: [] }}
           maxItems={8}
+          addLabel={t("edit.section.add")}
+          removeLabel={t("edit.section.remove")}
           render={(item, idx, update) => (
             <div className="flex flex-col gap-2">
               <input
                 type="text"
                 value={item.title}
                 onChange={(e) => update({ ...item, title: e.target.value })}
-                placeholder="项目名，如 involutionhell.com"
+                placeholder={t("edit.sec3.title.placeholder")}
                 className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-serif text-sm font-bold"
               />
               <textarea
@@ -324,14 +327,14 @@ export function EditProfileForm({ targetIdentifier }: Props) {
                   update({ ...item, description: e.target.value })
                 }
                 rows={2}
-                placeholder="一两句说明做了什么、解决什么问题。hover 时会展开显示"
+                placeholder={t("edit.sec3.desc.placeholder")}
                 className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-sans text-xs resize-y"
               />
               <input
                 type="url"
                 value={item.url}
                 onChange={(e) => update({ ...item, url: e.target.value })}
-                placeholder="项目链接（GitHub repo / 产品首页）"
+                placeholder={t("edit.sec3.url.placeholder")}
                 className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-mono text-xs"
               />
               <input
@@ -346,7 +349,7 @@ export function EditProfileForm({ targetIdentifier }: Props) {
                       .filter(Boolean),
                   })
                 }
-                placeholder="技术栈标签，逗号分隔。例如 TypeScript, Next.js, LLM"
+                placeholder={t("edit.sec3.tags.placeholder")}
                 className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-mono text-xs"
               />
             </div>
@@ -354,11 +357,11 @@ export function EditProfileForm({ targetIdentifier }: Props) {
         />
       </Section>
 
-      {/* Section 4: Papers — 重命名为"最近在读 / 推荐的论文"，用户更能理解 */}
+      {/* Section 4: Papers */}
       <Section
-        title="SEC. 04 · PAPERS"
-        heading="最近在读 / 推荐的论文"
-        description="你最近读到觉得值得分享的论文（学术 / 技术博客都行）。可以填 Zotero itemKey 自动补齐信息，也可以手动填标题作者年份。不是必填，没有就留空。"
+        title={t("edit.sec4.title")}
+        heading={t("edit.sec4.heading")}
+        description={t("edit.sec4.description")}
       >
         <RepeatableList
           items={prefs.pinned_papers}
@@ -372,20 +375,22 @@ export function EditProfileForm({ targetIdentifier }: Props) {
             abstract: "",
           }}
           maxItems={8}
+          addLabel={t("edit.section.add")}
+          removeLabel={t("edit.section.remove")}
           render={(item, idx, update) => (
             <div className="flex flex-col gap-2">
               <input
                 type="text"
                 value={item.itemKey}
                 onChange={(e) => update({ ...item, itemKey: e.target.value })}
-                placeholder="Zotero itemKey（可选，填了会自动拉元信息；不填就手填下面字段）"
+                placeholder={t("edit.sec4.itemKey.placeholder")}
                 className="border border-dashed border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-mono text-xs uppercase tracking-wider"
               />
               <input
                 type="text"
                 value={item.title}
                 onChange={(e) => update({ ...item, title: e.target.value })}
-                placeholder="论文标题"
+                placeholder={t("edit.sec4.title.placeholder")}
                 className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-serif text-sm font-bold"
               />
               <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-2">
@@ -393,14 +398,14 @@ export function EditProfileForm({ targetIdentifier }: Props) {
                   type="text"
                   value={item.authors}
                   onChange={(e) => update({ ...item, authors: e.target.value })}
-                  placeholder="作者（Alice, Bob）"
+                  placeholder={t("edit.sec4.authors.placeholder")}
                   className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-mono text-xs"
                 />
                 <input
                   type="text"
                   value={item.year}
                   onChange={(e) => update({ ...item, year: e.target.value })}
-                  placeholder="年份"
+                  placeholder={t("edit.sec4.year.placeholder")}
                   className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-mono text-xs"
                 />
               </div>
@@ -408,14 +413,14 @@ export function EditProfileForm({ targetIdentifier }: Props) {
                 type="url"
                 value={item.url}
                 onChange={(e) => update({ ...item, url: e.target.value })}
-                placeholder="链接"
+                placeholder={t("edit.sec4.url.placeholder")}
                 className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-mono text-xs"
               />
               <textarea
                 value={item.abstract}
                 onChange={(e) => update({ ...item, abstract: e.target.value })}
                 rows={2}
-                placeholder="摘要或一句话评价"
+                placeholder={t("edit.sec4.abstract.placeholder")}
                 className="border border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-sans text-xs resize-y"
               />
             </div>
@@ -430,13 +435,13 @@ export function EditProfileForm({ targetIdentifier }: Props) {
           disabled={saving}
           className="font-mono text-xs uppercase tracking-widest px-6 py-3 border-2 border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)] hover:bg-[#CC0000] hover:border-[#CC0000] transition-colors disabled:opacity-50"
         >
-          {saving ? "Saving..." : "保存 →"}
+          {saving ? t("edit.cta.saving") : t("edit.cta.save")}
         </button>
         <Link
           href={`/u/${user?.githubId ?? user?.username}`}
           className="font-mono text-xs uppercase tracking-widest text-neutral-500 hover:text-[var(--foreground)]"
         >
-          取消
+          {t("edit.cta.cancel")}
         </Link>
         {message && (
           <span className="font-mono text-xs text-neutral-600 dark:text-neutral-400">
@@ -506,12 +511,18 @@ function RepeatableList<T>({
   onChange,
   empty,
   maxItems,
+  addLabel,
+  removeLabel,
   render,
 }: {
   items: T[];
   onChange: (items: T[]) => void;
   empty: T;
   maxItems: number;
+  /** 翻译后的"+ 新增" / "+ Add"，由调用方传入保证 locale 一致 */
+  addLabel: string;
+  /** 翻译后的"删除此项" / "Remove"，由调用方传入 */
+  removeLabel: string;
   render: (
     item: T,
     index: number,
@@ -535,7 +546,7 @@ function RepeatableList<T>({
             onClick={() => onChange(items.filter((_, i) => i !== idx))}
             className="self-end font-mono text-[10px] uppercase tracking-widest text-neutral-500 hover:text-[#CC0000]"
           >
-            删除此项
+            {removeLabel}
           </button>
         </div>
       ))}
@@ -545,7 +556,7 @@ function RepeatableList<T>({
           onClick={() => onChange([...items, empty])}
           className="self-start font-mono text-[10px] uppercase tracking-widest px-3 py-1 border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
         >
-          + 新增
+          {addLabel}
         </button>
       )}
     </div>

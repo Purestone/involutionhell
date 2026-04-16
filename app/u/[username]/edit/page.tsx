@@ -1,6 +1,7 @@
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import { EditProfileForm } from "./EditProfileForm";
+import { getServerT } from "@/lib/i18n/server";
 
 interface Param {
   params: Promise<{ username: string }>;
@@ -13,6 +14,7 @@ interface Param {
  */
 export default async function EditProfilePage({ params }: Param) {
   const { username } = await params;
+  const t = await getServerT();
   return (
     <>
       <Header />
@@ -20,10 +22,10 @@ export default async function EditProfilePage({ params }: Param) {
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <header className="border-t-4 border-[var(--foreground)] pt-6 mb-12">
             <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-500">
-              Edit · User Dossier
+              {t("edit.pageHeader")}
             </div>
             <h1 className="font-serif text-4xl md:text-5xl font-black uppercase mt-2 tracking-tight text-[var(--foreground)]">
-              编辑个人主页
+              {t("edit.pageTitle")}
             </h1>
           </header>
           <EditProfileForm targetIdentifier={username} />

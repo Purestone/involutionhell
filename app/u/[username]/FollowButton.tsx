@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/use-auth";
+import { useT } from "@/lib/i18n/client";
 
 interface Props {
   /** 目标用户的 identifier（/u/{identifier}，数字或 username 都行） */
@@ -37,6 +38,7 @@ function readToken(): string | null {
  */
 export function FollowButton({ identifier, targetUserId }: Props) {
   const { user, status } = useAuth();
+  const t = useT();
   const [followerCount, setFollowerCount] = useState<number | null>(null);
   const [followingCount, setFollowingCount] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -114,13 +116,13 @@ export function FollowButton({ identifier, targetUserId }: Props) {
           <strong className="text-[var(--foreground)] font-serif text-base font-black">
             {followerCount?.toLocaleString() ?? "—"}
           </strong>{" "}
-          粉丝
+          {t("follow.followers")}
         </span>
         <span>
           <strong className="text-[var(--foreground)] font-serif text-base font-black">
             {followingCount?.toLocaleString() ?? "—"}
           </strong>{" "}
-          关注
+          {t("follow.following")}
         </span>
       </div>
       {!isSelf && (
@@ -138,12 +140,12 @@ export function FollowButton({ identifier, targetUserId }: Props) {
           data-umami-event={isFollowing ? "unfollow_click" : "follow_click"}
         >
           {status !== "authenticated"
-            ? "登录后关注"
+            ? t("follow.signInToFollow")
             : pending
               ? "..."
               : isFollowing
-                ? "已关注"
-                : "+ 关注"}
+                ? t("follow.unfollow")
+                : t("follow.follow")}
         </button>
       )}
     </div>
