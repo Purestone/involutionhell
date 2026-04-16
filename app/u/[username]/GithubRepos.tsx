@@ -53,6 +53,40 @@ function fmtDate(iso: string): string {
   }
 }
 
+/**
+ * GithubRepos 骨架屏。
+ * profile 页用 <Suspense> 包住 GithubRepos 时作为 fallback，避免 GitHub repos API
+ * （后端走 Caffeine 缓存 1h，但首次或缓存失效时可能 500ms-1s）阻塞整页 SSR 输出。
+ */
+export function GithubReposSkeleton() {
+  return (
+    <section className="border border-[var(--foreground)] p-6 lg:p-8 flex flex-col gap-4">
+      <div className="flex items-baseline justify-between gap-3 flex-wrap border-b border-[var(--foreground)] pb-3">
+        <div>
+          <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
+            REPOS
+          </div>
+          <h3 className="font-serif text-xl font-black uppercase mt-1 text-[var(--foreground)]">
+            Loading…
+          </h3>
+        </div>
+      </div>
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4" aria-hidden>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <li
+            key={i}
+            className="border border-[var(--foreground)] p-4 flex flex-col gap-2"
+          >
+            <div className="h-4 bg-neutral-200 dark:bg-neutral-800 w-2/3 animate-pulse" />
+            <div className="h-3 bg-neutral-200 dark:bg-neutral-800 w-full animate-pulse" />
+            <div className="h-3 bg-neutral-200 dark:bg-neutral-800 w-5/6 animate-pulse" />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export async function GithubRepos({ identifier }: Props) {
   const repos = await fetchRepos(identifier);
   if (repos.length === 0) return null;

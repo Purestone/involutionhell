@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import ZoteroFeedLazy from "@/app/components/ZoteroFeedLazy";
 import { Contribute } from "@/app/components/Contribute";
@@ -6,7 +7,10 @@ import Image from "next/image";
 import { ActivityTicker } from "@/app/components/ActivityTicker";
 import { cn } from "@/lib/utils";
 import { AnimatedBar } from "@/app/components/rank/AnimatedBar";
-import { HotDocsPreview } from "@/app/components/HotDocsPreview";
+import {
+  HotDocsPreview,
+  HotDocsPreviewSkeleton,
+} from "@/app/components/HotDocsPreview";
 import leaderboardData from "@/generated/site-leaderboard.json";
 import { MAINTAINERS } from "@/lib/admins";
 
@@ -214,7 +218,14 @@ export async function Hero() {
               })()}
             </div>
             <div className="lg:col-span-4">
-              <HotDocsPreview />
+              {/*
+                用 Suspense 包住 HotDocsPreview，避免后端 /analytics/top-docs 慢响应（~1.85s）
+                阻塞整个首页 HTML flush。Next.js 会先把外层 shell（含 LCP 的 h1）stream 到浏览器，
+                等热榜 API 返回再追加这块 HTML，TTFB 从 1.7s 级回到 ~200ms。
+              */}
+              <Suspense fallback={<HotDocsPreviewSkeleton />}>
+                <HotDocsPreview />
+              </Suspense>
             </div>
           </div>
         </div>

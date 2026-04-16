@@ -9,7 +9,8 @@ import { ProfileCard } from "./ProfileCard";
 import { EditLinkIfOwner } from "./EditLinkIfOwner";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { FollowButton } from "./FollowButton";
-import { GithubRepos } from "./GithubRepos";
+import { GithubRepos, GithubReposSkeleton } from "./GithubRepos";
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 
 interface UserView {
@@ -541,9 +542,13 @@ export default async function UserProfilePage({ params }: Param) {
             </div>
           )}
 
-          {/* GitHub 公开 repos：server component 内部 fetch，零数据时自动返回 null */}
+          {/* GitHub 公开 repos：server component 内部 fetch，零数据时自动返回 null。
+              用 Suspense 包住，避免后端 /api/user-center/github/repos 慢响应阻塞整个 profile 页 TTFB。
+              页面主体（identity / projects / papers）先 stream 给浏览器，repos 异步填进来。 */}
           <div className="mt-12">
-            <GithubRepos identifier={username} />
+            <Suspense fallback={<GithubReposSkeleton />}>
+              <GithubRepos identifier={username} />
+            </Suspense>
           </div>
 
           {/* 文档贡献列表：放最底部，紧凑列表形式（每行 ~48px），避免 docs 多的用户把页面顶得很长。

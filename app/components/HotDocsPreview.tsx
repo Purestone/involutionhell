@@ -30,6 +30,42 @@ async function fetchTopDocs(): Promise<TopDocDto[]> {
   }
 }
 
+/**
+ * HotDocsPreview 的骨架屏。
+ * 在首页被 <Suspense> 包裹时作为 fallback，让页面 shell 先 stream 给浏览器，
+ * 等后端 /analytics/top-docs 返回后再替换成真实内容。
+ * 结构刻意贴合真组件（同样的 5 行 + 标题栏），避免 CLS。
+ */
+export function HotDocsPreviewSkeleton() {
+  return (
+    <div className="border border-[var(--foreground)] p-6 bg-[var(--background)]">
+      <div className="flex items-center justify-between mb-4 border-b border-[var(--foreground)] pb-3">
+        <div>
+          <div className="font-serif text-lg font-black uppercase text-[var(--foreground)]">
+            Hot This Week
+          </div>
+          <div className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
+            Loading…
+          </div>
+        </div>
+      </div>
+      <ol className="flex flex-col gap-4" aria-hidden>
+        {Array.from({ length: 5 }).map((_, idx) => (
+          <li key={idx} className="flex items-start gap-3">
+            <span className="font-mono text-[10px] text-neutral-400 w-4 shrink-0 pt-1">
+              {String(idx + 1).padStart(2, "0")}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="h-4 bg-neutral-200 dark:bg-neutral-800 w-11/12 animate-pulse" />
+              <div className="h-3 bg-neutral-200 dark:bg-neutral-800 w-16 mt-1.5 animate-pulse" />
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 export async function HotDocsPreview() {
   const docs = await fetchTopDocs();
   const t = await getTranslations("hotDocs");
