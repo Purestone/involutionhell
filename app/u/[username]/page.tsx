@@ -140,7 +140,9 @@ function findContributions(githubId: number | null | undefined) {
     contributedDocs?: Array<{ id: string; title: string; url: string }>;
     dailyCounts?: Record<string, number>;
   };
-  const rows = leaderboard as Row[];
+  // 先经 unknown 再转 Row[]：JSON 的字面量类型（每条 dailyCounts 都是独立的 literal）和 Row 的
+  // Record<string, number> 索引签名不兼容，tsc --noEmit 会报 TS2352。先走 unknown 绕开。
+  const rows = leaderboard as unknown as Row[];
   const idStr = String(githubId);
   const match = rows.find((r) => r.id === idStr);
   if (!match) return { docs: [], points: 0, commits: 0, dailyCounts: {} };
@@ -315,7 +317,8 @@ export default async function UserProfilePage({ params }: Param) {
                   key={`paper-${idx}`}
                   kind="PAPER"
                   index={idx + 1}
-                  title={p.title}
+                  // title 在 UserPaperItem 里允许 itemKey-only（title 可能缺），这里兜底
+                  title={p.title || p.itemKey || "(untitled paper)"}
                   meta={[p.authors, p.year].filter(Boolean).join(", ")}
                   summary={p.abstract}
                   detail={p.abstract}
