@@ -57,6 +57,25 @@ const config = {
         source: "/api/docs/history",
         destination: `${backendUrl}/api/docs/history`,
       },
+      {
+        // Events 公开读接口 + 感兴趣接口
+        // 需要两条规则：`/:path*` 不匹配空路径（即 /api/events 本身）
+        source: "/api/events",
+        destination: `${backendUrl}/api/events`,
+      },
+      {
+        source: "/api/events/:path*",
+        destination: `${backendUrl}/api/events/:path*`,
+      },
+      {
+        // Events 管理员 CRUD（后端 @SaCheckRole("admin") 做权限校验）
+        source: "/api/admin/events",
+        destination: `${backendUrl}/api/admin/events`,
+      },
+      {
+        source: "/api/admin/events/:path*",
+        destination: `${backendUrl}/api/admin/events/:path*`,
+      },
     ];
   },
   images: {

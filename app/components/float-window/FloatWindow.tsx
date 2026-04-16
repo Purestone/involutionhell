@@ -4,29 +4,27 @@ import { useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
-import { activityEventsConfig } from "@/app/types/event";
+import type { HomepageEvent } from "@/lib/events-fetch";
 import { cn } from "@/lib/utils";
 import { X, ChevronUp, ExternalLink, Play } from "lucide-react";
 import styles from "./FloatWindow.module.css";
 
-const { events: rawEvents, settings } = activityEventsConfig;
-const { maxItems } = settings;
-
-// 显示所有活动（包括存档的已过期活动）
-// 优先显示未过期的活动，然后是已过期的
-const sortedEvents = [
-  ...rawEvents.filter((e) => !e.deprecated),
-  ...rawEvents.filter((e) => e.deprecated),
-].slice(0, maxItems);
-
-const latestEvent = sortedEvents[0];
-
 /**
- * FloatWindow - 复古报纸风格的活动预告悬浮窗
- * 仅显示最新的一条活动
- * 仅在首页 (/) 可见
+ * FloatWindow - 复古报纸风格的活动预告悬浮窗。
+ * 仅显示最新的一条活动，仅在首页 (/) 可见。
+ *
+ * 数据来源：
+ * - 之前从 data/event.json 直接 import
+ * - 现在由上游 Server Component（app/page.tsx）调 lib/events-fetch.ts 拉 /api/events
+ *   后通过 event prop 传进来；后端失败时 fetch 内部会 fallback 到 JSON
  */
-export function FloatWindow() {
+
+interface FloatWindowProps {
+  /** 要展示的单条活动；null 或已过期时组件不渲染 */
+  event: HomepageEvent | null;
+}
+
+export function FloatWindow({ event }: FloatWindowProps) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -37,10 +35,9 @@ export function FloatWindow() {
   const handleDismiss = useCallback(() => setIsDismissed(true), []);
   const handleToggle = useCallback(() => setIsCollapsed((prev) => !prev), []);
 
-  if (!isHomePage || isDismissed || !latestEvent || latestEvent.deprecated)
-    return null;
+  if (!isHomePage || isDismissed || !event || event.deprecated) return null;
 
-  const currentEvent = latestEvent;
+  const currentEvent = event;
 
   return (
     <motion.div
