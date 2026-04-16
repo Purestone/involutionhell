@@ -53,7 +53,7 @@ export default function ProfileError({
         <div className="flex flex-wrap gap-3 pt-2">
           <button
             type="button"
-            onClick={() => reset()}
+            onClick={reset}
             className="font-mono text-xs uppercase tracking-widest px-4 py-2 border border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)] hover:bg-[#CC0000] hover:border-[#CC0000] transition-colors"
           >
             重试
