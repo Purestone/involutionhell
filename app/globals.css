@@ -11,10 +11,15 @@
   --color-accent: #cc0000;
   --color-border: var(--foreground);
 
-  --font-serif: "Playfair Display", "Times New Roman", serif;
-  --font-body: "Lora", Georgia, serif;
-  --font-sans: "Inter", "Helvetica Neue", sans-serif;
-  --font-mono: "JetBrains Mono", "Courier New", monospace;
+  /*
+   * 字体链：优先用 next/font/google 生成的自托管 CSS 变量（--font-playfair 等由 app/layout.tsx 注入），
+   * 一并保留原字面名和系统 fallback，字体加载前浏览器有合理的替身。
+   */
+  --font-serif:
+    var(--font-playfair), "Playfair Display", "Times New Roman", serif;
+  --font-body: var(--font-lora), "Lora", Georgia, serif;
+  --font-sans: var(--font-inter), "Inter", "Helvetica Neue", sans-serif;
+  --font-mono: var(--font-jb-mono), "JetBrains Mono", "Courier New", monospace;
 
   --radius-none: 0px;
   --radius-sm: 0px;
