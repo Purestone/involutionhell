@@ -30,24 +30,32 @@ export function Header() {
         </div>
 
         <div className="flex items-center justify-between h-10">
+          {/*
+            导航对齐当前信息架构（2026-04 重构后）：
+            - 去掉"首页"：左上角 BrandMark 已经是回首页入口，避免冗余
+            - 去掉"特点"：Features 组件已经删除，旧的 /#features 锚点不存在
+            - 文档 / 排行榜：站点两大主路由，提到顶
+            - 社区：保留 /#community 锚点（指向首页底部 DispatchNetwork 的 GitHub/Discord/Zotero bar）
+            - 联系：缩写自"联系我们"，/#contact 还在 Footer 里
+          */}
           <nav className="hidden md:flex items-center gap-8 font-sans text-xs font-bold uppercase tracking-widest text-[var(--foreground)]">
             <Link
-              href="/"
+              href="/docs"
               className="hover:text-[#CC0000] transition-colors"
               data-umami-event="navigation_click"
               data-umami-event-region="header"
-              data-umami-event-label="home"
+              data-umami-event-label="docs"
             >
-              首页
+              文档
             </Link>
             <Link
-              href="/#features"
+              href="/rank"
               className="hover:text-[#CC0000] transition-colors"
               data-umami-event="navigation_click"
               data-umami-event-region="header"
-              data-umami-event-label="features"
+              data-umami-event-label="rank"
             >
-              特点
+              排行榜
             </Link>
             <Link
               href="/#community"
@@ -65,7 +73,7 @@ export function Header() {
               data-umami-event-region="header"
               data-umami-event-label="contact"
             >
-              联系我们
+              联系
             </Link>
           </nav>
 
