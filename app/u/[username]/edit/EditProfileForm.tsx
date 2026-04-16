@@ -18,6 +18,8 @@ interface ProjectItem {
 }
 
 interface PaperItem {
+  /** Zotero group item key；填了之后 profile 页会自动拉 Zotero 元信息填充 */
+  itemKey: string;
   title: string;
   authors: string;
   year: string;
@@ -77,6 +79,7 @@ function normalize(raw: unknown): Preferences {
       : [],
     pinned_papers: Array.isArray(p.pinned_papers)
       ? p.pinned_papers.map((x) => ({
+          itemKey: x?.itemKey ?? "",
           title: x?.title ?? "",
           authors: x?.authors ?? "",
           year: String(x?.year ?? ""),
@@ -153,7 +156,8 @@ export function EditProfileForm({ targetIdentifier }: Props) {
       tagline: prefs.tagline,
       links: prefs.links.filter((l) => l.label && l.url),
       projects: prefs.projects.filter((p) => p.title),
-      pinned_papers: prefs.pinned_papers.filter((p) => p.title),
+      // 有 itemKey 或有 title 的条目保留，至少得有一个标识符
+      pinned_papers: prefs.pinned_papers.filter((p) => p.itemKey || p.title),
     };
     try {
       const res = await fetch("/api/user-center/preferences", {
@@ -328,6 +332,7 @@ export function EditProfileForm({ targetIdentifier }: Props) {
           items={prefs.pinned_papers}
           onChange={(items) => setPrefs({ ...prefs, pinned_papers: items })}
           empty={{
+            itemKey: "",
             title: "",
             authors: "",
             year: "",
@@ -337,6 +342,13 @@ export function EditProfileForm({ targetIdentifier }: Props) {
           maxItems={8}
           render={(item, idx, update) => (
             <div className="flex flex-col gap-2">
+              <input
+                type="text"
+                value={item.itemKey}
+                onChange={(e) => update({ ...item, itemKey: e.target.value })}
+                placeholder="Zotero itemKey（可选，填了会自动拉元信息；不填就手填下面字段）"
+                className="border border-dashed border-[var(--foreground)] bg-[var(--background)] px-3 py-2 font-mono text-xs uppercase tracking-wider"
+              />
               <input
                 type="text"
                 value={item.title}

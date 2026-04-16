@@ -28,11 +28,52 @@ interface UserProjectItem {
 }
 
 interface UserPaperItem {
-  title: string;
+  /** Zotero group item key；有值时优先从后端 /api/user-center/zotero/items 拉元信息 */
+  itemKey?: string;
+  title?: string;
   authors?: string;
   year?: string | number;
   url?: string;
   abstract?: string;
+}
+
+interface ZoteroItemDto {
+  itemKey: string;
+  title: string;
+  authors: string;
+  year: string;
+  url: string;
+  abstractNote: string;
+  publicationTitle: string;
+}
+
+/**
+ * 批量调后端 Zotero 代理，返回 itemKey → 元信息映射。
+ * 任意失败或没 itemKey 时返回空 map，调用方走手填 fallback。
+ */
+async function fetchZoteroByKeys(
+  keys: string[],
+): Promise<Record<string, ZoteroItemDto>> {
+  if (keys.length === 0) return {};
+  const backendUrl = process.env.BACKEND_URL;
+  if (!backendUrl) return {};
+  try {
+    const res = await fetch(
+      `${backendUrl}/api/user-center/zotero/items?keys=${encodeURIComponent(keys.join(","))}`,
+      { next: { revalidate: 3600 } },
+    );
+    if (!res.ok) return {};
+    const json = (await res.json()) as {
+      success: boolean;
+      data?: ZoteroItemDto[];
+    };
+    if (!json.success || !Array.isArray(json.data)) return {};
+    const map: Record<string, ZoteroItemDto> = {};
+    for (const it of json.data) map[it.itemKey] = it;
+    return map;
+  } catch {
+    return {};
+  }
 }
 
 interface UserLinkItem {
@@ -139,8 +180,27 @@ export default async function UserProfilePage({ params }: Param) {
     user.githubId,
   );
   const projects = preferences.projects ?? [];
-  const papers = preferences.pinned_papers ?? [];
+  const rawPapers = preferences.pinned_papers ?? [];
   const links = preferences.links ?? [];
+
+  // 用 itemKey 批量拉 Zotero 元信息 → 用它填字段，覆盖手填值（手填作为离线 fallback）
+  const zoteroKeys = rawPapers
+    .map((p) => p.itemKey)
+    .filter((k): k is string => typeof k === "string" && k.length > 0);
+  const zoteroMap = await fetchZoteroByKeys(zoteroKeys);
+  const papers: UserPaperItem[] = rawPapers.map((p) => {
+    if (!p.itemKey) return p;
+    const z = zoteroMap[p.itemKey];
+    if (!z) return p; // Zotero 拉不到就用手填值兜底
+    return {
+      itemKey: p.itemKey,
+      title: p.title || z.title,
+      authors: p.authors || z.authors,
+      year: p.year || z.year,
+      url: p.url || z.url,
+      abstract: p.abstract || z.abstractNote,
+    };
+  });
 
   return (
     <>
