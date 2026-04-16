@@ -1,0 +1,402 @@
+{
+  "header": {
+    "nav": {
+      "docs": "Docs",
+      "rank": "Rank",
+      "community": "Community",
+      "contact": "Contact"
+    }
+  },
+  "hero": {
+    "mission": "A free, open learning community built by developers, for developers. No gatekeeping, no pointless grind — just real progress and the joy of building. Knowledge is a ladder to freedom, not a cage.",
+    "cta": {
+      "access": "Access Articles",
+      "guideAriaLabel": "Contribution Guide"
+    },
+    "archivesLabel": "Classified Archives",
+    "join": {
+      "title": "Join the Resistance",
+      "body": "Connect with thousands of developers who are reclaiming their passion for technology."
+    },
+    "categories": {
+      "ai": {
+        "title": "AI",
+        "desc": "Math foundations, LLMs, training & inference, benchmarks, datasets"
+      },
+      "cs": {
+        "title": "Computer Science",
+        "desc": "Data structures, algorithms, and core CS fundamentals"
+      },
+      "jobs": {
+        "title": "Interview Prep",
+        "desc": "Give me a job. I'll do anything."
+      },
+      "community": {
+        "title": "Community Notes",
+        "desc": "Written by the people, for the people"
+      }
+    }
+  },
+  "footer": {
+    "brand": "A free, open learning community built by developers. We believe collective effort and radical openness can break down knowledge monopolies — and build something fairer.",
+    "a11y": {
+      "github": "GitHub",
+      "discord": "Discord"
+    }
+  },
+  "notFound": {
+    "heading": "Page Not Found",
+    "body": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+    "cta": "Return Home"
+  },
+  "login": {
+    "heading": "Sign In",
+    "subheading": "Sign in to access protected pages"
+  },
+  "settings": {
+    "theme": {
+      "label": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "language": {
+      "label": "Language"
+    },
+    "ai": {
+      "label": "Default AI Provider",
+      "intern": "InternLM"
+    },
+    "save": "Save Settings",
+    "saving": "Saving...",
+    "toast": {
+      "tokenMissing": "Session expired — sign in again",
+      "tokenMissingSave": "Session expired — sign in again before saving",
+      "loadError": "Failed to load preferences — showing defaults",
+      "saveSuccess": "Preferences saved",
+      "saveFail": "Save failed — try again later",
+      "fetchFail": "Failed to fetch preferences"
+    }
+  },
+  "signIn": {
+    "button": "Sign In"
+  },
+  "assistant": {
+    "welcome": {
+      "greeting": "Hello.",
+      "prompt": "What can I help you with today?"
+    },
+    "suggestions": {
+      "label": "Suggested Questions",
+      "thinking": "Generating follow-up questions...",
+      "defaults": {
+        "summarize": {
+          "title": "Summarize this page",
+          "label": "Key points",
+          "action": "Summarize the main content and key points of this page"
+        },
+        "llm": {
+          "title": "What is a foundation model",
+          "label": "Concept explained",
+          "action": "What is a foundation model? Explain in detail."
+        },
+        "concept": {
+          "title": "Explain a technical concept",
+          "label": "Deep dive",
+          "action": "Explain the core technical concepts mentioned on this page"
+        },
+        "learning": {
+          "title": "Learning recommendations",
+          "label": "Getting started",
+          "action": "Based on this content, what learning path would you suggest for a beginner?"
+        }
+      }
+    },
+    "settings": {
+      "title": "AI Assistant Settings",
+      "provider": {
+        "label": "AI Provider"
+      },
+      "apiKey": {
+        "save": "Save API Key to local storage",
+        "warning": {
+          "title": "Security Notice",
+          "plaintext": "The API key will be stored in plain text in your browser's localStorage",
+          "access": "Anyone with access to this browser may retrieve your API key",
+          "shared": "Do not check this on shared or public computers",
+          "rotate": "Rotate your API key regularly for better security"
+        }
+      },
+      "intern": {
+        "notice": "InternLM is provided by Shanghai AI Lab. No API key required — it's pre-configured and free to use."
+      }
+    }
+  },
+  "editor": {
+    "pageTitle": "Article Editor",
+    "heading": "Editor"
+  },
+  "contribute": {
+    "button": "Submit Contribution",
+    "dialog": {
+      "title": "Submit an Article",
+      "description": "Select a section (single-select, searchable; top-level is for navigation only), or create a new sub-section, then jump to GitHub to create your article.",
+      "selectLabel": "Select Section",
+      "selectPlaceholder": "Search or select...",
+      "subdirLabel": "New sub-section name",
+      "subdirPathPrefix": "Path will be: ",
+      "subdirEmpty": "<empty>",
+      "articleTitleLabel": "Article title (front-matter)",
+      "filenameLabel": "Filename (required)",
+      "filenameError": {
+        "empty": "Filename is required.",
+        "invalid": "Filename must start with a letter or number and contain only letters, numbers, hyphens, or underscores."
+      },
+      "pathPreview": "Path preview: ",
+      "pathEmpty": "(none selected)",
+      "submit": "Continue on GitHub"
+    }
+  },
+  "search": {
+    "placeholder": "Search docs...",
+    "noResults": "No results found"
+  },
+  "feedback": {
+    "question": "Was this page helpful?",
+    "thanks": "Thanks for your feedback!"
+  },
+  "hotDocs": {
+    "subtitle": "Hot This Week",
+    "more": "More",
+    "empty": "No data yet"
+  },
+  "floatWindow": {
+    "minimize": "Minimize",
+    "close": "Close",
+    "breaking": "Breaking",
+    "latest": "Latest",
+    "watchReplay": "Watch Replay",
+    "readMore": "Read More"
+  },
+  "ticker": {
+    "eventActive": "Event Active",
+    "archivesAvailable": "Archives Available"
+  },
+  "contributors": {
+    "heading": "Contributors"
+  },
+  "profile": {
+    "dossier": "User Dossier",
+    "volumeIssue": "Vol. 1 Issue {id}",
+    "fullRank": "Full Rank →",
+    "editProfile": "Edit Profile →",
+    "sec": {
+      "profile": "SEC. PROFILE · 001"
+    },
+    "stats": {
+      "docs": "Docs",
+      "commits": "Commits",
+      "points": "Points"
+    },
+    "empty": {
+      "title": "No projects or reading list yet.",
+      "subtitle": "GitHub repos and doc contributions still shown below."
+    },
+    "follow": {
+      "followers": "Followers",
+      "following": "Following",
+      "signInToFollow": "Sign in to follow",
+      "follow": "+ Follow",
+      "unfollow": "Following"
+    },
+    "activity": {
+      "sec": "SEC. ACTIVITY · 005",
+      "heading": "Activity · Last 52 Weeks",
+      "stats": "{days} active days · {commits} commits",
+      "legend": {
+        "less": "Less",
+        "more": "More"
+      },
+      "weekday": {
+        "mon": "Mon",
+        "thu": "Thu",
+        "sat": "Sat"
+      },
+      "month": {
+        "1": "Jan",
+        "2": "Feb",
+        "3": "Mar",
+        "4": "Apr",
+        "5": "May",
+        "6": "Jun",
+        "7": "Jul",
+        "8": "Aug",
+        "9": "Sep",
+        "10": "Oct",
+        "11": "Nov",
+        "12": "Dec"
+      }
+    },
+    "repos": {
+      "sec": "SEC. REPOS · 006",
+      "heading": "GitHub Repositories",
+      "subtitle": "Public repos · sorted by stars & updates",
+      "count": "{n} repos"
+    },
+    "docs": {
+      "sec": "SEC. DOCS · 007",
+      "heading": "Docs Contributed",
+      "count": "{n} docs · {commits} commits",
+      "showMore": "Show {n} more ↓"
+    },
+    "card": {
+      "kind": {
+        "project": "Project",
+        "paper": "Paper",
+        "doc": "Docs"
+      },
+      "view": "View →"
+    },
+    "edit": {
+      "pageTitle": "Edit Profile",
+      "pageHeader": "Edit · User Dossier",
+      "loading": "Loading...",
+      "auth": {
+        "required": "Sign in to edit your profile.",
+        "signIn": "Sign In →",
+        "notYours": "This isn't your profile (URL ID: {id}). Only the owner can edit.",
+        "goMine": "Go to my profile →"
+      },
+      "intro": {
+        "label": "About this page",
+        "body": "What you put here shows up on your profile page at /u/{id}. Every field is optional — fill what you like; empty profiles still show GitHub info and contribution stats."
+      },
+      "cta": {
+        "save": "Save →",
+        "saving": "Saving...",
+        "cancel": "Cancel"
+      },
+      "status": {
+        "saved": "Saved. Redirecting..."
+      },
+      "error": {
+        "noToken": "Login token missing, please sign in again",
+        "http": "Save failed: HTTP {status}",
+        "unknown": "Save failed"
+      },
+      "section": {
+        "add": "+ Add",
+        "remove": "Remove"
+      },
+      "sec1": {
+        "title": "SEC. 01 · IDENTITY",
+        "heading": "About You",
+        "description": "A one-line tagline and a short bio. Shown at the top of your profile left column — think of it as your site-wide business card.",
+        "tagline": {
+          "label": "Tagline (≤80 chars)",
+          "placeholder": "e.g. LLM Safety @ UNSW · looking for summer internships"
+        },
+        "bio": {
+          "label": "Bio (80-200 chars recommended)",
+          "placeholder": "Who you are, what you're working on, what you're interested in. e.g. CS MSc, working on alignment, writing tools on the side; happy to chat about RLHF / evals / infra."
+        }
+      },
+      "sec2": {
+        "title": "SEC. 02 · LINKS",
+        "heading": "Links",
+        "description": "External places people can reach you or learn more. Up to 5 items; shown as small buttons at the bottom of your profile left column.",
+        "label": {
+          "placeholder": "Button label, e.g. Blog / Twitter / Zhihu"
+        },
+        "url": {
+          "placeholder": "https://your-blog.com"
+        }
+      },
+      "sec3": {
+        "title": "SEC. 03 · PROJECTS",
+        "heading": "Your Projects",
+        "description": "Personal projects / toys / open-source work. Your public GitHub repos are shown automatically below; use this for things not on GitHub or worth highlighting. Up to 8 items.",
+        "titleField": {
+          "placeholder": "Project name, e.g. involutionhell.com"
+        },
+        "desc": {
+          "placeholder": "1-2 sentences on what it does. Expands on hover."
+        },
+        "url": {
+          "placeholder": "Project URL (GitHub repo / product homepage)"
+        },
+        "tags": {
+          "placeholder": "Comma-separated tech tags, e.g. TypeScript, Next.js, LLM"
+        }
+      },
+      "sec4": {
+        "title": "SEC. 04 · PAPERS",
+        "heading": "Currently Reading / Recommended Papers",
+        "description": "Papers you've recently read and want to share (academic or tech-blog). Add a Zotero itemKey to auto-fill metadata, or type title / authors / year manually. Optional.",
+        "itemKey": {
+          "placeholder": "Zotero itemKey (optional — auto-fills metadata; or leave empty and fill below)"
+        },
+        "titleField": {
+          "placeholder": "Paper title"
+        },
+        "authors": {
+          "placeholder": "Authors (Alice, Bob)"
+        },
+        "year": {
+          "placeholder": "Year"
+        },
+        "url": {
+          "placeholder": "URL"
+        },
+        "abstract": {
+          "placeholder": "Abstract or one-line take"
+        }
+      }
+    }
+  },
+  "userMenu": {
+    "profile": "My Profile",
+    "settings": "Settings",
+    "switchGithub": "Switch GitHub account (opens GitHub logout in new tab)",
+    "signOut": "Sign out"
+  },
+  "docHistory": {
+    "heading": "Recent Updates",
+    "empty": "No history yet",
+    "loadError": "Failed to load history",
+    "timeAgo": {
+      "justNow": "just now",
+      "minutesAgo": "{n}m ago",
+      "hoursAgo": "{n}h ago",
+      "daysAgo": "{n}d ago",
+      "monthsAgo": "{n}mo ago",
+      "yearsAgo": "{n}y ago"
+    }
+  },
+  "docShare": {
+    "ariaLabel": "Copy page link",
+    "copy": "Copy link",
+    "copied": "Copied"
+  },
+  "editorMetadata": {
+    "heading": "Article Info",
+    "title": {
+      "label": "Title",
+      "placeholder": "Enter article title..."
+    },
+    "description": {
+      "label": "Description",
+      "placeholder": "Brief description of the article..."
+    },
+    "tags": {
+      "label": "Tags",
+      "hint": "comma-separated",
+      "placeholder": "algorithms, system design, React"
+    },
+    "filename": {
+      "label": "Filename",
+      "placeholder": "my-article",
+      "hint": "Auto-appends .md"
+    }
+  }
+}

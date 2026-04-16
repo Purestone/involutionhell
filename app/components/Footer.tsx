@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Github, MessageCircle } from "lucide-react";
 import { BrandMark } from "./BrandMark";
 import { LicenseNotice } from "./LicenseNotice";
 
-export function Footer() {
+export async function Footer() {
+  const t = await getTranslations("footer");
   return (
     <footer
       id="contact"
@@ -18,36 +20,36 @@ export function Footer() {
               textClassName="font-serif font-black text-2xl uppercase italic text-[var(--foreground)]"
             />
             <p className="font-body text-neutral-600 dark:text-neutral-400 mb-8 max-w-md text-justify leading-relaxed">
-              一个由开发者自发组织的、完全免费且开放的学习社区。我们相信通过集体协作与开放共享，可以打破技术垄断，创造一个更公平的学习环境。
+              {t("tagline")}
             </p>
             <div className="flex space-x-2">
               <a
                 href="https://github.com/involutionhell"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="访问 GitHub"
-                title="访问 GitHub"
+                aria-label={t("github.ariaLabel")}
+                title={t("github.ariaLabel")}
                 data-umami-event="social_click"
                 data-umami-event-platform="github"
                 data-umami-event-location="footer"
                 className="w-12 h-12 flex items-center justify-center border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all text-[var(--foreground)]"
               >
                 <Github className="h-5 w-5" />
-                <span className="sr-only">访问 GitHub</span>
+                <span className="sr-only">{t("github.srOnly")}</span>
               </a>
               <a
                 href="https://discord.com/invite/6CGP73ZWbD"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="加入 Discord 社区"
-                title="加入 Discord 社区"
+                aria-label={t("discord.ariaLabel")}
+                title={t("discord.ariaLabel")}
                 data-umami-event="social_click"
                 data-umami-event-platform="discord"
                 data-umami-event-location="footer"
                 className="w-12 h-12 flex items-center justify-center border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all text-[var(--foreground)]"
               >
                 <MessageCircle className="h-5 w-5" />
-                <span className="sr-only">加入 Discord 社区</span>
+                <span className="sr-only">{t("discord.srOnly")}</span>
               </a>
             </div>
           </div>
@@ -63,7 +65,6 @@ export function Footer() {
                   <Link
                     href="/docs/ai"
                     className="hover:text-[#CC0000] transition-colors"
-                    // Umami 埋点: Footer 快速链接点击
                     data-umami-event="navigation_click"
                     data-umami-event-region="footer"
                     data-umami-event-label="AI & Mathematics"
@@ -75,7 +76,6 @@ export function Footer() {
                   <Link
                     href="/docs/computer-science"
                     className="hover:text-[#CC0000] transition-colors"
-                    // Umami 埋点: Footer 快速链接点击
                     data-umami-event="navigation_click"
                     data-umami-event-region="footer"
                     data-umami-event-label="Computer Science"
@@ -87,7 +87,6 @@ export function Footer() {
                   <Link
                     href="/docs/CommunityShare"
                     className="hover:text-[#CC0000] transition-colors"
-                    // Umami 埋点: Footer 快速链接点击
                     data-umami-event="navigation_click"
                     data-umami-event-region="footer"
                     data-umami-event-label="Community Sharing"
@@ -99,7 +98,6 @@ export function Footer() {
                   <Link
                     href="/docs/jobs"
                     className="hover:text-[#CC0000] transition-colors"
-                    // Umami 埋点: Footer 快速链接点击
                     data-umami-event="navigation_click"
                     data-umami-event-region="footer"
                     data-umami-event-label="Career Prep"
@@ -132,7 +130,6 @@ export function Footer() {
                 <li>
                   <a
                     href="#features"
-                    // Umami 埋点: Footer 快速链接点击
                     data-umami-event="navigation_click"
                     data-umami-event-region="footer"
                     data-umami-event-label="Mission Brief"
@@ -144,7 +141,6 @@ export function Footer() {
                 <li>
                   <a
                     href="#community"
-                    // Umami 埋点: Footer 快速链接点击
                     data-umami-event="navigation_click"
                     data-umami-event-region="footer"
                     data-umami-event-label="Network Status"

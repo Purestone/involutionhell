@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/lib/use-auth";
-import { useT } from "@/lib/i18n/client";
+import { useTranslations } from "next-intl";
 
 interface Props {
   /** 当前页面主人的 GitHub 数字 ID（可能为 null 的老数据） */
@@ -23,7 +23,7 @@ export function EditLinkIfOwner({
   identifier,
 }: Props) {
   const { user, status } = useAuth();
-  const t = useT();
+  const t = useTranslations("profile");
   if (status !== "authenticated" || !user) return null;
 
   const isOwner =
@@ -37,7 +37,7 @@ export function EditLinkIfOwner({
       className="font-mono text-[11px] uppercase tracking-widest hover:text-[#CC0000] transition-colors flex items-center gap-1 font-bold"
       data-umami-event="profile_edit_click"
     >
-      {t("profile.editProfile")}
+      {t("editProfile")}
     </Link>
   );
 }

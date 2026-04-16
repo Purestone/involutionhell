@@ -1,16 +1,12 @@
 "use client";
 
 import { useState } from "react";
-
+import { useTranslations } from "next-intl";
 import { useEditorStore } from "@/lib/editor-store";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { cn } from "@/lib/utils";
 
-/**
- * 编辑器元数据表单组件
- * 用于输入文章的标题、描述、标签和文件名
- */
 export function EditorMetadataForm() {
   const {
     title,
@@ -22,6 +18,7 @@ export function EditorMetadataForm() {
     setTags,
     setFilename,
   } = useEditorStore();
+  const t = useTranslations("editorMetadata");
 
   const [tagsInputValue, setTagsInputValue] = useState(() => tags.join(", "));
   const [skipNextSync, setSkipNextSync] = useState(false);
@@ -36,7 +33,6 @@ export function EditorMetadataForm() {
     }
   }
 
-  // 处理标签输入（逗号分隔）
   const handleTagsChange = (value: string) => {
     setTagsInputValue(value);
     const processedTags = value
@@ -48,7 +44,6 @@ export function EditorMetadataForm() {
     setTags(processedTags);
   };
 
-  // 处理标签输入框失去焦点 - 过滤所有空标签并同步展示值
   const handleTagsBlur = () => {
     const filteredTags = tags.filter((tag) => tag.length > 0);
     setSkipNextSync(true);
@@ -56,7 +51,6 @@ export function EditorMetadataForm() {
     setTagsInputValue(filteredTags.join(", "));
   };
 
-  // 自动添加 .md 后缀
   const handleFilenameBlur = () => {
     if (filename && !filename.endsWith(".md")) {
       setFilename(filename + ".md");
@@ -65,17 +59,17 @@ export function EditorMetadataForm() {
 
   return (
     <div className="space-y-4 rounded-lg border border-border bg-card p-4 shadow-sm">
-      <h2 className="text-lg font-semibold">文章信息</h2>
+      <h2 className="text-lg font-semibold">{t("heading")}</h2>
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* 标题 */}
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="title">
-            标题 <span className="text-destructive">*</span>
+            {t("title.label")} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="title"
-            placeholder="输入文章标题..."
+            placeholder={t("title.placeholder")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -85,10 +79,10 @@ export function EditorMetadataForm() {
 
         {/* 描述 */}
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="description">描述</Label>
+          <Label htmlFor="description">{t("description.label")}</Label>
           <Input
             id="description"
-            placeholder="简短描述文章内容..."
+            placeholder={t("description.placeholder")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -97,12 +91,14 @@ export function EditorMetadataForm() {
         {/* 标签 */}
         <div className="space-y-2">
           <Label htmlFor="tags">
-            标签{" "}
-            <span className="text-muted-foreground text-xs">(逗号分隔)</span>
+            {t("tags.label")}{" "}
+            <span className="text-muted-foreground text-xs">
+              ({t("tags.hint")})
+            </span>
           </Label>
           <Input
             id="tags"
-            placeholder="算法, 系统设计, React"
+            placeholder={t("tags.placeholder")}
             value={tagsInputValue}
             onChange={(e) => handleTagsChange(e.target.value)}
             onBlur={handleTagsBlur}
@@ -112,18 +108,18 @@ export function EditorMetadataForm() {
         {/* 文件名 */}
         <div className="space-y-2">
           <Label htmlFor="filename">
-            文件名 <span className="text-destructive">*</span>
+            {t("filename.label")} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="filename"
-            placeholder="my-article"
+            placeholder={t("filename.placeholder")}
             value={filename}
             onChange={(e) => setFilename(e.target.value)}
             onBlur={handleFilenameBlur}
             required
             className={cn(!filename && "aria-invalid:border-destructive")}
           />
-          <p className="text-xs text-muted-foreground">自动添加 .md 后缀</p>
+          <p className="text-xs text-muted-foreground">{t("filename.hint")}</p>
         </div>
       </div>
 

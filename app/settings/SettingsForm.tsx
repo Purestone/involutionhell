@@ -5,6 +5,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/lib/use-auth";
 import { useTheme } from "@/app/components/ThemeProvider";
 
@@ -49,6 +50,7 @@ export function SettingsForm() {
   const { status } = useAuth();
   const { theme: currentTheme, setTheme } = useTheme();
   const router = useRouter();
+  const t = useTranslations("settings");
 
   // 初始值：主题从 ThemeProvider 读（避免表单与页面实际主题不一致），
   // 语言从 locale cookie 读（与 middleware 写的值保持同步）
@@ -90,7 +92,7 @@ export function SettingsForm() {
     // token 缺失时立刻结束 loading 并提示 + 跳转，否则页面会卡在骨架屏
     if (!token) {
       setLoading(false);
-      showToast("error", "登录态丢失，请重新登录");
+      showToast("error", t("toast.tokenMissing"));
       router.replace("/login?redirect=/settings");
       return;
     }
@@ -99,7 +101,7 @@ export function SettingsForm() {
       headers: { satoken: token },
     })
       .then((res) => {
-        if (!res.ok) throw new Error("获取偏好失败");
+        if (!res.ok) throw new Error(t("toast.fetchFail"));
         return res.json();
       })
       .then((body) => {
@@ -115,7 +117,7 @@ export function SettingsForm() {
         }
       })
       .catch(() => {
-        showToast("error", "无法加载偏好设置，已显示默认值");
+        showToast("error", t("toast.loadError"));
       })
       .finally(() => setLoading(false));
     // setTheme 是 ThemeProvider 提供的稳定引用，router 同理；这里依赖 status 变化触发
@@ -143,7 +145,7 @@ export function SettingsForm() {
     const token = getToken();
     // token 缺失时给明确反馈并跳转登录，而不是静默返回让用户摸不着头脑
     if (!token) {
-      showToast("error", "登录态丢失，请重新登录后再保存");
+      showToast("error", t("toast.tokenMissingSave"));
       router.replace("/login?redirect=/settings");
       return;
     }
@@ -157,7 +159,7 @@ export function SettingsForm() {
         },
         body: JSON.stringify(prefs),
       });
-      if (!res.ok) throw new Error("保存失败");
+      if (!res.ok) throw new Error(t("toast.saveFail"));
       const body = await res.json();
       if (body?.data) {
         const merged: UserPreferences = { ...DEFAULT_PREFS, ...body.data };
@@ -167,9 +169,9 @@ export function SettingsForm() {
         // 语言变化写回 cookie，供文档页 Server Component 读取
         document.cookie = `locale=${merged.language};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
       }
-      showToast("success", "偏好设置已保存");
+      showToast("success", t("toast.saveSuccess"));
     } catch {
-      showToast("error", "保存失败，请稍后重试");
+      showToast("error", t("toast.saveFail"));
     } finally {
       setSaving(false);
     }
@@ -190,9 +192,9 @@ export function SettingsForm() {
   if (status === "unauthenticated") return null;
 
   const themeOptions: { value: UserPreferences["theme"]; label: string }[] = [
-    { value: "light", label: "浅色" },
-    { value: "dark", label: "深色" },
-    { value: "system", label: "跟随系统" },
+    { value: "light", label: t("theme.light") },
+    { value: "dark", label: t("theme.dark") },
+    { value: "system", label: t("theme.system") },
   ];
 
   const langOptions: { value: UserPreferences["language"]; label: string }[] = [
@@ -204,7 +206,7 @@ export function SettingsForm() {
     value: UserPreferences["aiDefaultProvider"];
     label: string;
   }[] = [
-    { value: "intern", label: "书生（InternLM）" },
+    { value: "intern", label: t("ai.intern") },
     { value: "openai", label: "OpenAI" },
     { value: "gemini", label: "Gemini" },
   ];
@@ -226,7 +228,9 @@ export function SettingsForm() {
 
       {/* 主题设置 */}
       <section>
-        <label className="block font-serif font-bold text-lg mb-3">主题</label>
+        <label className="block font-serif font-bold text-lg mb-3">
+          {t("theme.label")}
+        </label>
         <div className="flex gap-0 border border-[var(--foreground)]">
           {themeOptions.map(({ value, label }) => (
             <button
@@ -251,7 +255,9 @@ export function SettingsForm() {
 
       {/* 语言设置 */}
       <section>
-        <label className="block font-serif font-bold text-lg mb-3">语言</label>
+        <label className="block font-serif font-bold text-lg mb-3">
+          {t("language.label")}
+        </label>
         <div className="flex gap-0 border border-[var(--foreground)]">
           {langOptions.map(({ value, label }) => (
             <button
@@ -277,7 +283,7 @@ export function SettingsForm() {
       {/* AI 默认提供商 */}
       <section>
         <label className="block font-serif font-bold text-lg mb-3">
-          AI 默认提供商
+          {t("ai.label")}
         </label>
         <div className="flex gap-0 border border-[var(--foreground)]">
           {aiOptions.map(({ value, label }) => (
@@ -307,7 +313,7 @@ export function SettingsForm() {
           disabled={saving}
           className="font-mono text-sm uppercase tracking-widest px-8 py-3 border-2 border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)] hover:bg-transparent hover:text-[var(--foreground)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {saving ? "保存中..." : "保存设置"}
+          {saving ? t("saving") : t("save")}
         </button>
       </div>
     </div>

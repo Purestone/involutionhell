@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Avatar,
   AvatarFallback,
@@ -22,6 +23,7 @@ interface UserMenuProps {
 
 export function UserMenu({ user, provider, logout }: UserMenuProps) {
   const initials = user.name?.[0] ?? user.email?.[0] ?? "?";
+  const t = useTranslations("userMenu");
 
   return (
     <details className="relative inline-block text-left">
@@ -67,7 +69,7 @@ export function UserMenu({ user, provider, logout }: UserMenuProps) {
             className="block px-4 py-2 text-sm text-neutral-900 dark:text-neutral-100 transition hover:bg-neutral-100 dark:hover:bg-neutral-800"
             data-umami-event="user_menu_profile_click"
           >
-            我的主页
+            {t("profile")}
           </Link>
         )}
 
@@ -77,7 +79,7 @@ export function UserMenu({ user, provider, logout }: UserMenuProps) {
           className="block px-4 py-2 text-sm text-neutral-900 dark:text-neutral-100 transition hover:bg-neutral-100 dark:hover:bg-neutral-800"
           data-umami-event="user_menu_settings_click"
         >
-          设置
+          {t("settings")}
         </Link>
 
         {provider === "github" ? (
@@ -87,7 +89,7 @@ export function UserMenu({ user, provider, logout }: UserMenuProps) {
             rel="noreferrer"
             className="block px-4 py-2 text-sm text-neutral-900 dark:text-neutral-100 transition hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
-            切换 GitHub 账号（将在新标签页登出 GitHub）
+            {t("switchGithub")}
           </a>
         ) : null}
 
@@ -95,7 +97,7 @@ export function UserMenu({ user, provider, logout }: UserMenuProps) {
           onClick={() => void logout()}
           className="w-full px-4 py-2 text-left text-sm text-neutral-900 dark:text-neutral-100 transition hover:bg-neutral-100 dark:hover:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700"
         >
-          Sign out
+          {t("signOut")}
         </button>
       </div>
     </details>

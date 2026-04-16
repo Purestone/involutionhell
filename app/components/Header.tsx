@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
@@ -7,11 +8,10 @@ import { AuthNav } from "./AuthNav";
 import { BrandMark } from "./BrandMark";
 import { LiveEditionLabel } from "./LiveEditionLabel";
 
-// 改为普通服务端组件，登录状态由客户端 AuthNav 处理
-export function Header() {
+export async function Header() {
+  const t = await getTranslations("header");
   const now = new Date();
   const editionTimestampMs = now.getTime();
-  // 使用 UTC 时区格式化日期，保证服务端渲染结果与客户端一致
   const formattedDate = now.toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
@@ -30,14 +30,6 @@ export function Header() {
         </div>
 
         <div className="flex items-center justify-between h-10">
-          {/*
-            导航对齐当前信息架构（2026-04 重构后）：
-            - 去掉"首页"：左上角 BrandMark 已经是回首页入口，避免冗余
-            - 去掉"特点"：Features 组件已经删除，旧的 /#features 锚点不存在
-            - 文档 / 排行榜：站点两大主路由，提到顶
-            - 社区：保留 /#community 锚点（指向首页底部 DispatchNetwork 的 GitHub/Discord/Zotero bar）
-            - 联系：缩写自"联系我们"，/#contact 还在 Footer 里
-          */}
           <nav className="hidden md:flex items-center gap-8 font-sans text-xs font-bold uppercase tracking-widest text-[var(--foreground)]">
             <Link
               href="/docs"
@@ -46,7 +38,7 @@ export function Header() {
               data-umami-event-region="header"
               data-umami-event-label="docs"
             >
-              文档
+              {t("nav.docs")}
             </Link>
             <Link
               href="/rank"
@@ -55,7 +47,7 @@ export function Header() {
               data-umami-event-region="header"
               data-umami-event-label="rank"
             >
-              排行榜
+              {t("nav.rank")}
             </Link>
             <Link
               href="/#community"
@@ -64,7 +56,7 @@ export function Header() {
               data-umami-event-region="header"
               data-umami-event-label="community"
             >
-              社区
+              {t("nav.community")}
             </Link>
             <Link
               href="/#contact"
@@ -73,7 +65,7 @@ export function Header() {
               data-umami-event-region="header"
               data-umami-event-label="contact"
             >
-              联系
+              {t("nav.contact")}
             </Link>
           </nav>
 
@@ -115,7 +107,6 @@ export function Header() {
               </a>
             </Button>
             <ThemeToggle />
-            {/* AuthNav 是客户端组件，内部通过 useAuth() 自动处理登录/未登录状态 */}
             <AuthNav />
           </div>
         </div>

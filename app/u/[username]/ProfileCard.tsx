@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useT } from "@/lib/i18n/client";
+import { useTranslations } from "next-intl";
 
 /**
  * URL scheme 白名单：仅允许 http(s)/mailto 和相对路径（/ 开头）。
@@ -60,12 +60,12 @@ export function ProfileCard({
   spanFull,
 }: ProfileCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const t = useT();
+  const t = useTranslations("card");
 
   const kindLabel = {
-    PROJ: t("card.kind.project"),
-    PAPER: t("card.kind.paper"),
-    DOC: t("card.kind.doc"),
+    PROJ: t("kind.project"),
+    PAPER: t("kind.paper"),
+    DOC: t("kind.doc"),
   }[kind];
 
   // desktop 走 hover（CSS 驱动，见下面的 group-hover 样式），mobile 走 tap toggle；
@@ -162,7 +162,7 @@ export function ProfileCard({
             onClick={(e) => e.stopPropagation()}
             className="font-mono text-[10px] uppercase tracking-widest text-[#CC0000] hover:underline"
           >
-            {t("card.view")}
+            {t("view")}
           </Link>
         </div>
       )}
