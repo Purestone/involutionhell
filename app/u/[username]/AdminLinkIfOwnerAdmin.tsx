@@ -36,7 +36,7 @@ export function AdminLinkIfOwnerAdmin({ ownerGithubId, ownerUsername }: Props) {
 
   return (
     <Link
-      href="/admin/events"
+      href="/admin"
       className="font-mono text-[11px] uppercase tracking-widest px-2 py-1 border border-[#CC0000] text-[#CC0000] hover:bg-[#CC0000] hover:text-white transition-colors font-bold"
       data-umami-event="profile_admin_click"
     >

@@ -185,8 +185,11 @@ function EventCard({ event }: { event: EventView }) {
 }
 
 function formatDate(iso: string): string {
+  // new Date(iso) 遇到非法字符串不 throw，只会返回一个 getTime() === NaN 的 Invalid Date，
+  // 直接调 toLocaleDateString 会输出字面量 "Invalid Date"，所以必须显式检查。
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
   try {
-    const d = new Date(iso);
     return d.toLocaleDateString("zh-CN", {
       year: "numeric",
       month: "short",

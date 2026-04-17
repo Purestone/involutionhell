@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import type { HomepageEvent } from "@/lib/events-fetch";
 import { cn } from "@/lib/utils";
@@ -119,13 +118,19 @@ export function FloatWindow({ event }: FloatWindowProps) {
             {/* Content */}
             <div className="p-0">
               {/* 图片区域 - 默认为灰度（暗黑模式除外） */}
+              {/*
+                用原生 <img> 不走 next/image：活动后台允许管理员填外链封面 URL，
+                next/image 需要提前把外链域名加到 next.config.mjs remotePatterns 白名单，
+                否则运行时会 500，把 FloatWindow 整个挂掉。原生 <img> 只负责渲染，
+                安全性由后端 EventRequest.coverUrl 做 URL scheme 校验承担。
+                /events 列表页也是这个策略，保持一致。
+              */}
               <div className="relative aspect-[16/9] border-b border-[#111111] dark:border-[#F9F9F7] overflow-hidden group">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={currentEvent.coverUrl}
                   alt={currentEvent.name}
-                  fill
-                  className="object-cover transition-all duration-500"
-                  sizes="280px"
+                  className="absolute inset-0 w-full h-full object-cover transition-all duration-500"
                   draggable={false}
                 />
                 {/* 突发新闻徽章 */}

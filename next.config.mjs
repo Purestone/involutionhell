@@ -77,6 +77,15 @@ const config = {
         source: "/api/admin/events/:path*",
         destination: `${backendUrl}/api/admin/events/:path*`,
       },
+      {
+        // 超管用户管理（后端 @SaCheckRole("superadmin") 做权限校验）
+        source: "/api/admin/users",
+        destination: `${backendUrl}/api/admin/users`,
+      },
+      {
+        source: "/api/admin/users/:path*",
+        destination: `${backendUrl}/api/admin/users/:path*`,
+      },
     ];
   },
   images: {
@@ -158,15 +167,20 @@ const finalConfig = withNextIntl(withMDX(config));
 // widenClientFileUpload 扩大 source map 扫描范围，保证前端错误堆栈能解出来。
 // disableLogger 树摇掉 Sentry 自带 logger，减小 bundle 体积。
 //
-// 守门条件：只有在存在 SENTRY_AUTH_TOKEN 时才启用 withSentryConfig。
-// 贡献者 clone 仓库后没配 Sentry env 也能直接 `pnpm build` / `pnpm dev`，
-// 不会因为 webpack 插件缺凭据而构建失败。生产 Vercel 那边 env 齐全，正常上报。
-const enableSentry = Boolean(process.env.SENTRY_AUTH_TOKEN);
+// 守门条件：三件套 AUTH_TOKEN + ORG + PROJECT 必须同时齐全才启用（Copilot CR）。
+// 以前只看 AUTH_TOKEN 并给 org/project 硬编码 fallback，导致谁本地只设 token
+// 不设 org/project 时会把 source map 错传到默认项目污染错误归因。现在要么配齐，
+// 要么完全跳过 webpack 插件 —— 贡献者 clone 仓库后零配置也能 `pnpm build`。
+const enableSentry = Boolean(
+  process.env.SENTRY_AUTH_TOKEN &&
+    process.env.SENTRY_ORG &&
+    process.env.SENTRY_PROJECT,
+);
 
 export default enableSentry
   ? withSentryConfig(finalConfig, {
-      org: process.env.SENTRY_ORG || "involutionhell",
-      project: process.env.SENTRY_PROJECT || "sentry-bole-notebook",
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
       silent: !process.env.CI,
       widenClientFileUpload: true,
       disableLogger: true,
