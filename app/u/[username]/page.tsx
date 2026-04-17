@@ -13,6 +13,7 @@ import { FollowButton } from "./FollowButton";
 import { GithubRepos, GithubReposSkeleton } from "./GithubRepos";
 import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
+import { sanitizeExternalUrl } from "@/lib/url-safety";
 
 interface UserView {
   id: number;
@@ -233,31 +234,6 @@ async function fetchProfile(identifier: string): Promise<ProfileData | null> {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
-}
-
-/**
- * URL scheme 白名单：仅允许 http(s)/mailto，拦截 javascript: / data: 等向量。
- * 任何 preferences 里的 URL 在渲染前必须过这里。
- */
-function sanitizeExternalUrl(raw: string | undefined | null): string | null {
-  if (!raw || typeof raw !== "string") return null;
-  const trimmed = raw.trim();
-  if (!trimmed) return null;
-  try {
-    // 允许相对路径（以 / 开头），直接放行
-    if (trimmed.startsWith("/") && !trimmed.startsWith("//")) return trimmed;
-    const u = new URL(trimmed);
-    if (
-      u.protocol === "http:" ||
-      u.protocol === "https:" ||
-      u.protocol === "mailto:"
-    ) {
-      return u.toString();
-    }
-    return null;
-  } catch {
-    return null;
-  }
 }
 
 /**

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import type { EventView } from "./types";
+import { sanitizeMediaUrl } from "@/lib/url-safety";
 
 /**
  * /events 列表页。
@@ -129,14 +130,16 @@ function EventSection({
 }
 
 function EventCard({ event }: { event: EventView }) {
+  // 后端传来的 coverUrl 理论上干净，但走 XSS 白名单防管理员填错或历史脏数据
+  const safeCoverUrl = sanitizeMediaUrl(event.coverUrl);
   return (
     <li className="border border-[var(--foreground)] hover:border-[#CC0000] transition-colors group">
       <Link href={`/events/${event.id}`} className="block">
-        {event.coverUrl ? (
+        {safeCoverUrl ? (
           // 用原生 img：/next.config.mjs 里全站 unoptimized:true，没必要走 next/image
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={event.coverUrl}
+            src={safeCoverUrl}
             alt={event.title}
             className="w-full aspect-[16/9] object-cover border-b border-[var(--foreground)]"
           />

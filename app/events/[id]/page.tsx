@@ -5,6 +5,7 @@ import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import type { EventDetailResponse, EventView } from "../types";
 import { InterestButton } from "./InterestButton";
+import { sanitizeExternalUrl, sanitizeMediaUrl } from "@/lib/url-safety";
 
 /**
  * /events/[id] 详情页。SSR 拉 /api/events/{id}。
@@ -69,7 +70,14 @@ export default async function EventDetailPage({ params }: Param) {
   if (!data) notFound();
 
   const event = data.event;
+  // 所有外来 URL 都过 XSS 白名单——jobs: 拦 javascript: / data: / vbscript:
+  // 等在 <a href> / <img src> 场景下会触发脚本执行或数据外泄的向量。
+  // toYoutubeEmbed 内部已经做了 host 白名单（只返回 youtube.com/embed/*），
+  // 但 fallback 的 <a> 链接仍然需要走 sanitize。
   const embedUrl = toYoutubeEmbed(event.playbackUrl);
+  const safeCoverUrl = sanitizeMediaUrl(event.coverUrl);
+  const safePlaybackUrl = sanitizeExternalUrl(event.playbackUrl);
+  const safeDiscordLink = sanitizeExternalUrl(event.discordLink);
 
   return (
     <>
@@ -107,10 +115,10 @@ export default async function EventDetailPage({ params }: Param) {
             )}
           </header>
 
-          {event.coverUrl && (
+          {safeCoverUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={event.coverUrl}
+              src={safeCoverUrl}
               alt={event.title}
               className="w-full aspect-[16/9] object-cover border border-[var(--foreground)] mt-6"
             />
@@ -132,41 +140,47 @@ export default async function EventDetailPage({ params }: Param) {
                 Speakers
               </h2>
               <ul className="flex flex-wrap gap-4">
-                {event.speakers.map((s) => (
-                  <li
-                    key={s.name}
-                    className="flex items-center gap-3 border border-[var(--foreground)] px-3 py-2"
-                  >
-                    {s.avatarUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={s.avatarUrl}
-                        alt={s.name}
-                        className="w-8 h-8 border border-[var(--foreground)] object-cover"
-                      />
-                    )}
-                    {s.profileUrl ? (
-                      <a
-                        href={s.profileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-serif text-sm font-semibold hover:text-[#CC0000] transition-colors"
-                      >
-                        {s.name}
-                      </a>
-                    ) : (
-                      <span className="font-serif text-sm font-semibold">
-                        {s.name}
-                      </span>
-                    )}
-                  </li>
-                ))}
+                {event.speakers.map((s) => {
+                  const safeProfileUrl = sanitizeExternalUrl(s.profileUrl);
+                  const safeAvatarUrl = sanitizeMediaUrl(s.avatarUrl);
+                  return (
+                    <li
+                      key={s.name}
+                      className="flex items-center gap-3 border border-[var(--foreground)] px-3 py-2"
+                    >
+                      {safeAvatarUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={safeAvatarUrl}
+                          alt={s.name}
+                          className="w-8 h-8 border border-[var(--foreground)] object-cover"
+                        />
+                      )}
+                      {safeProfileUrl ? (
+                        <a
+                          href={safeProfileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-serif text-sm font-semibold hover:text-[#CC0000] transition-colors"
+                        >
+                          {s.name}
+                        </a>
+                      ) : (
+                        <span className="font-serif text-sm font-semibold">
+                          {s.name}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </section>
           )}
 
-          {/* 回放：YouTube 可嵌入就内嵌，不行就给按钮 */}
-          {event.playbackUrl && (
+          {/* 回放：YouTube 可嵌入就内嵌；不行就看 safePlaybackUrl 有没有值给按钮。
+              embedUrl 来自 toYoutubeEmbed 自带 host 白名单；safePlaybackUrl 走
+              通用 scheme 白名单。两者都 null 时整块不渲染（连标题一起隐藏）。 */}
+          {(embedUrl || safePlaybackUrl) && (
             <section className="mt-10">
               <h2 className="font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4">
                 回放 · Playback
@@ -181,16 +195,16 @@ export default async function EventDetailPage({ params }: Param) {
                     className="w-full h-full"
                   />
                 </div>
-              ) : (
+              ) : safePlaybackUrl ? (
                 <a
-                  href={event.playbackUrl}
+                  href={safePlaybackUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-block font-mono text-xs uppercase tracking-widest px-4 py-2 border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
                 >
                   前往回放 →
                 </a>
-              )}
+              ) : null}
             </section>
           )}
 
@@ -201,9 +215,9 @@ export default async function EventDetailPage({ params }: Param) {
               initialCount={event.interestCount}
               initialInterested={data.interested}
             />
-            {event.discordLink && (
+            {safeDiscordLink && (
               <a
-                href={event.discordLink}
+                href={safeDiscordLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-mono text-xs uppercase tracking-widest px-4 py-2 border border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)] hover:bg-[#CC0000] hover:border-[#CC0000] transition-colors"
