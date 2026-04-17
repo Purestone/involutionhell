@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ThemeToggle } from "./ThemeToggle";
+import { LocaleToggle } from "./LocaleToggle";
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import { Github as GithubIcon } from "./icons/Github";
@@ -29,7 +30,7 @@ export async function Header() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between h-10">
+        <div className="flex items-center justify-end md:justify-between h-10">
           <nav className="hidden md:flex items-center gap-8 font-sans text-xs font-bold uppercase tracking-widest text-[var(--foreground)]">
             <Link
               href="/docs"
@@ -106,6 +107,7 @@ export async function Header() {
                 <MessageCircle className="h-4 w-4" />
               </a>
             </Button>
+            <LocaleToggle />
             <ThemeToggle />
             <AuthNav />
           </div>
