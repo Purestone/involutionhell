@@ -1,0 +1,287 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Header } from "@/app/components/Header";
+import { Footer } from "@/app/components/Footer";
+import type { EventDetailResponse, EventView } from "../types";
+import { InterestButton } from "./InterestButton";
+
+/**
+ * /events/[id] 详情页。SSR 拉 /api/events/{id}。
+ *
+ * 核心信息摆放：
+ *   - 头部：标题 + 时间 + 状态 + tags
+ *   - 描述大段落
+ *   - 讲师列表（有则渲染，没有则隐藏整块）
+ *   - 回放嵌入区：优先 iframe（YouTube 直接内嵌），其次普通链接按钮
+ *   - Discord / 感兴趣按钮（感兴趣是 Client Component 独立管理登录状态）
+ */
+
+export const revalidate = 300;
+
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+}
+
+async function fetchDetail(id: string): Promise<EventDetailResponse | null> {
+  const backendUrl = process.env.BACKEND_URL;
+  if (!backendUrl) throw new Error("BACKEND_URL is not configured");
+  const res = await fetch(
+    `${backendUrl}/api/events/${encodeURIComponent(id)}`,
+    {
+      next: { revalidate: 300 },
+      headers: {
+        accept: "application/json",
+        "user-agent": "InvolutionHell-SSR/1.0 (+https://involutionhell.com)",
+      },
+    },
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(
+      `/api/events/${id} backend ${res.status} ${res.statusText}`,
+    );
+  }
+  const json = (await res.json()) as ApiResponse<EventDetailResponse>;
+  if (!json.success || !json.data) return null;
+  return json.data;
+}
+
+interface Param {
+  params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: Param): Promise<Metadata> {
+  const { id } = await params;
+  const data = await fetchDetail(id);
+  if (!data) return { title: `活动 #${id} · Involution Hell` };
+  return {
+    title: `${data.event.title} · Involution Hell`,
+    description: data.event.description || "Involution Hell 社群活动详情。",
+  };
+}
+
+export default async function EventDetailPage({ params }: Param) {
+  const { id } = await params;
+  const data = await fetchDetail(id);
+  if (!data) notFound();
+
+  const event = data.event;
+  const embedUrl = toYoutubeEmbed(event.playbackUrl);
+
+  return (
+    <>
+      <Header />
+      <main className="pt-32 pb-16 bg-[var(--background)] min-h-screen">
+        <div className="max-w-4xl mx-auto px-6 lg:px-8">
+          {/* 返回链接 */}
+          <Link
+            href="/events"
+            className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 hover:text-[#CC0000] transition-colors"
+          >
+            ← 所有活动
+          </Link>
+
+          <header className="mt-4 border-t-4 border-[var(--foreground)] pt-6">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <StatusBadge event={event} />
+              {event.tags.map((t) => (
+                <span
+                  key={t}
+                  className="font-mono text-[10px] uppercase tracking-widest text-neutral-500 border border-neutral-400 px-2 py-0.5"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+            <h1 className="font-serif text-3xl md:text-5xl font-black uppercase tracking-tight text-[var(--foreground)]">
+              {event.title}
+            </h1>
+            {event.startTime && (
+              <p className="mt-3 font-mono text-xs text-neutral-500">
+                {formatDateTime(event.startTime)}
+                {event.endTime && <> — {formatDateTime(event.endTime)}</>}
+              </p>
+            )}
+          </header>
+
+          {event.coverUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={event.coverUrl}
+              alt={event.title}
+              className="w-full aspect-[16/9] object-cover border border-[var(--foreground)] mt-6"
+            />
+          )}
+
+          {event.description && (
+            <section className="mt-8 prose prose-neutral dark:prose-invert max-w-none leading-relaxed">
+              {event.description.split(/\n{2,}/).map((para, i) => (
+                <p key={i} className="text-sm md:text-base">
+                  {para}
+                </p>
+              ))}
+            </section>
+          )}
+
+          {event.speakers.length > 0 && (
+            <section className="mt-10">
+              <h2 className="font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4">
+                Speakers
+              </h2>
+              <ul className="flex flex-wrap gap-4">
+                {event.speakers.map((s) => (
+                  <li
+                    key={s.name}
+                    className="flex items-center gap-3 border border-[var(--foreground)] px-3 py-2"
+                  >
+                    {s.avatarUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={s.avatarUrl}
+                        alt={s.name}
+                        className="w-8 h-8 border border-[var(--foreground)] object-cover"
+                      />
+                    )}
+                    {s.profileUrl ? (
+                      <a
+                        href={s.profileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-serif text-sm font-semibold hover:text-[#CC0000] transition-colors"
+                      >
+                        {s.name}
+                      </a>
+                    ) : (
+                      <span className="font-serif text-sm font-semibold">
+                        {s.name}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* 回放：YouTube 可嵌入就内嵌，不行就给按钮 */}
+          {event.playbackUrl && (
+            <section className="mt-10">
+              <h2 className="font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4">
+                回放 · Playback
+              </h2>
+              {embedUrl ? (
+                <div className="aspect-video border border-[var(--foreground)]">
+                  <iframe
+                    src={embedUrl}
+                    title={`${event.title} 回放`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
+                  />
+                </div>
+              ) : (
+                <a
+                  href={event.playbackUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block font-mono text-xs uppercase tracking-widest px-4 py-2 border border-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
+                >
+                  前往回放 →
+                </a>
+              )}
+            </section>
+          )}
+
+          {/* 操作区：感兴趣 + Discord */}
+          <section className="mt-12 flex flex-wrap items-center gap-4 border-t border-[var(--foreground)]/40 pt-6">
+            <InterestButton
+              eventId={event.id}
+              initialCount={event.interestCount}
+              initialInterested={data.interested}
+            />
+            {event.discordLink && (
+              <a
+                href={event.discordLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs uppercase tracking-widest px-4 py-2 border border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)] hover:bg-[#CC0000] hover:border-[#CC0000] transition-colors"
+              >
+                进入 Discord →
+              </a>
+            )}
+          </section>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+function StatusBadge({ event }: { event: EventView }) {
+  if (event.ongoing)
+    return (
+      <span className="font-mono text-[10px] uppercase tracking-widest bg-[#CC0000] text-white px-2 py-0.5">
+        进行中
+      </span>
+    );
+  if (event.past)
+    return (
+      <span className="font-mono text-[10px] uppercase tracking-widest border border-neutral-400 text-neutral-500 px-2 py-0.5">
+        已结束
+      </span>
+    );
+  if (event.status === "published")
+    return (
+      <span className="font-mono text-[10px] uppercase tracking-widest border border-[var(--foreground)] text-[var(--foreground)] px-2 py-0.5">
+        即将开始
+      </span>
+    );
+  return (
+    <span className="font-mono text-[10px] uppercase tracking-widest border border-neutral-400 text-neutral-500 px-2 py-0.5">
+      {event.status}
+    </span>
+  );
+}
+
+/**
+ * 如果 playback URL 是 YouTube 视频链接，转换成 embed URL。
+ * 其他链接（Drive / 站内 docs）不做 iframe 嵌入，避免 X-Frame-Options 报错。
+ */
+function toYoutubeEmbed(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    if (u.hostname === "youtu.be") {
+      return `https://www.youtube.com/embed/${u.pathname.slice(1)}`;
+    }
+    if (
+      u.hostname.endsWith("youtube.com") ||
+      u.hostname.endsWith("youtube-nocookie.com")
+    ) {
+      const videoId = u.searchParams.get("v");
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+      // 已经是 /embed/ 路径
+      if (u.pathname.startsWith("/embed/")) return url;
+    }
+  } catch {
+    // 非法 URL 直接跳过
+  }
+  return null;
+}
+
+function formatDateTime(iso: string): string {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString("zh-CN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return iso;
+  }
+}
