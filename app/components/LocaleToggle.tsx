@@ -15,11 +15,14 @@
  *   - 简单的 ZH / EN 双字母展示，当前语言高亮；button 尺寸与 ThemeToggle 对齐
  */
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 type Locale = "zh" | "en";
+
+// 自定义事件名：toggle 点击后 dispatch，通知 useSyncExternalStore 重新读取 cookie
+const LOCALE_EVENT = "locale-toggle-change";
 
 function readLocaleCookie(): Locale {
   if (typeof document === "undefined") return "zh";
@@ -33,21 +36,35 @@ function writeLocaleCookie(next: Locale) {
   document.cookie = `locale=${next};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
 }
 
+// 订阅 LOCALE_EVENT，toggle 时主动 dispatch 让 useSyncExternalStore 重新读 cookie
+function subscribeLocale(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(LOCALE_EVENT, callback);
+  return () => window.removeEventListener(LOCALE_EVENT, callback);
+}
+
+const emptySubscribe = () => () => {};
+
 export function LocaleToggle() {
   const router = useRouter();
-  // 初始 render 先给默认值避免 hydration 不一致，真实值由 useEffect 读 cookie 后覆盖
-  const [locale, setLocale] = useState<Locale>("zh");
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    setLocale(readLocaleCookie());
-    setReady(true);
-  }, []);
+  // 用 useSyncExternalStore 替代 useEffect+setState：SSR 返回 "zh"，客户端读 cookie
+  const locale = useSyncExternalStore<Locale>(
+    subscribeLocale,
+    () => readLocaleCookie(),
+    () => "zh",
+  );
+  // ready 表示已 hydrate 到客户端，可以按真实 locale 高亮
+  const ready = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   const toggle = () => {
     const next: Locale = locale === "zh" ? "en" : "zh";
     writeLocaleCookie(next);
-    setLocale(next);
+    // 通知所有订阅者（当前组件）重新从 cookie 读取
+    window.dispatchEvent(new Event(LOCALE_EVENT));
     // 刷新 server component 树，重新按 cookie 渲染各页面
     router.refresh();
   };

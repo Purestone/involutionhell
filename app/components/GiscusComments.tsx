@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Giscus from "@giscus/react";
 import { useTheme } from "./ThemeProvider";
 
@@ -8,6 +8,10 @@ interface GiscusCommentsProps {
   className?: string;
   docId?: string | null;
 }
+
+// 用 useSyncExternalStore 代替 useEffect+setState(true) 的 mounted 哨兵，
+// SSR 快照固定返回 false，客户端返回 true，避免 react-hooks/set-state-in-effect
+const emptySubscribe = () => () => {};
 
 export function GiscusComments({ className, docId }: GiscusCommentsProps) {
   const { theme } = useTheme();
@@ -18,15 +22,15 @@ export function GiscusComments({ className, docId }: GiscusCommentsProps) {
   // 如果这里直接渲染 Giscus，iframe 会以 SSR 的错主题加载；之后即使 key 变化触发
   // remount，@giscus/react 的 iframe 也可能残留旧 theme。延迟到 mount 后再渲染，
   // 用的就是客户端已经对齐过 localStorage 的主题。
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
   const [isSystemDark, setIsSystemDark] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (theme !== "system" || typeof window === "undefined") return;

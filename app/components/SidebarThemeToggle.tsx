@@ -8,18 +8,21 @@
  * 内置按钮点击无效；这里直接 setTheme 到自建 ThemeProvider 即可）。
  */
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import { cn } from "@/lib/utils";
 
+// 用 useSyncExternalStore 处理 SSR/CSR mounted 差异，避免 effect 内 setState
+const emptySubscribe = () => () => {};
+
 export function SidebarThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   // 把 "system" 折算成实际显示主题，决定哪个 icon 高亮
   const resolved = (() => {
