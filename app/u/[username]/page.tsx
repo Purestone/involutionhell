@@ -7,6 +7,7 @@ import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import { ProfileCard } from "./ProfileCard";
 import { EditLinkIfOwner } from "./EditLinkIfOwner";
+import { AdminLinkIfOwnerAdmin } from "./AdminLinkIfOwnerAdmin";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { FollowButton } from "./FollowButton";
 import { GithubRepos, GithubReposSkeleton } from "./GithubRepos";
@@ -409,6 +410,11 @@ export default async function UserProfilePage({ params }: Param) {
                   ownerGithubId={user.githubId ?? null}
                   ownerUsername={user.username}
                   identifier={username}
+                />
+                {/* 管理员自见入口：只有 roles=admin 的本人访问自己主页时才渲染 */}
+                <AdminLinkIfOwnerAdmin
+                  ownerGithubId={user.githubId ?? null}
+                  ownerUsername={user.username}
                 />
                 <Link
                   href="/rank"
