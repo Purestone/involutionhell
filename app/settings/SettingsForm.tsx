@@ -168,6 +168,8 @@ export function SettingsForm() {
         setTheme(merged.theme);
         // 语言变化写回 cookie，供文档页 Server Component 读取
         document.cookie = `locale=${merged.language};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
+        // Server Component（文档 sidebar / 正文）读 cookie，必须刷新 RSC 才能反映新 locale
+        router.refresh();
       }
       showToast("success", t("toast.saveSuccess"));
     } catch {
@@ -267,6 +269,8 @@ export function SettingsForm() {
                 setPrefs((p) => ({ ...p, language: value }));
                 // 写 cookie 覆盖 middleware 的 IP 判断，让文档页 Server Component 读取
                 document.cookie = `locale=${value};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
+                // 立即刷新 RSC，让 sidebar / 正文按新 locale 重渲染（不刷会看起来没生效）
+                router.refresh();
               }}
               className={`flex-1 py-2 px-4 font-mono text-sm uppercase transition-colors ${
                 prefs.language === value
