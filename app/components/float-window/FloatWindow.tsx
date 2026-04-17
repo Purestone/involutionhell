@@ -123,7 +123,7 @@ export function FloatWindow({ event }: FloatWindowProps) {
                 next/image 需要提前把外链域名加到 next.config.mjs remotePatterns 白名单，
                 否则运行时会 500，把 FloatWindow 整个挂掉。原生 <img> 只负责渲染，
                 安全性由后端 EventRequest.coverUrl 做 URL scheme 校验承担。
-                / events 列表页也是这个策略，保持一致。
+                /events 列表页也是这个策略，保持一致。
               */}
               <div className="relative aspect-[16/9] border-b border-[#111111] dark:border-[#F9F9F7] overflow-hidden group">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

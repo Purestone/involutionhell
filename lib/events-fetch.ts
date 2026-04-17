@@ -73,7 +73,16 @@ export async function fetchHomepageEvents(): Promise<HomepageEvent[]> {
       return [];
     }
     const json = (await res.json()) as ApiResponse<EventView[]>;
-    if (!json.success || !json.data) return [];
+    if (!json.success || !json.data) {
+      // success=false 或缺少 data 分支：以前直接 return [] 会丢掉排障信息，
+      // 补一条 warn 携带 message / success / hasData，让 server log 能定位
+      console.warn("[fetchHomepageEvents] 后端返回业务失败或数据缺失", {
+        message: json.message,
+        success: json.success,
+        hasData: json.data !== undefined,
+      });
+      return [];
+    }
     return json.data
       .map(toHomepageEvent)
       // 未过期的活动排前面

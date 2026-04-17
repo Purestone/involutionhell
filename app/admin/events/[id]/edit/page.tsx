@@ -21,12 +21,11 @@ interface Param {
 export default function EditEventPage({ params }: Param) {
   // React 19 的 new-style async params：用 use() 同步解包 Promise
   const { id } = use(params);
-  // 路由参数不受控，可能是 "abc"、"12ab" 之类非法字符串；直接 Number() 得到 NaN
-  // 会让后续请求变成 /api/admin/events/NaN 并报一条迷惑错误（"活动不存在"）。
-  // 用 parseInt 严格解析 + Number.isFinite 双重校验，非法 id 直接传 null
-  // 让下游渲染一个"id 非法"的错误态，不打请求。
-  const parsed = Number.parseInt(id, 10);
-  const eventId = Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  // 路由参数不受控，可能是 "abc"、"12ab" 之类非法字符串。
+  // 必须"整串都是正整数"严格校验——不能用 parseInt，因为 "12ab" 会被宽松解析成
+  // 12 从而错误编辑到 id=12 的活动。用正则 ^[1-9]\d*$ 拒绝前导零 / 非数字字符 /
+  // 负号 / 小数点，非法时传 null 让下游渲染错误态，不打请求。
+  const eventId = /^[1-9]\d*$/.test(id) ? Number(id) : null;
 
   return (
     <AdminGuard>
