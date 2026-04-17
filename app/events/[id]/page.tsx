@@ -253,16 +253,27 @@ function toYoutubeEmbed(url: string | null | undefined): string | null {
   if (!url) return null;
   try {
     const u = new URL(url);
-    if (u.hostname === "youtu.be") {
+    // 严格白名单：只匹配 youtu.be 精确、或 youtube.com / youtube-nocookie.com
+    // 精确 + *.youtube.com / *.youtube-nocookie.com 子域名。
+    // 之前用 endsWith("youtube.com") 会把 evilyoutube.com 也判对，放进 iframe 后
+    // 相当于把任意第三方站点嵌进详情页。
+    const isYoutuBe = u.hostname === "youtu.be";
+    const isYoutubeHost =
+      u.hostname === "youtube.com" ||
+      u.hostname === "www.youtube.com" ||
+      u.hostname.endsWith(".youtube.com");
+    const isYoutubeNocookieHost =
+      u.hostname === "youtube-nocookie.com" ||
+      u.hostname === "www.youtube-nocookie.com" ||
+      u.hostname.endsWith(".youtube-nocookie.com");
+
+    if (isYoutuBe) {
       return `https://www.youtube.com/embed/${u.pathname.slice(1)}`;
     }
-    if (
-      u.hostname.endsWith("youtube.com") ||
-      u.hostname.endsWith("youtube-nocookie.com")
-    ) {
+    if (isYoutubeHost || isYoutubeNocookieHost) {
       const videoId = u.searchParams.get("v");
       if (videoId) return `https://www.youtube.com/embed/${videoId}`;
-      // 已经是 /embed/ 路径
+      // 已经是 /embed/ 路径（此时原 URL 就是白名单内 host + /embed/xxx，可直接返回）
       if (u.pathname.startsWith("/embed/")) return url;
     }
   } catch {
@@ -272,8 +283,10 @@ function toYoutubeEmbed(url: string | null | undefined): string | null {
 }
 
 function formatDateTime(iso: string): string {
+  // Invalid Date 检查同 /events/page.tsx 的 formatDate：new Date() 不抛。
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
   try {
-    const d = new Date(iso);
     return d.toLocaleString("zh-CN", {
       year: "numeric",
       month: "short",

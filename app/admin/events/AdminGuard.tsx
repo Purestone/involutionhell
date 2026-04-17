@@ -23,7 +23,11 @@ export function AdminGuard({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.replace("/login?next=/admin/events");
+      // 注意：登录页 / SignInButton 当前没实现 next 参数透传（走 GitHub OAuth
+      // 走 /oauth/render/github，回调后固定落在首页 #token=xxx）。这里就不带
+      // ?next=，避免"看起来支持其实不生效"的迷惑。登录成功后用户需自己再点
+      // 个人主页里的"管理员界面"按钮返回这里。
+      router.replace("/login");
     }
   }, [status, router]);
 
