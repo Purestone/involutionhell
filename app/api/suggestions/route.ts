@@ -2,6 +2,7 @@ import { generateText } from "ai";
 import { unstable_cache } from "next/cache";
 import { getModel, requiresApiKey, type AIProvider } from "@/lib/ai/models";
 import { createGlmFlashModel } from "@/lib/ai/providers/glm";
+import { limitChat, rateLimitResponse } from "@/lib/rate-limit";
 
 // 允许流式响应最长30秒
 export const maxDuration = 30;
@@ -20,6 +21,10 @@ interface SuggestionsRequest {
 }
 
 export async function POST(req: Request) {
+  // Rate limit：suggestions 也打 LLM，共用同一 IP 额度池
+  const rl = await limitChat(req, false);
+  if (!rl.success) return rateLimitResponse(rl);
+
   try {
     const {
       messages,
