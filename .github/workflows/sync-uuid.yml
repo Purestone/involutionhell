@@ -57,6 +57,13 @@ jobs:
           script: |
             set -euo pipefail
             BRANCH="${GITHUB_REF_NAME:-main}"
+
+            # SSH 非交互 shell 不加载 ~/.bashrc / ~/.zshrc，nvm + pnpm 的 PATH
+            # 要手动 source 进来。否则 pnpm: command not found 直接卡住后面所有步骤。
+            # -s 开头表示"if file exists" 兼容 nvm 没装的极端情况。
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
             cd /home/ubuntu/involution-hell-project/frontend
 
             # ============================================================
