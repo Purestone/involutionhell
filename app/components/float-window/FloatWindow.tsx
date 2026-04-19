@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import type { HomepageEvent } from "@/lib/events-fetch";
 import { cn } from "@/lib/utils";
-import { X, ChevronUp, ExternalLink, Play } from "lucide-react";
+import { X, ChevronDown, ChevronUp, ExternalLink, Play } from "lucide-react";
 import styles from "./FloatWindow.module.css";
 
 /**
@@ -63,7 +63,7 @@ export function FloatWindow({ event }: FloatWindowProps) {
             exit={{ opacity: 0 }}
             onClick={handleToggle}
             className={cn(
-              "group flex items-center gap-2 px-4 py-2",
+              "group flex h-8 items-center gap-2 px-4",
               // Newsprint 风格：锐利边角，纯黑实线边框
               "bg-[#111111] text-[#F9F9F7] border border-[#111111]",
               "hover:bg-[#F9F9F7] hover:text-[#111111]", // 悬停时反色
@@ -74,7 +74,7 @@ export function FloatWindow({ event }: FloatWindowProps) {
           >
             <span className="w-2 h-2 bg-[#CC0000] animate-pulse" />
             <span className="font-bold">Latest</span>
-            <ChevronUp className="w-4 h-4 rotate-180 group-hover:-translate-y-0.5 transition-transform" />
+            <ChevronUp className="w-3.5 h-3.5 shrink-0 group-hover:-translate-y-0.5 transition-transform" />
           </motion.button>
         ) : (
           /* 展开状态 - 报纸卡片 */
@@ -91,7 +91,7 @@ export function FloatWindow({ event }: FloatWindowProps) {
             )}
           >
             {/* Header Bar */}
-            <div className="flex items-center justify-between px-3 py-2 border-b border-[#111111] dark:border-[#F9F9F7] bg-[#111111] dark:bg-[#F9F9F7]">
+            <div className="flex h-8 items-center justify-between px-3 border-b border-[#111111] dark:border-[#F9F9F7] bg-[#111111] dark:bg-[#F9F9F7]">
               <span className="font-mono text-[10px] uppercase tracking-widest font-bold text-[#F9F9F7] dark:text-[#111111]">
                 The Daily Feed
               </span>
@@ -102,7 +102,7 @@ export function FloatWindow({ event }: FloatWindowProps) {
                   className="text-[#F9F9F7] dark:text-[#111111] hover:text-[#CC0000] transition-colors"
                   aria-label="Minimize"
                 >
-                  <ChevronUp className="w-3.5 h-3.5" />
+                  <ChevronDown className="w-3.5 h-3.5 shrink-0" />
                 </button>
                 <button
                   onClick={handleDismiss}
@@ -110,7 +110,7 @@ export function FloatWindow({ event }: FloatWindowProps) {
                   className="text-[#F9F9F7] dark:text-[#111111] hover:text-[#CC0000] transition-colors"
                   aria-label="Close"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-3.5 h-3.5 shrink-0" />
                 </button>
               </div>
             </div>
