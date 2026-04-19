@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import ZoteroFeedLazy from "@/app/components/ZoteroFeedLazy";
 import { Contribute } from "@/app/components/Contribute";
+import { ShareLink } from "@/app/components/ShareLink";
 import Image from "next/image";
 import { ActivityTicker } from "@/app/components/ActivityTicker";
 import { cn } from "@/lib/utils";
@@ -64,8 +65,11 @@ export async function Hero() {
                 {t("mission")}
               </p>
 
-              <div className="mt-12">
+              {/* 双 CTA 并排：Contribute（正式投稿 Fumadocs）+ ShareLink（随手分享外部文章到 /feed）
+                  两者视觉平级，移动端堆叠（flex-wrap），桌面并排（gap-6） */}
+              <div className="mt-12 flex flex-wrap items-start gap-x-6 gap-y-8">
                 <Contribute />
+                <ShareLink />
               </div>
             </div>
           </div>

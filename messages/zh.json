@@ -158,6 +158,49 @@
     },
     "guideAriaLabel": "查看投稿指南"
   },
+  "feed": {
+    "title": "社区分享墙",
+    "subtitle": "群友精选好文，随手转发，沉淀有价值的信息流。",
+    "empty": "暂无已审核通过的分享，快来第一个投稿吧！",
+    "submit": {
+      "title": "丢个链接",
+      "urlLabel": "文章链接（必填）",
+      "urlPlaceholder": "https://mp.weixin.qq.com/...",
+      "recommendationLabel": "一句话推荐（选填，最多 200 字）",
+      "recommendationPlaceholder": "为什么推荐这篇？",
+      "submitButton": "提交",
+      "submitting": "提交中...",
+      "successToast": "提交成功，AI 正在审核...",
+      "loginRequired": "请先登录再提交",
+      "charCount": "{count}/200"
+    },
+    "card": {
+      "reportButton": "举报",
+      "ogFallback": "封面/摘要未能抓取",
+      "archivedBadge": "原文已失效",
+      "visitLink": "查看原文",
+      "submittedBy": "by"
+    },
+    "report": {
+      "title": "举报这条分享",
+      "reasonLabel": "举报原因（选填）",
+      "reasonPlaceholder": "请描述问题...",
+      "submitButton": "提交举报",
+      "successToast": "举报已提交，感谢反馈",
+      "loginRequired": "请登录后举报"
+    },
+    "category": {
+      "all": "全部",
+      "ai_frontier": "AI 前沿",
+      "engineering": "工程实践",
+      "job": "求职 & 实习",
+      "grad_study": "考研 & 留学",
+      "industry": "行业观察",
+      "learning": "学习方法",
+      "lifestyle": "生活 & 随笔",
+      "other": "其他"
+    }
+  },
   "search": {
     "placeholder": "搜索文档...",
     "noResults": "未找到相关文档"
@@ -399,5 +442,9 @@
       "placeholder": "my-article",
       "hint": "自动添加 .md 后缀"
     }
+  },
+  "shareLink": {
+    "button": "丢个链接",
+    "submitAriaLabel": "快速提交"
   }
 }
