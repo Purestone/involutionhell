@@ -60,7 +60,7 @@ export function BrandMark({
       </div>
       <span
         className={cn(
-          "font-serif font-black text-2xl tracking-tighter uppercase italic",
+          "hidden font-serif font-black text-2xl tracking-tighter uppercase italic [@media(min-width:410px)]:inline",
           textClassName,
         )}
       >

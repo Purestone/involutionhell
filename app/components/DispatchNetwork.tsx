@@ -16,10 +16,12 @@ export function DispatchNetwork() {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between gap-4 py-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[var(--foreground)] md:text-xs">
           {/* 左：栏目标签 */}
-          <span className="font-bold whitespace-nowrap">
+          <span className="font-bold whitespace-nowrap invisible [@media(min-width:400px)]:visible">
             Dispatch Network
-            <span className="mx-2 hidden text-neutral-400 md:inline">·</span>
-            <span className="hidden font-normal text-neutral-500 md:inline">
+            <span className="mx-2 hidden text-neutral-400 [@media(min-width:1024px)]:inline">
+              ·
+            </span>
+            <span className="hidden font-normal text-neutral-500 [@media(min-width:1024px)]:inline">
               Sec. Net-01
             </span>
           </span>
@@ -36,7 +38,7 @@ export function DispatchNetwork() {
               data-umami-event-location="dispatch_network"
             >
               <GithubIcon className="h-3.5 w-3.5" />
-              <span>GitHub</span>
+              <span className="hidden sm:inline">GitHub</span>
             </Link>
             <span className="text-neutral-400">·</span>
             <Link
@@ -49,7 +51,7 @@ export function DispatchNetwork() {
               data-umami-event-location="dispatch_network"
             >
               <MessageCircle className="h-3.5 w-3.5" />
-              <span>Discord</span>
+              <span className="hidden sm:inline">Discord</span>
             </Link>
             <span className="text-neutral-400">·</span>
             <Link
@@ -62,7 +64,7 @@ export function DispatchNetwork() {
               data-umami-event-location="dispatch_network"
             >
               <BookMarked className="h-3.5 w-3.5" />
-              <span>Zotero</span>
+              <span className="hidden sm:inline">Zotero</span>
             </Link>
           </nav>
 
