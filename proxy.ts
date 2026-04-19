@@ -11,7 +11,7 @@ import { NextResponse, type NextRequest } from "next/server";
  *
  * cookie 有效期 1 年，用户在 /settings 页切换语言时会覆盖此 cookie。
  */
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   // 用户已选过语言，尊重选择不覆盖
   if (req.cookies.get("locale")) {
     return NextResponse.next();
